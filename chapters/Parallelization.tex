@@ -15,6 +15,8 @@ The main process of the algorithm as described by dataflow:
 		|< =======================     |filter|
 \end{verbatim}
 
+\missingfigure{proper diagram}
+
 The easiest thing here to parallelize is the extender since it's interaction
 can be seen as a separate unit.
 
@@ -25,7 +27,7 @@ have single take / put process to decide which actual pool to use.
 
 We can use several extenders that work in parallel without problems since they do not need information about other querys nor input/output pools.
 
-DIAGRAM
+\missingfigure{parallelized diagram}
 
 \section{Filtering}
 

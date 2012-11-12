@@ -1,6 +1,6 @@
 \chapter{Abstractification}
 
-In this chapter we discuss the general structure of the new algorithm.
+In this chapter we discuss the general idea of the new algorithm.
 
 \section{Algorithm}
 
@@ -114,14 +114,18 @@ Next positions step is finding ACG.[C]CG.[A]TCG.[C].
 
 Grouping is [C] ==> CGC, [A] => CGA.
 
-\subsection{DFAs}
+\missingfigure{sketch of extending}
+
+\subsection{NFAs}
 
 Since we want to find more interesting patterns we can add more
 information to the sequence DFA. Such as a star expression.
 
 Same sequence with star paths.
 
-\subsection{Groups}
+\missingfigure{sketch of more complex}
+
+\subsection{Optimizations}
 
 Although we can add the group information to the DFA, it is more
 performant to use the information gathered from the extension
@@ -129,10 +133,14 @@ of non-groups.
 
 A[CG].Positions = AC.Positions union AG.Positions
 
-\subsection{Other}
+\missingfigure{sketch of possible optimizations}
+
+\subsection{Complex}
 
 There maybe several other extensions to the regular expressions.
 
 Questionable position:
 
 AC?.Positions = A.Positions + AC.Positions
+
+\missingfigure{sketch of questions}
