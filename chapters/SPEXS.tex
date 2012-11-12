@@ -14,9 +14,9 @@ The original algorithm was as follows:
 \begin{verbatim}
 TODO: format nicely
 Algorithm 3.19 The SPEXS algorithm
-Input: StringS, pattern class P, output criteria, search order, and ﬁtness measureF
-Output: Patterns \pi from pattern class P fulﬁlling all the criteria, and output in the order
-of ﬁtnessF
+Input: StringS, pattern class P, output criteria, search order, and fitness measureF
+Output: Patterns \pi from pattern class P fulfilling all the criteria, and output in the order
+of fitnessF
 Method:
 1. Convert input sequences into a single sequence, initiate the data structures
 2.Root  new node
@@ -26,12 +26,12 @@ Method:
 6. whileN  dequeue(Q)
 7. Create all possible extensionsP 2 P ofN usingN :pos andS
 8. foreach extensionP ofN
-9. if patternP and position listP:pos fulﬁll the criteria
+9. if patternP and position listP:pos fulfill the criteria
 10. then
 11.N :child  P
 12. calculateF(P; S)
 13.enqueue(Q; P; order) // Insert toQ for further extensions
-14. ifP fulﬁlls the output criteria storeP into output queueO
+14. ifP fulfills the output criteria storeP into output queueO
 15. end
 16. Report the list of top-ranking patterns from output queueO
 \end{verbatim}

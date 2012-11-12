@@ -4,9 +4,9 @@ Pattern discovery is a problem of finding interesting patterns in
 some dataset. We discuss the algorithm in terms of DFAs and
 show how this can help to discover patterns in sequences.
 
-\section{Sequence}
+\subsection{Sequence}
 
-We use $\Sigma$ to denote the set of tokens in the dataset, an /em{alphabet}. 
+We use $\Sigma$ to denote the set of tokens in the dataset, an \em{alphabet}. 
 The \em{size} of the alphabet is $|\Sigma|$. \em{Tokens} can be numbers, 
 letters, words or sentences - any symbol.
 
@@ -14,32 +14,37 @@ Any \em{sequence} $S=a_1 a_2 ... a_n, \forall i \in \Sigma$ is called a \em{sequ
 over the token set $\Sigma$. If the length of the
 string is $0$, it is called an empty string or $\epsilon$.
 
-\section{Pattern}
+\subsection{Pattern}
 
 A \em{pattern} is a structure that defines a set of structures $\Gamma$.
-We denote the set that a pattern defines as $x(\Gamma)}$.
+We denote the set that a pattern defines as $x(\Gamma)$.
 If a structure $\alpha$ \em{matches} a pattern $\Gamma$, it means that
 $\alpha \in x(\Gamma)$.
 
 The most common form of such structures are regular expressions. 
 
-\section{Deterministic finite automaton}
+\subsection{Finite automaton}
 
 A \em{deterministic finite automaton} (henceforth \em{DFA}) is an 
 finite state machine (henceforth \em{FSM}) that accepts or rejects
 a sequence of tokens.
 
-Both patterns and sequences can be represented by DFAs and hence
+A \em{non-deterministic finite automaton} (henceforth \em{NFA}) is an 
+FSM that accepts or rejects a sequence of tokens.
+
+Patterns can be represented 
+
+Both patterns and sequences can be represented by NFAs and hence
 is a good abstraction for both. This also means that if our algorithm
-works on DFAs it must work on any other dataset that is defined
-by DFAs.
+works on NFAs it must work on any other dataset that is defined in 
+terms of NFA.
 
-\section{Dataset}
+\subsection{Dataset}
 
-A dataset is a set of DFAs. In practice it may be more comfortable
+A \em{dataset} is a set of NFAs. In practice it may be more comfortable
 to view it as a set of sequence because of it's simpler structure.
 
-\section{Query}
+\subsection{Query}
 
 A \em{query} is a compound structure that has information about a
 pattern and it's matches in a dataset. The information about a
@@ -48,7 +53,7 @@ match is the ending states where a pattern matches a DFA.
 On sequences this means the ending positions of the pattern 
 in the sequence.
 
-\section{Query interestingness}
+\subsection{Query interestingness}
 
 \em{Query feature} is a function of the query. It gives 
 information about the query such as the pattern representation, 
@@ -57,9 +62,9 @@ length, number of matches in the dataset.
 results are well-ordered. This functions result allows to
 say whether one query is more interesting than the other.
 For convenience it is useful to represent that value in
-\Real.
+$R$.
 
-\section{Pattern discovery problem}
+\subsection{Pattern discovery problem}
 
 \em{Pattern discovery problem} is a process of finding
 most interesting querys by some interestingness measure.

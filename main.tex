@@ -30,6 +30,8 @@
 \usepackage{ifpdf}
 \usepackage{listings, textcomp, color, xcolor, caption}
 
+\usepackage{todo}
+
 \makeindex
 
 \begin{document}
@@ -59,10 +61,13 @@
     \pagestyle{plain}
     \tableofcontents
 
+    \input{./defs.tex}
+
     \input{./chapters/Introduction.tex}
     \input{./chapters/Definitions.tex}
     \input{./chapters/SPEXS.tex}
-    \input{./chapters/ParallelSPEXS.tex}
+    \input{./chapters/Abstractification.tex}
+    \input{./chapters/Parallelization.tex}
     \input{./chapters/Implementation.tex}
     \input{./chapters/Results.tex}
     
