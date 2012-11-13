@@ -11,30 +11,38 @@ later show the changes made to this algorithm.
 We describe the general representation of the SPEXS algorithm. 
 The original algorithm was as follows:
 
-\begin{verbatim}
-TODO: format nicely
-Algorithm 3.19 The SPEXS algorithm
-Input: StringS, pattern class P, output criteria, search order, and fitness measureF
-Output: Patterns \pi from pattern class P fulfilling all the criteria, and output in the order
-of fitnessF
-Method:
-1. Convert input sequences into a single sequence, initiate the data structures
-2.Root  new node
-3.Root:label = \eps
-4.Root:pos  (1; 2; : : : ; n) // Assume empty pattern to match everywhere
-5.enqueue(Q; Root; order)
-6. whileN  dequeue(Q)
-7. Create all possible extensionsP 2 P ofN usingN :pos andS
-8. foreach extensionP ofN
-9. if patternP and position listP:pos fulfill the criteria
-10. then
-11.N :child  P
-12. calculateF(P; S)
-13.enqueue(Q; P; order) // Insert toQ for further extensions
-14. ifP fulfills the output criteria storeP into output queueO
-15. end
-16. Report the list of top-ranking patterns from output queueO
-\end{verbatim}
+
+\begin{algorithm}[H]
+	\caption{The SPEXS algorithm}
+\begin{algorithmic}[1]
+	\Require{String $S$, pattern class $\sym{P}$, output criteria, search order, and fitness measure $\sym{F}$}
+	\Ensure{Patterns $\pi \in \sym{P}$ fulfilling all criteria, and output in the order of fitness $\sym{F}$}
+
+	\State{Convert input into sequences into a single sequence}
+	\State{Initiate data structures}
+
+	\Statef{Root \gets new node}
+	\Statef{Root.label \gets \epsilon}
+	\Statef{Root.pos \gets (1,2,...,n)}
+	\Statef{enqueue(\sym{Q}, Root, order)}
+
+	\While{$N \gets dequeue(\sym{Q})$}
+		\State{ Create all possible 
+			extensions $P \in \sym{P}$ of $N$ using $N.pos$ and $S$ }
+		\For{ extension $P$ of $N$}
+			\If{pattern $P$ and position list $P.pos$ fulfill the criteria}
+				\Statef{N.child \gets P}
+				\State{calculate $\sym{F}(P,S)$}
+				\Statef{enqueue(\sym{Q},P,order)}
+				\If{ $P$ fulfills the output criteria}
+					\State{store $P$ into ouput queue $\sym{O}$}
+				\EndIf
+			\EndIf
+		\EndFor
+	\EndWhile
+	\State{Report the list of top-ranking patterns from output queue $\sym{O}$}
+\end{algorithmic}
+\end{algorithm}
 
 The main idea of the algorithm is that first we generate a 
 pattern and a query that match all possible positions in 

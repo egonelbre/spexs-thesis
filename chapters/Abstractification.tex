@@ -1,27 +1,33 @@
 \chapter{Abstractification}
 
-In this chapter we discuss the general idea of the new algorithm.
+In this chapter we show how to make the algorithm more abstract by allowing flexibilty through functions as paramters.
 
 \section{Algorithm}
 
 The algorithm in a more convetional view is:
 
-\begin{verbatim}
-func SPEXS(dataset, in, out, extender, extendable, outputtable, postprocess) {
-	q := NewEmptyQuery(dataset)
-	in.Put(q)
-	while( !in.Empty() ) {
-		q := in.Take()
-		extended := extender(q)
-		foreach qx in extended {
-			if extendable(qx)
-				in.Put(qx)
-			if outputtable(qx)
-				out.Put(qx)
-		}
-	}
-}
-\end{verbatim}
+\begin{algorithm}[H]
+	\caption{The SPEXS2 algorithm}
+\begin{algorithmic}[1]
+	\Require{$dataset$, $in$ pool, $out$ pool, $extender$,
+		$extendable$ filter, $outputtable$ filter, $postprocess$ function }
+	\Ensure{Patterns satisfying filters and $extender$ are in $out$ pool}
+	\Statef{\varepsilon \gets NewEmptyQuery(dataset)}
+	\Statef{in.put(\varepsilon)}
+	\While{$q \gets in.take()$}
+		\Statef{extended \gets extender(q, dataset)}
+		\For{ $qx \in extended$ }
+			\If{ $extendable(qx)$ }
+				\Statef{in.put(qx)}
+			\EndIf
+			\If{ $outputtable(qx)$ }
+				\Statef{out.put(qx)}
+			\EndIf
+		\EndFor
+		\Statef{postprocess(q)}
+	\EndWhile
+\end{algorithmic}
+\end{algorithm}
 
 When the algorithm starts we create an empty pattern query and put 
 into the in pool. The in pool contains querys whose patterns
@@ -52,6 +58,8 @@ in which order they are taken out.
 In practice this means we can use any collection such as list, set,
 queue as a pool. This gives us different performance characteristics.
 
+This also means that pools can persist the querys if necesssary.
+
 \section{Filtering}
 
 Filtering allows us to dramatically reduce the number of querys
@@ -74,37 +82,42 @@ We shall look at how we can deal with different types.
 
 The extending method is:
 
-\begin{verbatim}
+\begin{algorithm}[H]
+	\caption{SPEXS2 extender}
+\begin{algorithmic}[1]
+	\Require{$q$ query, $next$ function}
+	\Ensure{result contains querys that have been extended by one}
+	
+	\Statef{nexts \gets new~collection}
+	\For{$pos \in matches(q)$}
+		\Statef{(token, pos) \gets next(pos)}
+		\Statef{nexts.put((token, pos))}
+	\EndFor
 
-func extender(query) {
-	// find all next positions
-	nexts = new collection
-	foreach pos in query.Matches {
-		token, set of nexts = next(pos)
-		nexts.add({token, set of nexts})
-	}
+	\Statef{matches \gets new~map~of~token~to~position~set }
+	\For{$(token, pos) \in nexts$}
+		\If{$matches[token]$ doesn't exist}
+			\Statef{matches[token] \gets \{\} }
+		\EndIf
+		\Statef{matches[token] \gets matches[token] + \{pos\} }
+	\EndFor
 
-	// group positions by the token
-	matches = new map token => pos
-	foreach x in nexts {
-		matches[x.token].add(x.pos)
-	}
+	\Statef{result \gets new~collection}
+	\For{$(token, positions) \in matches$}
+		\Statef{qx \gets new~query}
+		\Statef{qx.pattern \gets q.pattern + token}
+		\Statef{qx.positions \gets positions}
+		\Statef{result.add(qx)}
+	\EndFor
+\end{algorithmic}
+\end{algorithm}
 
-	// make new querys from the matches
-	result := new query collection
-	foreach token, positions in matches {
-		q := NewQuery( query.Pattern + token, positions )
-		result.add(q)
-	}
-
-	return result
-}
-
-\end{verbatim}
+This extender depends on how next is implemented, we shall look at different
+ways how to implement it.
 
 \subsection{Sequences}
 
-The simplest of the extensions are just sequences.
+The simplest case how the next function behaves is when we are only looking for simple sequences.
 
 Let's consider a sequence ACGCCGATCGC and a pattern CG.
 
@@ -114,9 +127,11 @@ Next positions step is finding ACG.[C]CG.[A]TCG.[C].
 
 Grouping is [C] ==> CGC, [A] => CGA.
 
-\missingfigure{sketch of extending}
+\begin{figure}[H]
+	\input{./diagrams/sequence.tex}
+\end{figure}
 
-\subsection{NFAs}
+\subsection{Groups and Stars}
 
 Since we want to find more interesting patterns we can add more
 information to the sequence DFA. Such as a star expression.
@@ -135,7 +150,7 @@ A[CG].Positions = AC.Positions union AG.Positions
 
 \missingfigure{sketch of possible optimizations}
 
-\subsection{Complex}
+\subsection{Other}
 
 There maybe several other extensions to the regular expressions.
 

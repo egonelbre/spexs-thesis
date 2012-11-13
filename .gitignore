@@ -2,6 +2,7 @@
 *.log
 
 build/**
+citations/**
 
 *.sublime-project
 *.sublime-workspace

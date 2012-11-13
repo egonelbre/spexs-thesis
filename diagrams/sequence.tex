@@ -1,0 +1,52 @@
+\begin{tikzpicture}[auto]
+	\tikzstyle{state} = [ draw, circle, thin, node distance = 2.5em, font={\small}];
+	\tikzstyle{query} = [ draw, rectangle, thin, node distance = 2.5em, font={\small}];
+	\tikzstyle{info} = [font={\itshape\footnotesize}]
+	\tikzstyle{point}  = [ ->, thin, font={\small}];
+	\tikzstyle{extend} = [ ->, double, font={\small}];
+	\tikzstyle{trace} = [ ->, thick, dashed, bend right, font={\small} ];
+
+	\def \seq {x,a,c,g,c,c,g,a,t,c,g,c}
+
+	\foreach \x [count=\xi] in \seq {
+		\ifnum 1 < \xi
+			\pgfmathparse{int(\xi-1)}
+			\let \li \pgfmathresult
+			\node[state, right of=\li] (\xi) {};
+			\draw[->, >=latex] (\li) to node{\x} (\xi);
+		\else
+			\node[state] (\xi) {};
+		\fi
+	}
+
+	\node[info] at (0,0.6) {Sequence};
+	\node[info] at (0,-0.7) {Matches};
+	\node[info] at (0,-1.5) {Querys};
+
+	\node[query](cg)  at (0,-2) {cg};
+	\node[query](cga) at (0,-3) {cga};
+	\node[query](cgc) at (0,-4) {cgc};
+
+	\tikzstyle{tracecg} = [ ->, thick, dashed, bend right, color=black ];
+	\tikzstyle{tracecga} = [ ->, thick, dashdotted, bend right, color=red ];
+	\tikzstyle{tracecgc} = [ ->, thick, dotted, bend right, color=blue ];
+
+	\draw[extend, bend right] (cg) to (cga);
+	\draw[extend, bend right] (cg) to (cgc);
+
+	\foreach \xi/\xv in {4/cg,7/cg,11/cg} {
+		\node[draw, below of=\xi, node distance=2em] (p\xi) {};
+		\draw[point] (p\xi) to (\xi);
+		\draw[trace\xv] (\xv) to (p\xi);
+	}
+
+	\foreach \xi/\xv in {5/cgc,8/cga,12/cgc} {
+		\node[draw, below of=\xi, node distance=2em] (p\xi) {};
+		\draw[point] (p\xi) to (\xi);
+		\draw[trace\xv] (\xv) to (p\xi);
+	}
+
+	\foreach \xi/\yi in {4/5,7/8,11/12} {
+		\draw[extend] (p\xi) to (p\yi);
+	}
+\end{tikzpicture}

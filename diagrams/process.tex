@@ -1,0 +1,67 @@
+\begin{tikzpicture}[auto]
+	\tikzstyle{pool} = [
+		draw, very thick, fill=white, 
+		circle,
+		minimum height=3em, minimum width=3em, 
+		node distance=9em, font={\sffamily\bfseries}];
+	\tikzstyle{temppool} = [
+		draw, very thick, fill=white, 
+		circle,
+		minimum height=1em, minimum width=1em, 
+		node distance=5em, font={\sffamily\bfseries}];
+
+	\tikzstyle{filter} = [
+		draw, very thick, fill=white, 
+		rectangle, rounded corners=0.2em,
+		minimum height=2em, minimum width=4em,
+		node distance=9em, font={\sffamily\bfseries}];
+	\tikzstyle{extender} = [
+		draw, very thick, fill=white, 
+		rectangle, rounded corners=0.2em,
+		minimum height=2em, minimum width=4em,
+		node distance=9em, font={\sffamily\bfseries}];
+
+	\tikzstyle{dataset} = [
+		draw, thick, fill=white, 
+		rectangle, double, double distance=2pt,
+		minimum height=2em, minimum width=4em,
+		node distance=9em, font={\sffamily\bfseries}];
+
+	\tikzstyle{take} = [
+		very thick, ->, >=latex,
+		text centered, font={\sffamily\bfseries}];
+	\tikzstyle{chan} = [
+		thick, ->, >=latex, double, double distance=4pt,
+		text centered, font={\sffamily\bfseries}];
+	\tikzstyle{filtered} = [
+		thick, ->, >=latex, double, double distance=2pt,
+		text centered, font={\sffamily\bfseries}];
+	\tikzstyle{needs} = [
+		thick, ->, >=latex, dashed,
+		text centered, font={\sffamily\bfseries}];
+
+	\node[pool] (in) {In};
+	\node[extender, right of=in] (ext) {Extender};
+	\node[temppool, right of=ext, label=above:Extended] (exts) {};
+	\node[filter, right of=exts] (outable) {Output?};
+	\node[filter, below of=exts] (extable) {Extend?};
+	\node[pool, right of=outable] (out) {Out};
+
+	\node[dataset, right of=extable] (dataset) {Dataset};
+	\draw[needs] (dataset) to (ext);
+	\draw[needs] (dataset) to (outable);
+	\draw[needs] (dataset) to (extable);
+
+	\draw[take] 
+		(in) to node{p} (ext);
+	\draw[chan]
+		(ext) to (exts);
+	\draw[chan] 
+		(exts) to node{pX} (outable);
+	\draw[chan] 
+		(exts) to node{pX} (extable);
+	\draw[filtered, bend left] 
+		(extable) to node{pX} (in);
+	\draw[filtered]
+		(outable) to node{pX} (out);
+\end{tikzpicture}

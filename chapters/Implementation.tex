@@ -1,15 +1,16 @@
 \chapter{Implementation}
 
+Here we discuss a practical implementation, \emph{spexs2}, for
+pattern discovery in sequences.
+
 The actual implementation may need to diverge from the abstract
-defintion of the algorithm for practicality, simplicity or
-performance reasons.
+definition for several reasons; mainly practicality, simplicity and
+performance. Many of the operations can be optimized for some 
+particular type of datasets and configuration.
 
-Many of the operations can be optimized for some particular
-subset of datasets and features.
-
-In this part we will use actual code from the program to show 
-the implementation. For an introduction to the language 
-Go that has been used see the appendix.
+In this chapter we will discuss parts of program that the author
+considers non-trivial in it's design decisions. Information about 
+the full source code is in the Appendix B and C.
 
 \section{Algorithm}
 
@@ -62,7 +63,7 @@ part, with the slight addition of PostProcess.
 
 The main criteria for designing program have been described in D. Parnas
 paper On the Decomposition of Programs. It suggests decomposing into
-isolated units and parts that are likely to change together.
+isolated units and parts that are likely to change together. \cite{Parnas72}
 
 We chose the following decomposition:
 
@@ -79,7 +80,10 @@ We chose the following decomposition:
 	Printer
 \end{verbatim}
 
-\subsection{Configuration}
+This allows easily to add new data formats for input and output, 
+add new query features and possible extenders.
+
+\section{Configuration}
 
 One problem with flexible algorithms is that they a lot of ways to be run.
 This often would need having tens or hundereds of program flags.
@@ -103,61 +107,30 @@ When using spexs2 --conf conf.json input=filename the input will be
 replaced by filename. Also there is optional default value if
 one wasn't given.
 
-\subsection{Dataset reader}
-
-One of the most likely things to change is the input format. As an 
-example we can have different delimiters. By adding this separation
-immediately we can avoid the future problem of trying to support multiple
-formats.
-
-\subsection{Datasets}
-
-We also may need to process several files. This means that we should
-treat each file as a separate entity and allow calculate features
-only on part of the dataset.
-
-\subsection{Setup}
-
-There are a lot of ways to setup the program. This allows us to separate
-the initialization all of the structures necessary for the algorithm
-from the algorithm itself.
-
-\subsection{Algorithm}
-
-This is an obvious separation. This is the main driver of the algorithm
-and shouldn't know anything about the rest of the setup. Also there
-are two versions of the algorithms one parallel the other not.
-
-\subsection{Sets}
+\section{Sets}
 
 Since we need a collection how to store the matching positions it suggests
 the need for a set datatype.
 
-\subsection{Pools}
+If we have predictable distribution we can pack the sets better.
 
-There can be different performance characteristics when using a particular
-implementation. Most importantly to support parallelism they should
-be ideally lock-free, but we can use locked version as well.
+Although such optimizations can be avoided if during storing pools the sets are packed using some compression algorithm.
+
+\section{Pools}
+
+There can be different performance characteristics when using a particular implementation. Most importantly to support parallelism they should be ideally lock-free, but we can use locked version as well.
 
 For the pools we have several choices: lifo, fifo or priority.
 
-If we use a fifo queue as the in pool the algorithm does a breadth first
-search of patterns. This can be problematic since we would need a lot of
-memory to hold all the patterns in memory.
+If we use a fifo queue as the in pool the algorithm does a breadth first search of patterns. This can be problematic since we would need a lot of memory to hold all the patterns in memory.
 
-A lifo queue for in pool is a more reasonable choice for memory problems since we need
-to hold less patterns in memory.
+A lifo queue for in pool is a more reasonable choice for memory problems since we need to hold less patterns in memory.
 
-A priority queue suits for the out pool since we can easily then
-use some feature to sort the queue and choose only a limited amount.
+A priority queue suits for the out pool since we can easily then use some feature to sort the queue and choose only a limited amount. We can use a simple trick to make limited size faster. Do a precheck against the worst element in the priority queue.
 
-\subsection{Extenders}
+\section{Features and Filters}
 
-As we saw in the theoretical part there are a lot of ways to extend
-the query. Hence it is reasonable to decompose into a separate piece from
-the algorithm.
-
-\subsection{Features}
+One problem is that the amount of possible filters it's useful to construct them from some other features. Or if we wish to use multiple filters we can combine them.
 
 We can use these features to find out something about the query.
 They each feature is defined as:
@@ -166,7 +139,7 @@ They each feature is defined as:
 type Feature func(q *Query) (float64, string)
 \end{verbatim}
 
-Most of features are in $R$, but for some there
+Most of features are in $\Re$, but for some there
 is some extended information that we may wish to know - hence
 the need for additional string value. One of the simplest
 is Pattern representation.
@@ -190,8 +163,6 @@ for dataset.
 
 We can use the name in the configuration file as "Matches(fore)".
 
-\subsection{Filters}
-
 If a feature returns a floating point value we can easily turn that
 into a filter by specifying a minimum or/and maximum value.
 
@@ -210,53 +181,60 @@ Of course there are some filters that cannot be defined by features hence
 there is still possibility to make separate filters. Such as disallowing
 star symbol in the beginning of the pattern.
 
-\subsection{Printer}
-
-Although we use a general formatting there may be a need to save into
-several files or output some extended information of the query.
-
 \section{Debugging}
 
-Debugging is a important part of development process hence the need for
-more information how the algorithm is working.
+Debugging is a important part of development process hence the need for more information how the algorithm is working.
 
 Often this is resolved by adding some debug statments:
 
 \begin{verbatim}
-	for i := 0; i < 100; i += 1{
-		printf("picking")
-		a := pick()
-		printf("picked %v", a)
+for i := 0; i < 100; i += 1{
+	printf("picking")
+	a := pick()
+	printf("picked %v", a)
 
-		printf("picking")
-		b := pick()
-		printf("picked %v", b)
-		
-		out.put(a + b)
-	}
+	printf("picking")
+	b := pick()
+	printf("picked %v", b)
+	
+	out.put(a + b)
+}
 \end{verbatim}
 
-This can be harmful to the readability of the code. To fix this debugging 
-problem we use closures.
+This can be harmful to the readability of the code. To fix this debugging problem we use closures.
 
 \begin{verbatim}
-	type PickFunc func() Thing
-	func debuggable(fn PickFunc) PickFunc {
-		return func() Thing {
-			printf("start")
-			p := fn()
-			printf("picked %v" p)
-			return p
-		}
+type PickFunc func()Thing
+func debuggable(fn PickFunc) PickFunc {
+	return func() Thing {
+		printf("start picking")
+		p := fn()
+		printf("picked %v" p)
+		return p
 	}
+}
 
-	pick = debuggable(pick)
-	for i := 0; i < 100; i += 1{
-		a := pick()
-		b := pick()
-		out.put(a + b)
-	}
+pick = debuggable(pick)
+for i := 0; i < 100; i += 1{
+	a := pick()
+	b := pick()
+	out.put(a + b)
+}
 \end{verbatim}
 
-As we can see the algorithm implementation is much more readable.
+As we can see the algorithm implementation is much more readable and we can inject different debugging statements without actually changing the algorithm.
 
+Also we can now change the ways how to add debug info. One of would be a full stepwise debugger.
+
+\begin{verbatim}
+func debuggable(fn PickFunc) PickFunc {
+	return func() Thing {
+		mutex.lock()
+		p := fn()
+		while not continue
+			interact with user
+		mutex.unlock()
+		return p
+	}
+}
+\end{verbatim}

@@ -26,6 +26,13 @@
 \usepackage{mdwlist}
 \usepackage{float,caption}
 
+\usepackage{tikz}
+\usetikzlibrary{fit, positioning}
+
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage[noend]{algpseudocode}
+
 \usepackage{graphicx}
 \usepackage{ifpdf}
 \usepackage{listings, textcomp, color, xcolor, caption}
@@ -81,8 +88,8 @@
     }
 
     \begin{appendix}
+        \input{./appendices/epps.tex}
         \input{./appendices/spexs2.tex}
         \input{./appendices/SourceCode.tex}
-        \input{./appendices/GoLang.tex}
     \end{appendix}
 \end{document}

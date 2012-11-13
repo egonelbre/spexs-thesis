@@ -19,3 +19,6 @@ Lock-free
 Ideas
 • Logic for Problem Solving
 	Algorithm = Logic + Control
+
+
+The Semantics of a Simple Language for Parallel Programming

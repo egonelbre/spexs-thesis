@@ -17,12 +17,12 @@ string is $0$, it is called an empty sequence or $\epsilon$.
 
 \section{Pattern}
 
-A \emph{pattern} is a structure that defines a set of structures $\Gamma$.
+A \emph{pattern} is a structure that defines a set of structures $\Gamma$. \todo{better definition}
 We denote the set that a pattern defines as $x(\Gamma)$.
 If a structure $\alpha$ \emph{matches} a pattern $\Gamma$, it means that
 $\alpha \in x(\Gamma)$.
 
-The most common form of such structures are regular expressions. 
+The most common form of such structures are regular expressions.
 
 \section{Finite automaton}
 
@@ -43,6 +43,8 @@ terms of NFA.
 A \emph{dataset} is a set of NFAs. In practice it may be more comfortable
 to view it as a set of sequence because of it's simpler structure.
 
+\todo[inline]{example}
+
 \section{Query}
 
 A \emph{query} is a compound structure that has information about a
@@ -52,20 +54,31 @@ match is the ending states where a pattern matches a DFA.
 On sequences this means the ending positions of the pattern 
 in the sequence.
 
-\section{Query interestingness}
+\todo[inline]{example}
+
+\section{Query features}
 
 \emph{Query feature} is a function of the query. It gives 
 information about the query such as the pattern representation, 
 length, number of matches in the dataset.
 
+\todo[inline]{example}
+
 \emph{Query interestingness} is a function of the query whose
 results are well-ordered. This functions result allows to
 say whether one query is more interesting than the other.
 For convenience it is useful to represent that value in
-$R$.
+$\Re$.
+
+\todo[inline]{example}
+
+\emph{Query filter} is a function of the query whose result
+is a boolean.
+
+\todo[inline]{example}
 
 \section{Pattern discovery problem}
 
 \emph{Pattern discovery problem} is a process of finding
-most interesting querys by some interestingness measure.
-
+most interesting querys according to some 
+interestingness measure, and use the pattern they reflect.
