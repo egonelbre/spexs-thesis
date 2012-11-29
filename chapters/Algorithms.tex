@@ -1,12 +1,14 @@
-\chapter{SPEXS}
+\chapter{Algorithms}
+
+There are many itemset discovery algorithms, but only few are general and can discover more complex patterns.
+
+\section{SPEXS}
 
 SPEXS is an pattern discovery algorithm described by Vilo et al.
 This algorithm finds patterns from a sequence.
 We take this as our basis for developing a new parallel algorithm.
 In this chapter we describe original algorithm so that we can
 later show the changes made to this algorithm.
-
-\section{Algorithm}
 
 We describe the general representation of the SPEXS algorithm. 
 The original algorithm was as follows:
@@ -52,3 +54,8 @@ Extending a query means finding all querys whose patterns length
 is longer by 1. If any of the querys is fit by some criteria
 it will be put into the main queue, for further extension, 
 and output queue for possible result.
+
+
+\section{TEIRESIAS}
+
+\todo[inline]{write about it}

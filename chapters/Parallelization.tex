@@ -1,7 +1,7 @@
 \chapter{Parallelization}
 
-Here we describe full parallelization of the previous 
-algorithm. The fully parallelized code can be seen in appendix A.
+Here we describe parallel implementations of the parts of the algorithm.
+A proof of concept for fully parallelized code can be seen in appendix A.
 
 \section{Process}
 
@@ -19,7 +19,8 @@ can be seen as a separate unit.
 If instead of in/out pool we had several the algorithm can still work, if we
 have single take / put process to decide which actual pool to use.
 
-We can use several extenders that work in parallel without problems since they do not need information about other querys nor input/output pools.
+We can use several extenders that work in parallel without problems since 
+they do not need information about other querys nor input/output pools.
 
 \section{Extending}
 
@@ -38,9 +39,11 @@ func extender(query) {
 
 \section{Dataset partitioning}
 
-If we look at where we need synchronization points if we partition the dataset. Whole parts of extension still apply for parts of dataset.
+If we look at where we need synchronization points if we partition 
+the dataset. Whole parts of extension still apply for parts of dataset.
 
-Synchronization is only needed for filtering. We don't need to know the whole query but just information about parts to make a decision whether to filter or not.
+Synchronization is only needed for filtering. We don't need to know the 
+whole query but just information about parts to make a decision whether to filter or not.
 
 \section{Filtering}
 
@@ -51,3 +54,4 @@ Although many operations can be parallelized with map reduce.
 \todo[inline]{example how to do counting}
 
 \todo[inline]{example what cannot be done easily on sharded data}
+
