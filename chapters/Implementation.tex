@@ -29,11 +29,11 @@ We chose the following decomposition:
 		\item[Pattern] represents a pattern
 		\item[Query] stores the pattern with database and pattern
 		\item[Set] stores matching positions
-		\item[Pool] stores querys
+		\item[Pool] stores queries
 		\item[Extender] drives algorithms extending step
 		\item[Feature] computes a value from the Query
-		\item[Filter] filters some Querys
-	\item[Printer] prints the result Querys
+		\item[Filter] filters some queries
+	\item[Printer] prints the result queries
 	\item[Debugging] utilities for the program
 \end{description}
 
@@ -117,7 +117,7 @@ retrieving values. This would mean that many processes can get locked.
 
 We can use some knowledge about the priority-queue behavior. We know that it usually
 has limited-size and the amount of patterns suitable for putting into the output
-queue is several magnitudes larger; this means most of the querys put into
+queue is several magnitudes larger; this means most of the queries put into
 the result queue are discarded. 
 
 We know that if the query is worse than the worst in the priority queue, it can

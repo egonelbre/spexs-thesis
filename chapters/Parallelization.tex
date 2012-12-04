@@ -20,11 +20,25 @@ If instead of in/out pool we had several the algorithm can still work, if we
 have single take / put process to decide which actual pool to use.
 
 We can use several extenders that work in parallel without problems since 
-they do not need information about other querys nor input/output pools.
+they do not need information about other queries nor input/output pools.
 
 \section{Extending}
 
 We still can also do the extending process in parallel:
+
+\begin{algorithm}[H]
+	\caption{Parallel Extender with Group optimization}
+\begin{algorithmic}[1]
+	\Require{Query $q$, function $next : \sym{I} \rightarrow [(\sym{I}, \sym{P})]$ }
+	\Ensure{Set of querys that have been extended by one step}
+
+	\Statef{ nexts \gets map(next, q.pos) }
+	\Statef{ matches \gets groupBy(snd, nexts) }
+	\Statef{ result \gets map(queryMaker(q), matches) }
+	\Statef{ optimized \gets map( (x) \rightarrow (union(matches(x))), groups) }
+	\Statef{ return union(result, optimized)}
+\end{algorithmic}
+\end{algorithm}
 
 \begin{verbatim}
 func extender(query) {
@@ -44,6 +58,8 @@ the dataset. Whole parts of extension still apply for parts of dataset.
 
 Synchronization is only needed for filtering. We don't need to know the 
 whole query but just information about parts to make a decision whether to filter or not.
+
+\missingfigure{example of a partitioning}
 
 \section{Filtering}
 
