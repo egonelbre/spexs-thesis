@@ -1,11 +1,16 @@
 \chapter{Definitions}
 
-Pattern discovery is a problem of finding interesting patterns in
-some dataset. We discuss the algorithm in terms of DFAs and
-show how this can help to discover patterns in sequences.
+Pattern discovery is a research area aiming to discover unknown patterns
+in a given set of data structures that are frequent and interesting according 
+to some measure.
+
+Since the discovery algorithms are highly dependent on the
+data structures, that are being searched, the algorithm must be minimal
+in the requirements on the dataset to be applicable as wide range as possible.
+This also means that the patterns found must be dependent on the initial data.
 
 
-\section{Sequence}
+\section{Sequence and Dataset}
 
 We use $\Sigma$ to denote the set of tokens in the dataset, an \emph{alphabet}. 
 The \emph{size} of the alphabet is $|\Sigma|$. \emph{Tokens} can be numbers, 
@@ -15,50 +20,33 @@ Any \emph{sequence} $S=a_1 a_2 ... a_n, \forall i \in \Sigma$ is called a \emph{
 over the token set $\Sigma$. If the length of the
 string is $0$, it is called an empty sequence or $\epsilon$.
 
+For example $ACGTGCCATC$ is a sequence where $\Sigma = \{A, C, G, T\}$.
+
+A \emph{dataset} is a set of sequences. For example a document can be considered
+as a dataset, where the sentences are sequences and each word is a token in the alphabet.
+
 \section{Pattern}
 
-A \emph{pattern} is a structure that defines a set of structures $\Gamma$. \todo{better definition}
-We denote the set that a pattern defines as $x(\Gamma)$.
-If a structure $\alpha$ \emph{matches} a pattern $\Gamma$, it means that
-$\alpha \in x(\Gamma)$.
+A \emph{pattern} is a structure that defines a set of sequences. 
+This pattern usually is denoted by a squence with an extended alphabet.
 
-The most common form of such structures are regular expressions.
+We denote the set of sequences that a pattern $p$ defines as $all(p)$.
+If $\alpha \in all(p)$, where $\alpha$ is a sequence then we say that
+sequence $\alpha$ \emph{matches exactly} pattern $p$. We say that $\alpha$
+\emph{matches} $p$ if any of sequences $all(p)$ is a subsequence of $\alpha$.
 
-\begin{comment}
+The most commonly used pattern descriptions are regular expressions.
+For example $.[AT]$ can denote a set $\{AA, AT, CA, CT, GA, GT, TA, TT\}$ and
+this would match $CCTC$ and exactly match $AT$. A \emph{match} is a location
+set where the pattern in the sequence ends.
 
-\section{Finite automaton}
-
-A \emph{deterministic finite automaton} (henceforth \emph{DFA}) is an 
-finite state machine (henceforth \emph{FSM}) that accepts or rejects
-a sequence of tokens. \todo{define}
-
-A \emph{non-deterministic finite automaton} (henceforth \emph{NFA}) is an 
-FSM that accepts or rejects a sequence of tokens. \todo{define}
-
-Both patterns and sequences can be represented by NFAs and hence
-is a good abstraction for both. This also means that if our algorithm
-works on NFAs it must work on any other dataset that is defined in 
-terms of NFA.
-
-\end{comment}
-
-\section{Dataset}
-
-A \emph{dataset} is a set of NFAs. In practice it may be more comfortable
-to view it as a set of sequence because of it's simpler structure.
-
-\todo[inline]{example}
+We denote the set of all pattern $p$ \emph{matches} in a dataset 
+$D$ as $matches(p, D) = \{ match(p, \alpha) | \alpha in D, matches(p, \alpha) \}$.
 
 \section{Query}
 
-A \emph{query} is a compound structure that has information about a
-pattern and it's matches in a dataset. The information about a
-match is the ending states where a pattern matches a DFA.
-
-On sequences this means the ending positions of the pattern 
-in the sequence.
-
-\todo[inline]{example}
+A \emph{query} is a compound structure $<D, p, matches(p, D)>$, 
+where $D$ is the dataset and $p$ a pattern.
 
 \section{Query features}
 
@@ -66,23 +54,17 @@ in the sequence.
 information about the query such as the pattern representation, 
 length, number of matches in the dataset.
 
-\todo[inline]{example}
-
 \emph{Query interestingness} is a function of the query whose
 results are well-ordered. This functions result allows to
 say whether one query is more interesting than the other.
 For convenience it is useful to represent that value in
 $\Re$.
 
-\todo[inline]{example}
-
 \emph{Query filter} is a function of the query whose result
 is a boolean.
 
-\todo[inline]{example}
+\section{Pattern Discovery}
 
-\section{Pattern discovery problem}
-
-\emph{Pattern discovery problem} is a process of finding
-most interesting queryies according to some 
-interestingness measure, and use the pattern they reflect.
+In this thesis \emph{pattern discovery} is a process of finding 
+the most interesting patterns, according to some query interestingness,
+in a dataset.

@@ -12,34 +12,16 @@ of genomic and proteomic sequences. Regularities in such data can
 give new insights into how these patterns form and how 
 they are related to the other features of the data.
 
-\todo[inline]{More on importance}
-
 In this thesis we explore an algorithm for finding patterns and show how
-abstractions can make it scalable and flexible, and simpler both in 
+generalizations can make it scalable and flexible, and simpler both in 
 theory and implementation compared with non-abstract version.
-
-\section{Pattern Discovery}
-
-Pattern discovery is a research area aiming to discover unknown patterns
-in a given set of data structures that are frequent and interesting according 
-to some measure.
-
-Since the discovery algorithms are highly dependent on the
-data structures, that are being searched, the algorithm must be minimal
-in the requirements on the dataset to be applicable as wide range as possible.
-This also means that the patterns found must be dependent on the initial data.
 
 \section{Structure of the thesis}
 
-Basic idea is to select a basis algorithm. Abstrify away concretness of 
-implementation to support flexibility. Use the flexibility to substitute 
-concretness with parallel implementations.
-
-\todo[inline]{Fix when structured}
-
-First we introduce definitions of our data and patterns in Chapter 2. In
-Chapter 3 we describe the pattern discovery algorithms.
-In Chapter 4 we generalize the SPEXS algorithm to get a flexible
-algorithm. In Chapter 5 we swap out the abstract parts with parallel implementations.
-The actual implementation of SPEXS is described in Chapter 6. In Chapter 7 we 
-show how the algorithm can be used and analyse the speed behavior.
+In the the Chapter 2 we give definitions for terminology that is used to
+describe the alogrithm. In the Chapter 3 we investigate the original
+SPEXS algorithm and TEIRESIAS algorithm. We generalize the SPEXS algorithm
+to get a flexible algorithm in Chapter 4 and we partition the algorithm
+to make it suitable for parallelization in Chapter 5. In Chapter 6 we
+discuss the implementation of SPEXS. In Chapter 7 we show possible applications
+for the algorithm.
