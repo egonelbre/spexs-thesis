@@ -1,0 +1,49 @@
+\begin{tikzpicture}[auto]
+	\tikzstyle{state} = [ draw, circle, thin, node distance = 2.5em, font={\small}];
+	\tikzstyle{query} = [ draw, rectangle, thin, node distance = 2.5em, font={\small}];
+	\tikzstyle{info} = [font={\itshape\footnotesize}]
+	\tikzstyle{point}  = [ ->, thin, font={\small}];
+	\tikzstyle{extend} = [ ->, double, font={\small}];
+	\tikzstyle{trace} = [ ->, thick, dashed, bend right, font={\small} ];
+
+
+	\def \seq {x,a,c,g,c,c,g,a,t,c,g,c}
+
+	\foreach \x [count=\xi] in \seq {
+		\ifnum 1 < \xi
+			\pgfmathparse{int(\xi-1)}
+			\let \li \pgfmathresult
+			\node[state, right of=\li] (\xi) {};
+			\draw[->, >=latex] (\li) to node{\x} (\xi);
+		\else
+			\node[state] (\xi) {};
+		\fi
+	}
+
+	\node[info] at (0,0.6) {Sequence};
+
+	\tikzstyle{starc} = [ ->, bend right, thin, color=red ];
+    \tikzstyle{starg} = [ ->, bend right, thin, color=blue ];
+    \tikzstyle{stara} = [ ->, bend right, thin, color=green ];
+    \tikzstyle{start} = [ ->, bend right, thin, color=black ];
+
+	\foreach \x [count=\xi] in \seq {
+        \foreach \y [count=\yi] in \seq {
+        	\pgfmathparse{int(\yi - \xi)}
+            \let \df \pgfmathresult
+
+            \ifnumcomp{1}{<}{\df}{
+               	\ifnumcomp{\df}{<}{4}{
+                	\pgfmathparse{-\df*20}
+	                \let \out \pgfmathresult
+	                \pgfmathparse{int(180 - \out)}
+	                \let \in \pgfmathresult
+
+	                \let \pat \seq[3]
+	                \draw[star\y, out=\out, in=\in] (\xi) to node[below]{$*$\y} (\yi);
+                }{}
+            }{}
+        }
+	}
+
+\end{tikzpicture}

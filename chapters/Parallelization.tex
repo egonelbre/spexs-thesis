@@ -1,30 +1,29 @@
 \chapter{Parallelization}
 
-Here we describe parallel implementations of the parts of the algorithm.
+Here we describe how we can partition the algorithm to support parallelism.
 A proof of concept for fully parallelized code can be seen in appendix A.
 
 \section{Process}
 
-The main process of the algorithm as described by dataflow.\cite{Kahn74,Lee95}
+The main process of the algorithm as described by dataflow diagram.\cite{Kahn74,Lee95}
 
 \begin{figure}[H]
 	\input{./diagrams/process.tex}
 \end{figure}
 
-The easiest thing here to parallelize is the extender since it's interaction
-can be seen as a separate unit.
+\todo{use proper syntax for dataflow diagrams}
+
+Here we can see that the only dependence between query extending is the original dataset.
 
 \section{Adding Nodes}
 
-If instead of in/out pool we had several the algorithm can still work, if we
-have single take / put process to decide which actual pool to use.
+We can have multiple \emph{in} nodes if the \emph{extender} knows from where to fetch the \emph{querys}, which would require an additional scheduler.
 
-We can use several extenders that work in parallel without problems since 
-they do not need information about other queries nor input/output pools.
+This means that we can run several \emph{extenders} in parallel without effecting the overall process. Although we introduce a source for indeterminism.
 
 \section{Extending}
 
-We still can also do the extending process in parallel:
+Since much of the work is done in \emph{extender} we should also try to parallelize it as well:
 
 \begin{algorithm}[H]
 	\caption{Parallel Extender with Group optimization}
@@ -32,42 +31,35 @@ We still can also do the extending process in parallel:
 	\Require{Query $q$, function $next : \sym{I} \rightarrow [(\sym{I}, \sym{P})]$ }
 	\Ensure{Set of querys that have been extended by one step}
 
-	\Statef{ nexts \gets map(next, q.pos) }
-	\Statef{ matches \gets groupBy(snd, nexts) }
+	\Statef{ nexts \gets map(next, positions(q.matches)) }
+	\Statef{ matches \gets groupBy(fst, nexts) }
 	\Statef{ result \gets map(queryMaker(q), matches) }
 	\Statef{ optimized \gets map( (x) \rightarrow (union(matches(x))), groups) }
 	\Statef{ return union(result, optimized)}
 \end{algorithmic}
 \end{algorithm}
 
-\begin{verbatim}
-func extender(query) {
-	// find all next positions
-	nexts = (map next query.matches)
-	matches = (group nexts by token)
-	result = (map newquery matches)
-	other = (map #(union (matches %1)) groups)
-	return result union other
-}
-\end{verbatim}
+\todo[inline]{figure out how to make it readable}
 
 \section{Dataset partitioning}
+
+Since the dataset itself can be large it would be useful to divide it into parts. 
+
+As we can see the extender only needs that sequences are intact, hence we can do the extension on partitioned dataset.
 
 If we look at where we need synchronization points if we partition 
 the dataset. Whole parts of extension still apply for parts of dataset.
 
-Synchronization is only needed for filtering. We don't need to know the 
-whole query but just information about parts to make a decision whether to filter or not.
-
-\missingfigure{example of a partitioning}
-
-\section{Filtering}
-
-This is the only place where we may need the whole information about the query.
-
-Although many operations can be parallelized with map reduce.
+The whole dataset is required only for filtering, since even one of the simplest operations ("counting matches in dataset") requires full knowledge of all matches over the dataset. But many such features can be calculated on sharded dataset with map-reduce.
 
 \todo[inline]{example how to do counting}
 
-\todo[inline]{example what cannot be done easily on sharded data}
+There are also operations that require presence of all information or extended synchronization. One of the examples implemented in SPEXS is finding minimal p-value by splitting the data.
 
+\todo[inline]{explain the optimal finding}
+
+\section{Parallelized Process}
+
+Applying these techniques we get a parallel dataflow:
+
+\missingfigure{fully parallelized dataflow diagram}

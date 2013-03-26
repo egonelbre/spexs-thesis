@@ -21,20 +21,22 @@ isolated units and parts that are likely to change together. \cite{Parnas72}
 We chose the following decomposition:
 
 \begin{description}
-	\item[Configuration] structure for holding the configuration data
-	\item[Setup] based on the configuration initializes data-structures and functions for the algorithm
-	\item[Reader] reads in the data from files
-	\item[Database] a collection of datasets
-	\item[Algorithm] the SPEXS2 algorithm
-		\item[Pattern] represents a pattern
-		\item[Query] stores the pattern with database and pattern
-		\item[Set] stores matching positions
-		\item[Pool] stores queries
-		\item[Extender] drives algorithms extending step
-		\item[Feature] computes a value from the Query
-		\item[Filter] filters some queries
-	\item[Printer] prints the result queries
-	\item[Debugging] utilities for the program
+    \item[Configuration] structure for holding the configuration data
+    \item[Setup] based on the configuration initializes data-structures and functions for the algorithm
+    \item[Reader] reads in the data from files
+    \item[Database] a collection of datasets
+    \item[Algorithm] the SPEXS2 algorithm
+    \begin{description}
+        \item[Pattern] represents a pattern
+        \item[Query] stores the pattern with database and pattern
+        \item[Set] stores matching positions
+        \item[Pool] stores queries
+        \item[Extender] drives algorithms extending step
+        \item[Feature] computes a value from the Query
+        \item[Filter] filters some queries
+    \end{description}
+    \item[Printer] prints the result queries
+    \item[Debugging] utilities for the program
 \end{description}
 
 It is a trivial decomposition for the algorithm part, since a lot of is derived 
@@ -42,13 +44,13 @@ directly from the algorithm definition.
 
 The main criteria was to decompose things based on their behavior, whether there
 is a commonality between them or whether they change independently from the other
-parts.
+parts. \cite{Parnas72}
 
 \section{Configuration}
 
 One problem with flexible algorithms is that they a lot of ways to be run.
 This often would need having tens or hundereds of program flags.
-To avoid this problem we decided to use a json file for the program
+To avoid this problem we decided to use a \emph{json} file for the program
 configuration.
 
 \todo[inline]{Short example of a configuration file.}
@@ -63,12 +65,12 @@ we added replacement strings into the json files that can be given in as
 a program argument.
 
 \begin{verbatim}
-	"Datasets" : {
-		"fore" : { "File" : "$inp$"
-	...
+    "Datasets" : {
+        "fore" : { "File" : "$inp$"
+        ...
 \end{verbatim}
 
-When using spexs2 --conf conf.json input=filename the input will be
+When using \emph{spexs2 --conf conf.json input=filename} the input will be
 replaced by filename. Also there is optional default value if one wasn't given.
 
 \section{Setup and Database}
@@ -113,30 +115,35 @@ the queue and choose only a limited amount. A lock-free priority queue would be 
 but it has many details to work correctly. \todo{link to lock-free queues}
 
 One simple solution to make priority queue concurrent is to use mutexes when storing or
-retrieving values. This would mean that many processes can get locked.
+retrieving values. This also would mean that, if the priority queue is used intensively, it can become a bottleneck.
 
-We can use some knowledge about the priority-queue behavior. We know that it usually
-has limited-size and the amount of patterns suitable for putting into the output
-queue is several magnitudes larger; this means most of the queries put into
-the result queue are discarded. 
+We can use some knowledge about our priority-queue behavior. We know that we usually
+have a limited-size and the amount of patterns suitable for putting into the output
+queue is several magnitudes larger; this means most of the queries put into the result queue can be discarded.
 
-We know that if the query is worse than the worst in the priority queue, it can
+So, if the query is worse than the worst in the priority queue, it can
 be discarded immediately without doing push/pop. If we allow for that check
 to fail once in a while - we can make it mostly lock-free.
 
-\begin{verbatim}
-	worst := current-worst
-	if worst > new-query {
-		exit
-	}
+\begin{algorithm}[H]
+    \caption{priority queue push}
+\begin{algorithmic}[1]   
+    \Statef{worst \gets current~worst}
+        
+    \If{$ worst > new~element $}
+        \Return
+    \EndIf
 
-	mutex.lock
-	pqueue.push(new-query)
-	current-worst = pqueue.pop()
-	mutex.unlock
-\end{verbatim}
+    \Statef{mutex.lock}
+    \Statef{queue.put(new~element)}
+    \If{$queue.length > queue.limit$}
+        \Statef{current~worst \gets queue.pop()}
+    \EndIf
+    \Statef{mutex.unlock}
+\end{algorithmic}
+\end{algorithm}
 
-Although the worst may already have changed after line 1, the algorithm still only keeps the best results.
+We assume the assignments to be atomic.
 
 \section{Features and Filters}
 
@@ -162,10 +169,10 @@ Example:
 
 \begin{verbatim}
 func Matches(dataset []int) Feature {
-	return func(q *Query) (float64, string) {
-		matches := countf(q.Pos, dataset)
-		return matches, ""
-	}
+    return func(q *Query) (float64, string) {
+        matches := countf(q.Pos, dataset)
+        return matches, ""
+    }
 }
 \end{verbatim}
 
@@ -181,10 +188,10 @@ For example to give a lower and higher limits to some feature:
 
 \begin{verbatim}
 func featureFilter(feature Feature, min float64, max float64) Filter {
-	return func(q *Query) bool {
-		v, _ := feature(q)
-		return (min <= v) && (v <= max)
-	}
+    return func(q *Query) bool {
+        v, _ := feature(q)
+        return (min <= v) && (v <= max)
+    }
 }
 \end{verbatim}
 
@@ -201,15 +208,15 @@ Often this is resolved by adding some debug statments:
 
 \begin{verbatim}
 for i := 0; i < 100; i += 1{
-	printf("picking")
-	a := pick()
-	printf("picked %v", a)
+    printf("picking")
+    a := pick()
+    printf("picked %v", a)
 
-	printf("picking")
-	b := pick()
-	printf("picked %v", b)
-	
-	out.put(a + b)
+    printf("picking")
+    b := pick()
+    printf("picked %v", b)
+    
+    out.put(a + b)
 }
 \end{verbatim}
 
@@ -218,19 +225,19 @@ This can be harmful to the readability of the code. To fix this debugging proble
 \begin{verbatim}
 type PickFunc func()Thing
 func debuggable(fn PickFunc) PickFunc {
-	return func() Thing {
-		printf("start picking")
-		p := fn()
-		printf("picked %v" p)
-		return p
-	}
+    return func() Thing {
+        printf("start picking")
+        p := fn()
+        printf("picked %v" p)
+        return p
+    }
 }
 
 pick = debuggable(pick)
 for i := 0; i < 100; i += 1{
-	a := pick()
-	b := pick()
-	out.put(a + b)
+    a := pick()
+    b := pick()
+    out.put(a + b)
 }
 \end{verbatim}
 
@@ -242,13 +249,13 @@ be a full stepwise debugger.
 
 \begin{verbatim}
 func debuggable(fn PickFunc) PickFunc {
-	return func() Thing {
-		mutex.lock()
-		p := fn()
-		while not continue
-			interact with user
-		mutex.unlock()
-		return p
-	}
+    return func() Thing {
+        mutex.lock()
+        p := fn()
+        while not continue
+            interact with user
+        mutex.unlock()
+        return p
+    }
 }
 \end{verbatim}

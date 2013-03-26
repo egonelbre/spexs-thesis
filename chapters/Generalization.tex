@@ -1,7 +1,7 @@
 \chapter{Generalization}
 
 In this chapter we show how to make the algorithm more 
-abstract by allowing flexibilty through functions as parameters and
+abstract by allowing flexibilty through functions composition and
 finding minimal requirements for the data-structures.
 
 \section{Algorithm}
@@ -31,22 +31,22 @@ The algorithm in a more convetional view is:
 \end{algorithmic}
 \end{algorithm}
 
-When the algorithm starts we create an empty pattern query and put 
-into the in pool. The in pool contains queries whose patterns
+When the algorithm starts we create an empty pattern query $\epsilon$ and put 
+into the \emph{in} pool. The \emph{in} pool contains queries whose patterns
 should be further examined.
 
-We pick a query from the in pool for extending. The extending means
-generating all queries whose pattern is larger by one. There can be
+We pick a query from the \emph{in} pool for extending. The extending means
+generating all queries whose pattern size is larger by one. There can be
 several such queries.
 
 If any of the queries should be further examined as defined by the
-extendable filter, it will be put into the in pool.
+\emph{extendable} query filter, it will be put into the \emph{in} pool.
 
-If the query is fit for output we as defined by the outputtable filter,
-it will be put into the out pool.
+If the query is fit for output we as defined by the \emph{outputtable} filter,
+it will be put into the \emph{out} pool.
 
 If we extend each pattern at each step by one we guarantee that we
-examine the all patterns that conform to our criteria.
+examine all the patterns that conform to our criteria.
 
 \section{Pools}
 
@@ -64,23 +64,22 @@ This also means that pools can persist the queries if necesssary.
 
 \section{Filtering}
 
-Filtering allows us to dramatically reduce the number of queries
-we have to look at. It also allows to select only interesting patterns by
-some criteria.
+Filtering allows us to reduce the number of queries we have to examine.
+It also allows to select only interesting patterns by some criteria.
 
 If we have interestingness measure we can create filter from it by
-defining it's minimum or maximum value. One very usefule example 
+defining it's minimum or maximum value. One very useful example 
 would be a filter for limiting the pattern length.
 
-By separating the extension and output filter, as opposed to SPEXS, 
+By separating the extension and output filter, as opposed to original SPEXS, 
 we can still limit output without affecting the extension process.
 For example if we wish to see only patterns of length 3 we cannot do
 it with one filter. Since we need to extend patterns of length 0, 1 and 2.
 
 \section{Extending}
 
-The extending process is at the core of the algorithm. 
-We shall look at how we can deal with different types.
+The extending process is at the core of the algorithm and there are
+several ways of doing it.
 
 The extending method is:
 
@@ -91,73 +90,89 @@ The extending method is:
 	\Ensure{result contains queries that have been extended by one}
 	
 	\Statef{nexts \gets new~collection}
-	\For{$pos \in matches(q)$}
-		\Statef{(token, pos) \gets next(pos)}
+	\For{$pos \in positions(q.matches)$}
+		\Statef{(token, loc) \gets next(q.document, pos)}
 		\Statef{nexts.put((token, pos))}
 	\EndFor
 
 	\Statef{matches \gets new~map~of~token~to~position~set }
-	\For{$(token, pos) \in nexts$}
+	\For{$(token, loc) \in nexts$}
 		\If{$matches[token]$ doesn't exist}
 			\Statef{matches[token] \gets \{\} }
 		\EndIf
-		\Statef{matches[token] \gets matches[token] + \{pos\} }
+		\Statef{matches[token] \gets matches[token] + loc }
 	\EndFor
 
-	\Statef{result \gets new~collection}
+	\Statef{querys \gets new~collection}
 	\For{$(token, positions) \in matches$}
 		\Statef{qx \gets new~query}
+		\Statef{qx.document \gets q.document}
 		\Statef{qx.pattern \gets q.pattern + token}
 		\Statef{qx.positions \gets positions}
-		\Statef{result.add(qx)}
+		\Statef{querys.add(qx)}
 	\EndFor
 \end{algorithmic}
 \end{algorithm}
 
-This extender depends on how next is implemented, we shall look at different
-ways how to implement it.
+The behavior of \emph{extender} depends on how \emph{next} is 
+implemented, we shall look at different ways how to implement it.
+The different implementations can capture more complex patterns,
+but often at the cost of performance.
 
 \subsection{Sequences}
 
-The simplest case how the next function behaves is when we are only looking for simple sequences.
+The simplest case how the next function behaves is when we are 
+only looking for simple sequences -- the alphabet for patterns
+and sequences is the same.
 
-Let's consider a sequence ACGCCGATCGC and a pattern CG.
-
-Diagram of the ACG.CCG.ATCG.C and query for that pattern.
-
-Next positions step is finding ACG.[C]CG.[A]TCG.[C].
-
-Grouping is [C] ==> CGC, [A] => CGA.
+Let's consider a sequence $ACGCCGATCGC$ and a pattern $CG$.
 
 \begin{figure}[H]
 	\input{./diagrams/sequence.tex}
 \end{figure}
 
-\subsection{Groups and Stars}
+Initially we have matches only for query $CG$. Then by taking
+the \emph{next} token from the sequence we can build up
+querys $CGA$ and $CGC$.
 
-Since we want to find more interesting patterns we can add more
-information to the sequence DFA. Such as a star expression.
+\subsection{Groups}
 
-Same sequence with star paths.
+One common addition in pattern language is capturing a group
+of tokens. For example we can use $X = [AC]$ to denote both tokens $A, T$. 
+By adding where either one transitions we can capture such groups in 
+the extension process.
 
-\missingfigure{sketch of more complex}
+\begin{figure}[H]
+	\input{./diagrams/groups.tex}
+\end{figure}
+
+We shall omit the extension examples since the following of corresponding edges is trivial and anologous to previous examples.
+
+\subsection{Star}
+
+Another possible extension is the \emph{dot-star} or more simply capturing
+a run of elements. Here we just show the expanded sequence with $*$ symbol.
+
+\begin{figure}[H]
+	\input{./diagrams/star.tex}
+\end{figure}
+
+Here we immediately notice how the complexity increases by introducing pattern token. Since this is a intermediary step isn't necessary we can instead extend with $*Y$, where $Y$ is some other token. This means we avoid this single large query and have multiple smaller queries.
+
+\begin{figure}[H]
+	\input{./diagrams/star2.tex}
+\end{figure}
+
+We can also limit the length of the run.
+
+\begin{figure}[H]
+	\input{./diagrams/star3.tex}
+\end{figure}
+
+Here we have limited the run length to be either 2 or 3.
 
 \subsection{Optimizations}
 
-Although we can add the group information to the DFA, it is more
-performant to use the information gathered from the extension
-of non-groups.
+We can further optimize \emph{group next} by inferring the positions from simple \emph{sequence next}. We can see that the positions of a group extension is the same as the union of positions by the group tokens.
 
-A[CG].Positions = AC.Positions union AG.Positions
-
-\missingfigure{sketch of possible optimizations}
-
-\subsection{Other}
-
-There maybe several other extensions to the regular expressions.
-
-Questionable position:
-
-AC?.Positions = A.Positions + AC.Positions
-
-\missingfigure{sketch of questions}
+If we have a group token $\gamma$ that contains $tokens(\gamma)$ then the \emph{matches} for such group is $$matches(p\gamma, D) = \bigcup_{t \in tokens(\gamma)} matches(pt, D) $$

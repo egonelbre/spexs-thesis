@@ -41,7 +41,7 @@ this would match $CCTC$ and exactly match $AT$. A \emph{match} is a location
 set where the pattern in the sequence ends.
 
 We denote the set of all pattern $p$ \emph{matches} in a dataset 
-$D$ as $matches(p, D) = \{ match(p, \alpha) | \alpha in D, matches(p, \alpha) \}$.
+$D$ as $matches(p, D) = \{ match(p, \alpha) | \alpha \in D, matches(p, \alpha) \}$.
 
 \section{Query}
 
@@ -50,17 +50,18 @@ where $D$ is the dataset and $p$ a pattern.
 
 \section{Query features}
 
-\emph{Query feature} is a function of the query. It gives 
-information about the query such as the pattern representation, 
+\emph{Query feature} is a function $f: Q \mapsto A$, 
+where $Q$ is the query type. It gives information about 
+the query such as the pattern representation, 
 length, number of matches in the dataset.
 
-\emph{Query interestingness} is a function of the query whose
-results are well-ordered. This functions result allows to
+\emph{Query interestingness} is a function $f: Q \mapsto Ord$ 
+of the query whose results are well-ordered. This functions result allows to
 say whether one query is more interesting than the other.
 For convenience it is useful to represent that value in
 $\Re$.
 
-\emph{Query filter} is a function of the query whose result
+\emph{Query filter} is a function $f: Q \mapsto Bool$ of the query whose result
 is a boolean.
 
 \section{Pattern Discovery}
