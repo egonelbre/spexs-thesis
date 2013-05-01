@@ -16,7 +16,7 @@ We use $\Sigma$ to denote the set of tokens in the dataset, an \emph{alphabet}.
 The \emph{size} of the alphabet is $|\Sigma|$. \emph{Tokens} can be numbers, 
 letters, words or sentences - any symbol.
 
-Any \emph{sequence} $S=a_1 a_2 ... a_n, \forall i \in \Sigma$ is called a \emph{sequence} 
+Any sequence $S=a_1 a_2 ... a_n, \forall i \in \Sigma$ is called a \emph{sequence} 
 over the token set $\Sigma$. If the length of the
 string is $0$, it is called an empty sequence or $\epsilon$.
 
@@ -28,7 +28,7 @@ as a dataset, where the sentences are sequences and each word is a token in the 
 \section{Pattern}
 
 A \emph{pattern} is a structure that defines a set of sequences. 
-This pattern usually is denoted by a squence with an extended alphabet.
+Pattern is usually denoted by a sequence over an extended alphabet.
 
 We denote the set of sequences that a pattern $p$ defines as $all(p)$.
 If $\alpha \in all(p)$, where $\alpha$ is a sequence then we say that
@@ -36,7 +36,7 @@ sequence $\alpha$ \emph{matches exactly} pattern $p$. We say that $\alpha$
 \emph{matches} $p$ if any of sequences $all(p)$ is a subsequence of $\alpha$.
 
 The most commonly used pattern descriptions are regular expressions.
-For example $.[AT]$ can denote a set $\{AA, AT, CA, CT, GA, GT, TA, TT\}$ and
+For example $.[AT]$ denotes a set $\{AA, AT, CA, CT, GA, GT, TA, TT\}$ and
 this would match $CCTC$ and exactly match $AT$. A \emph{match} is a location
 set where the pattern in the sequence ends.
 
@@ -48,7 +48,7 @@ $D$ as $matches(p, D) = \{ match(p, \alpha) | \alpha \in D, matches(p, \alpha) \
 A \emph{query} is a compound structure $<D, p, matches(p, D)>$, 
 where $D$ is the dataset and $p$ a pattern.
 
-\section{Query features}
+\subsection{Query features}
 
 \emph{Query feature} is a function $f: Q \mapsto A$, 
 where $Q$ is the query type. It gives information about 
@@ -67,5 +67,10 @@ is a boolean.
 \section{Pattern Discovery}
 
 In this thesis \emph{pattern discovery} is a process of finding 
-the most interesting patterns, according to some query interestingness,
+the most interesting subset of patterns, according to some query interestingness,
 in a dataset.
+
+For example "Finding most common nucleotide patterns that are at least 3 nucleotides long 
+from a shotgun sequencing output." \emph{Most common} defines our interestingness 
+measure. \emph{At least 3 nucleotides} is the pattern subset criteria. 
+\emph{Sequencing output} is our dataset and \emph{nucleotides} define the token alphabet.

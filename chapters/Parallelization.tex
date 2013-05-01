@@ -5,25 +5,26 @@ A proof of concept for fully parallelized code can be seen in appendix A.
 
 \section{Process}
 
-The main process of the algorithm as described by dataflow diagram.\cite{Kahn74,Lee95}
+The main process of the algorithm as described by dataflow diagram.\cite{Kahn74,Lee95} 
+Circles denote processes and unfinished rectangles denote data stores.
 
 \begin{figure}[H]
 	\input{./diagrams/process.tex}
 \end{figure}
 
-\todo{use proper syntax for dataflow diagrams}
+We can see that the different query extensions do not share a dependency, except the dataset.
+Since dataset itself is read-only for a given process, it means we can use multiple extender processes. 
+The same applies for extendability and output filter.
 
-Here we can see that the only dependence between query extending is the original dataset.
+\begin{figure}[H]
+	\input{./diagrams/process2.tex}
+\end{figure}
 
-\section{Adding Nodes}
-
-We can have multiple \emph{in} nodes if the \emph{extender} knows from where to fetch the \emph{querys}, which would require an additional scheduler.
-
-This means that we can run several \emph{extenders} in parallel without effecting the overall process. Although we introduce a source for indeterminism.
+We can add more processes in a similar fashion without affecting the end result. Although this will introduce a source of indeterminism.
 
 \section{Extending}
 
-Since much of the work is done in \emph{extender} we should also try to parallelize it as well:
+Since much of the work is done in \emph{extender} it could be useful to parallelize it as well:
 
 \begin{algorithm}[H]
 	\caption{Parallel Extender with Group optimization}
@@ -31,35 +32,31 @@ Since much of the work is done in \emph{extender} we should also try to parallel
 	\Require{Query $q$, function $next : \sym{I} \rightarrow [(\sym{I}, \sym{P})]$ }
 	\Ensure{Set of querys that have been extended by one step}
 
-	\Statef{ nexts \gets map(next, positions(q.matches)) }
-	\Statef{ matches \gets groupBy(fst, nexts) }
-	\Statef{ result \gets map(queryMaker(q), matches) }
-	\Statef{ optimized \gets map( (x) \rightarrow (union(matches(x))), groups) }
-	\Statef{ return union(result, optimized)}
+	\Statef{nexts \gets map(next, positions(q.matches)) }
+	\Statef{matches \gets groupBy(fst, nexts) }
+	\Statef{result \gets map(queryMaker(q), matches) }
+	\Statef{optimized \gets map( (x) \rightarrow (union(matches(x))), groups) }
+	\Statef{return union(result, optimized)}
 \end{algorithmic}
 \end{algorithm}
 
 \todo[inline]{figure out how to make it readable}
 
-\section{Dataset partitioning}
+This practically may not give much improvement on conventional CPUs, but could be benefitial for
+highly parallel processors such as GPGPU or FPGA.
 
-Since the dataset itself can be large it would be useful to divide it into parts. 
+\section{Distributed process}
 
-As we can see the extender only needs that sequences are intact, hence we can do the extension on partitioned dataset.
+Since the dataset and the process memory consumption can get quite it would also be benefitial to
+be able to partition the dataset between multiple machines.
 
-If we look at where we need synchronization points if we partition 
-the dataset. Whole parts of extension still apply for parts of dataset.
+The extension results for a given query stays inside the sequence which means we can partition by dividing
+sequences to separate datasets.
 
-The whole dataset is required only for filtering, since even one of the simplest operations ("counting matches in dataset") requires full knowledge of all matches over the dataset. But many such features can be calculated on sharded dataset with map-reduce.
+The whole dataset is required only for filtering, since even one of the simplest operations ("counting matches in dataset") requires full knowledge of all matches over the dataset. We can use partial results ($Z$) to reduce the communication overhead.
 
-\todo[inline]{example how to do counting}
+\begin{figure}[H]
+	\input{./diagrams/process3.tex}
+\end{figure}
 
-There are also operations that require presence of all information or extended synchronization. One of the examples implemented in SPEXS is finding minimal p-value by splitting the data.
-
-\todo[inline]{explain the optimal finding}
-
-\section{Parallelized Process}
-
-Applying these techniques we get a parallel dataflow:
-
-\missingfigure{fully parallelized dataflow diagram}
+For example to see whether some query is over some count limit we first count matches in the partial datasets, then send the partial results to a process that adds these results together. Depending on that result we can decide whether it needs further processing.

@@ -1,0 +1,94 @@
+% Defines a `datastore' shape for use in DFDs.  This inherits from a
+% rectangle and only draws two horizontal lines.
+\makeatletter
+\pgfdeclareshape{datastore}{
+	\inheritsavedanchors[from=rectangle]
+	\inheritanchorborder[from=rectangle]
+	\inheritanchor[from=rectangle]{center}
+	\inheritanchor[from=rectangle]{base}
+	\inheritanchor[from=rectangle]{north}
+	\inheritanchor[from=rectangle]{north east}
+	\inheritanchor[from=rectangle]{east}
+	\inheritanchor[from=rectangle]{south east}
+	\inheritanchor[from=rectangle]{south}
+	\inheritanchor[from=rectangle]{south west}
+	\inheritanchor[from=rectangle]{west}
+	\inheritanchor[from=rectangle]{north west}
+	\backgroundpath{
+	%  store lower right in xa/ya and upper right in xb/yb
+		\southwest \pgf@xa=\pgf@x \pgf@ya=\pgf@y
+		\northeast \pgf@xb=\pgf@x \pgf@yb=\pgf@y
+		\pgfpathmoveto{\pgfpoint{\pgf@xa}{\pgf@ya}}
+		\pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@ya}}
+		\pgfpathmoveto{\pgfpoint{\pgf@xa}{\pgf@yb}}
+		\pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@yb}}
+	}
+}
+
+\tikzset{%
+	pool/.style={%
+		datastore,
+		draw, very thick, fill=white, 
+		minimum height=3em, minimum width=3em, 
+		node distance=9em, font={\sffamily\bfseries}
+	},
+	process/.style={%
+		draw, very thick, fill=white, 
+		circle,
+		minimum height=2em, minimum width=4em,
+		node distance=9em, font={\sffamily\bfseries}
+	},
+	dataset/.style={%
+		draw, thick, fill=white, 
+		datastore,
+		minimum height=2em, minimum width=4em,
+		node distance=9em, font={\sffamily\bfseries}
+	},
+	chan/.style={%
+		very thick, ->, >=latex,
+		text centered, font={\sffamily\bfseries}
+	},
+	needs/.style={%
+		thick, ->, >=latex, dashed,
+		text centered, font={\sffamily\bfseries}
+	}
+}
+
+\newcount\tsx@wrapperdepth
+\tsx@wrapperdepth=0
+\newcount\tsx@wrappercount
+\tsx@wrappercount=0
+
+\gdef\tsx@wrappercode{}
+
+\tikzset{wrap/.style={
+      local bounding box/.expanded={localbb\number\tsx@wrappercount},
+      execute at begin scope={
+        \global\advance\tsx@wrapperdepth by 1\relax
+        \global\advance\tsx@wrappercount by 1\relax},
+      execute at end scope/.expanded={
+        \noexpand\global\noexpand\advance\noexpand\tsx@wrapperdepth by -1\noexpand\relax
+        %
+        % store the wrapper drawing code for later use
+        \noexpand\toks@\noexpand\expandafter{\noexpand\tsx@wrappercode}
+        \noexpand\xdef\noexpand\tsx@wrappercode{%
+          \noexpand\noexpand\noexpand\node[fit=(localbb\number\tsx@wrappercount),
+            every wrap,
+            #1
+            ]{};
+          \noexpand\the\noexpand\toks@
+        }
+        %
+        % if we are at depth 0, draw all the wrappers
+        \noexpand\ifnum\noexpand\tsx@wrapperdepth=0
+          \noexpand\begin{scope}[on background layer]
+            \noexpand\tsx@wrappercode
+          \noexpand\end{scope}
+          \noexpand\gdef\noexpand\tsx@wrappercode{}
+        \noexpand\fi
+        }}
+}
+
+\tikzset{every wrap/.style={draw, fill=red!30}}
+
+\makeatother

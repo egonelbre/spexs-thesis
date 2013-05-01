@@ -1,0 +1,41 @@
+\begin{tikzpicture}[auto]
+	\node[pool] (in) {In};
+	
+	% lower part
+	\begin{scope}[wrap={label={below:process 2}, inner sep=2ex,fill=black!5}]
+		\node[process, below right of=in] (ext1) {Extender};
+		\node[process, left of=ext1] (extable1) {Extend?};
+		\node[process, right of=ext1] (outable1) {Output?};
+	\end{scope}
+
+	\begin{scope}[wrap={label={above:process 1}, inner sep=2ex,fill=black!5}]
+		\node[process, above right of=in] (ext2) {Extender};
+		\node[process, left of=ext2] (extable2) {Extend?};
+		\node[process, right of=ext2] (outable2) {Output?};
+	\end{scope}
+
+	\node[dataset, right of=in] (dataset) {Dataset};
+	\node[pool, right of=dataset, node distance=12em] (out) {Out};
+
+	\draw[needs] (dataset) to (ext1);
+	\draw[needs] (dataset) to (outable1);
+	\draw[needs] (dataset) to (extable1);	
+
+	\draw[needs] (dataset) to (ext2);
+	\draw[needs] (dataset) to (outable2);
+	\draw[needs] (dataset) to (extable2);
+
+	% lower part flow
+	\draw[chan, bend left] (in) to node{p} (ext1);
+	\draw[chan]	(ext1) to node{pX} (outable1);
+	\draw[chan, bend left] (ext1) to node[below]{pX} (extable1);
+	\draw[chan, bend left] (extable1) to node[left]{pX} (in);
+	\draw[chan, bend right] (outable1) to node[below right]{pX} (out);
+
+	% upper part flow
+	\draw[chan, bend right] (in) to node{p} (ext2);
+	\draw[chan]	(ext2) to node{pX} (outable2);
+	\draw[chan, bend right] (ext2) to node[above]{pX} (extable2);
+	\draw[chan, bend right] (extable2) to node[left]{pX} (in);
+	\draw[chan, bend left] (outable2) to node{pX} (out);
+\end{tikzpicture}

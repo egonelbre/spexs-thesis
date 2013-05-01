@@ -1,34 +1,43 @@
-\chapter{SPEXS2 Source Code}
-\label{add:files}
+\section{source}
 
-The source code for the implementation of \emph{SPEXS2} is 
-available at \url{github.com/egonelbre/spexs}.
+The source code in \emph{src} has the following structure:
 
-The source folder "src" has the following structure:
+\dirtree{%
+	.1 src/.
+		.2 spexs \DTcomment{algorithm definition}.
+			.3 extenders/ \DTcomment{query extenders}.
+			.3 features/ \DTcomment{query feature calculators}.
+			.3 filters/ \DTcomment{filter implementations}.
+			.3 pool/ \DTcomment{different queue implementations}.
+			.3 database.go \DTcomment{sequence dataset definition}.
+			.3 query.go \DTcomment{query definition}.
+			.3 spexs.go \DTcomment{algorithm implementation}.
+		.2 spexs2 \DTcomment{command-line utility}.
+			.3 conf.go \DTcomment{configuration reader}.
+			.3 dataset.go \DTcomment{dataset reader}.
+			.3 features.go \DTcomment{parses and creates feature functions}.
+			.3 help.go \DTcomment{prints help for the program}.
+			.3 printer.go \DTcomment{prints the final output}.
+			.3 runtime.go \DTcomment{profiling and live-view setup}.
+			.3 setup.go \DTcomment{prepares everything for algorithm}.
+			.3 spexs2.go \DTcomment{main-entry point}.
+}
 
-\missingfigure{code organization}
+There are also additional packages:
 
-%	src | root for the source code
-%		debugger | generic attachable debugger
-%		stats | statistics utilities
-%		utils | other utility functions
-%		spxs  | the command line application
-%			spxs.go | main entry point
-%			conf.go | configuration file reading
-%			database.go | reading of the database file
-%			debugger.go | code for setting up debugger for spexs algorithm
-%			help.go | printing of help
-%			printer.go | output formatter
-%			setup.go | constructs the data structures necessary for spexs algorithm
-%			version.go | automatically generated file for versioning
-%		spexs | algorithm implementation
-%			extenders | query extending methods
-%			features | query features
-%			filters  | query filtering methods
-%			fitnesses | fitness functions for sorting results
-%			pool | pool implementations for storing querys
-%			sets | position bitvector storing
-%
-%			spexs.go | main algorithm and the setup
-%			database.go | implementation of a sequence database
-%			query.go | implementation for storing querys
+\dirtree{%
+	.1 src/.
+		.2 debugger/ \DTcomment{debugger for concurrent processes}.
+		.2 stats/ \DTcomment{statistical functions}.
+			.3 binom/ \DTcomment{binomial p-value calculation}.
+			.3 hyper/ \DTcomment{hypergeometric p-value calculation}.
+		.2 utils/ \DTcomment{additional utility functions}.
+		.2 bit/ \DTcomment{functions for bitmanipulation}.
+		.2 set/ \DTcomment{set implementations}.
+			.3 hash/ \DTcomment{hash table with entry per value}.
+			.3 bin/ \DTcomment{hash table with bitvectors}.
+			.3 trie/ \DTcomment{2-level hashtable with bitvectors}.
+}
+
+For compilation there are two scripts \emph{make.bat} and \emph{make.sh} 
+that build the program into bin directory.

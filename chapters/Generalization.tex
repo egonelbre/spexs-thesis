@@ -1,15 +1,15 @@
 \chapter{Generalization}
 
 In this chapter we show how to make the algorithm more 
-abstract by allowing flexibilty through functions composition and
+abstract by allowing flexibilty through function composition and
 finding minimal requirements for the data-structures.
 
 \section{Algorithm}
 
-The algorithm in a more convetional view is:
+The algorithm in a more conventional view is:
 
 \begin{algorithm}[H]
-	\caption{The SPEXS2 algorithm}
+	\caption{The spexs2 algorithm}
 \begin{algorithmic}[1]
 	\Require{$dataset$, $in$ pool, $out$ pool, $extender$,
 		$extendable$ filter, $outputtable$ filter, $postprocess$ function }
@@ -55,17 +55,16 @@ allows queries to be put into it and taken from it, also we can
 ask whether the pool is empty or not.
 
 It has no guarantees on how the queries are stored internally and
-in which order they are taken out.
+in which order they are taken out. This gives an option to persist the
+queries if needed.
 
 In practice this means we can use any collection such as list, set,
-queue as a pool. This gives us different performance characteristics.
-
-This also means that pools can persist the queries if necesssary.
+queue as a pool. This gives us different performance and memory characteristics.
 
 \section{Filtering}
 
-Filtering allows us to reduce the number of queries we have to examine.
-It also allows to select only interesting patterns by some criteria.
+Filtering allows us to reduce the number of queries we have to examine and
+allows to select a subset of patterns by some criteria.
 
 If we have interestingness measure we can create filter from it by
 defining it's minimum or maximum value. One very useful example 
@@ -74,14 +73,14 @@ would be a filter for limiting the pattern length.
 By separating the extension and output filter, as opposed to original SPEXS, 
 we can still limit output without affecting the extension process.
 For example if we wish to see only patterns of length 3 we cannot do
-it with one filter. Since we need to extend patterns of length 0, 1 and 2.
+it with one filter, since we still would need to extend patterns of length 0, 1 and 2.
 
 \section{Extending}
 
 The extending process is at the core of the algorithm and there are
 several ways of doing it.
 
-The extending method is:
+The idea of extending method is:
 
 \begin{algorithm}[H]
 	\caption{SPEXS2 extender}
@@ -137,7 +136,7 @@ querys $CGA$ and $CGC$.
 
 \subsection{Groups}
 
-One common addition in pattern language is capturing a group
+One common addition in a pattern language is capturing a group
 of tokens. For example we can use $X = [AC]$ to denote both tokens $A, T$. 
 By adding where either one transitions we can capture such groups in 
 the extension process.
@@ -146,7 +145,8 @@ the extension process.
 	\input{./diagrams/groups.tex}
 \end{figure}
 
-We shall omit the extension examples since the following of corresponding edges is trivial and anologous to previous examples.
+We shall omit the extension examples since the following of corresponding 
+edges is trivial and anologous to previous examples.
 
 \subsection{Star}
 
@@ -157,7 +157,10 @@ a run of elements. Here we just show the expanded sequence with $*$ symbol.
 	\input{./diagrams/star.tex}
 \end{figure}
 
-Here we immediately notice how the complexity increases by introducing pattern token. Since this is a intermediary step isn't necessary we can instead extend with $*Y$, where $Y$ is some other token. This means we avoid this single large query and have multiple smaller queries.
+Here we immediately notice how the complexity increases by introducing 
+pattern token. Since this is a intermediary step isn't necessary we can 
+instead extend with $*Y$, where $Y$ is some other token. This means we 
+avoid this single large query and have multiple smaller queries.
 
 \begin{figure}[H]
 	\input{./diagrams/star2.tex}
@@ -173,6 +176,9 @@ Here we have limited the run length to be either 2 or 3.
 
 \subsection{Optimizations}
 
-We can further optimize \emph{group next} by inferring the positions from simple \emph{sequence next}. We can see that the positions of a group extension is the same as the union of positions by the group tokens.
+We can further optimize \emph{group next} by inferring the positions from 
+simple \emph{sequence next}. We can see that the positions of a group 
+extension is the same as the union of positions by the group tokens.
 
-If we have a group token $\gamma$ that contains $tokens(\gamma)$ then the \emph{matches} for such group is $$matches(p\gamma, D) = \bigcup_{t \in tokens(\gamma)} matches(pt, D) $$
+If we have a group token $\gamma$ that contains $tokens(\gamma)$ then 
+the \emph{matches} for such group is $$matches(p\gamma, D) = \bigcup_{t \in tokens(\gamma)} matches(pt, D) $$

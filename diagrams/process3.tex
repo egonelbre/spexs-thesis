@@ -1,0 +1,57 @@
+\begin{tikzpicture}[auto]
+	\node[process] (extable) {Extend?};
+
+	% lower part
+	\begin{scope}[wrap={label={below:process 2}, inner sep=2ex,fill=black!5}]
+		\node[pool, below right of=extable] (in1) {In};
+		\node[dataset, right of=in1] (data1) {Dataset 2};
+		\node[process, below left of=data1, xshift=2em] (ext1) {Extender};
+		\node[process, left of=ext1] (extable1) {Extend?};
+		\node[process, right of=ext1] (outable1) {Output?};
+	\end{scope}
+
+	\begin{scope}[wrap={label={above:process 1}, inner sep=2ex,fill=black!5}]
+		\node[pool, above right of=extable] (in2) {In};
+		\node[dataset, right of=in2] (data2) {Dataset 1};
+		\node[process, above left of=data2, xshift=2em] (ext2) {Extender};
+		\node[process, left of=ext2] (extable2) {Extend?};
+		\node[process, right of=ext2] (outable2) {Output?};
+	\end{scope}
+
+	\node[process, right of=in, xshift=8em] (outable) {Output?};
+
+	\node[pool, right of=outable, node distance=6em] (out1) {Out};
+	\node[pool, right of=outable, node distance=6em] (out2) {Out};
+
+	\draw[needs] (data1) to (ext1);
+	\draw[needs] (data1) to (outable1);
+	\draw[needs] (data1) to (extable1);
+
+	\draw[needs] (data2) to (ext2);
+	\draw[needs] (data2) to (outable2);
+	\draw[needs] (data2) to (extable2);
+
+	\draw[chan] (outable) to (out1);
+	\draw[chan] (outable) to (out2);
+
+	% lower part flow
+	\draw[chan, bend left] (in1) to node[left]{p} (ext1);
+	\draw[chan]	(ext1) to node{pX} (outable1);
+	\draw[chan, bend left] (ext1) to node{pX} (extable1);
+	\draw[chan, bend right] (outable1) to node[right]{pX,Z} (outable);
+
+	% upper part flow
+	\draw[chan, bend right] (in2) to node{p} (ext2);
+	\draw[chan]	(ext2) to node{pX} (outable2);
+	\draw[chan, bend right] (ext2) to node[above]{pX} (extable2);
+	\draw[chan, bend left] (outable2) to node{pX,Z} (outable);
+
+	% sync extable
+	\draw[chan, bend left] (extable1) to node[draw, diamond](ok1){pX} (in1);
+	\draw[chan, bend left] (extable1) to node{Z} (extable);
+	\draw[chan] (extable) to node{ok?} (ok1);
+
+	\draw[chan, bend right] (extable2) to node[left, draw, diamond](ok2){pX} (in2);
+	\draw[chan, bend right] (extable2) to node[left]{Z} (extable);
+	\draw[chan] (extable) to node{ok?} (ok2);
+\end{tikzpicture}

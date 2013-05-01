@@ -29,7 +29,7 @@
 \usepackage{float,caption}
 
 \usepackage{tikz}
-\usetikzlibrary{fit, positioning}
+\usetikzlibrary{fit, positioning, arrows, backgrounds, shapes}
 
 \usepackage{algorithm}
 \usepackage{algorithmicx}
@@ -39,9 +39,13 @@
 \usepackage{ifpdf}
 \usepackage{listings, textcomp, color, xcolor, caption}
 
+\usepackage{dirtree}
+
 \usepackage{todonotes}
 
 \makeindex
+
+\input{./diagrams/defs.tex}
 
 \begin{document}
     %settings
@@ -90,8 +94,8 @@
     }
 
     \begin{appendix}
-        \input{./appendices/epps.tex}
         \input{./appendices/spexs2.tex}
         \input{./appendices/SourceCode.tex}
+        % \input{./appendices/epps.tex}
     \end{appendix}
 \end{document}

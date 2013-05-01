@@ -1,16 +1,13 @@
 \chapter{Implementation}
 
 Here we discuss a practical implementation, \emph{spexs2}, for
-pattern discovery in sequences.
+pattern discovery in sequences. 
 
-The actual implementation may need to diverge from the abstract
-definition for several reasons; mainly practicality, simplicity and
-performance. Many of the operations can be optimized for some 
-particular type of datasets and configuration.
+In this chapter we will discuss a practical implementation, \emph{spexs2}, for 
+pattern discovery in sequences. We only discuss parts that we consider non-trivial 
+or interesting and could be useful in implementing other algorithms.
 
-In this chapter we will discuss parts of program that the author
-considers non-trivial in it's design decisions. Information about 
-the full source code is in the Appendix B and C.
+Information about the full source code is in the Appendix B and C.
 
 \section{Architecture}
 
@@ -18,111 +15,92 @@ The main criteria for designing program have been described in D. Parnas
 paper On the Decomposition of Programs. It suggests decomposing into
 isolated units and parts that are likely to change together. \cite{Parnas72}
 
-We chose the following decomposition:
+We chose the following decomposition for the application:
 
+\begin{small}
 \begin{description}
+    \itemsep-0.5em
     \item[Configuration] structure for holding the configuration data
     \item[Setup] based on the configuration initializes data-structures and functions for the algorithm
     \item[Reader] reads in the data from files
     \item[Database] a collection of datasets
     \item[Algorithm] the SPEXS2 algorithm
-    \begin{description}
-        \item[Pattern] represents a pattern
-        \item[Query] stores the pattern with database and pattern
-        \item[Set] stores matching positions
-        \item[Pool] stores queries
-        \item[Extender] drives algorithms extending step
-        \item[Feature] computes a value from the Query
-        \item[Filter] filters some queries
-    \end{description}
     \item[Printer] prints the result queries
     \item[Debugging] utilities for the program
 \end{description}
+\end{small}
 
-It is a trivial decomposition for the algorithm part, since a lot of is derived 
-directly from the algorithm definition.
+The algorithm was decomposed based on the generalization:
 
-The main criteria was to decompose things based on their behavior, whether there
-is a commonality between them or whether they change independently from the other
-parts. \cite{Parnas72}
+\begin{small}
+\begin{description}
+    \itemsep-0.5em
+    \item[Pattern] represents a pattern
+    \item[Query] stores the pattern with database and pattern
+    \item[Set] stores matching positions
+    \item[Pool] stores queries
+    \item[Extender] drives algorithms extending step
+    \item[Feature] computes a value from a query
+    \item[Filter] filters a query
+\end{description}
+\end{small}
 
 \section{Configuration}
 
 One problem with flexible algorithms is that they a lot of ways to be run.
-This often would need having tens or hundereds of program flags.
-To avoid this problem we decided to use a \emph{json} file for the program
-configuration.
+This often leads to having tens or hundereds of program flags.
+To avoid this problem we first decided to use a \emph{json} file for the program
+configuration. Using \emph{json} requires exact placement of commas and quotes that
+caused a lot of problems, hence we started using \emph{yaml} that is more suitable for
+human input.
 
 \todo[inline]{Short example of a configuration file.}
 
-To properly represent configuration in a static language we
-marshal this file directly to the data-structure. This means we can be
-less worried about parsing when setting up our algorithm.
+When running the program from command line it can be uncomfortable to
+make little changes to the configuration files. In these cases a command line
+flag would be much easier. To solve this problem we added markup into the 
+json files so they could be replaced with a flag.
 
-The problem with only using a json file is that when running from
-command line it may be more comfortable using flags. To solve this problem
-we added replacement strings into the json files that can be given in as
-a program argument.
+For example, inside the configuration file:
 
 \begin{verbatim}
     "Datasets" : {
-        "fore" : { "File" : "$inp$"
+        "fore" : { "File" : "$input:main$"
         ...
 \end{verbatim}
 
-When using \emph{spexs2 --conf conf.json input=filename} the input will be
-replaced by filename. Also there is optional default value if one wasn't given.
+Using \emph{spexs2 --conf conf.json input=other} would replace the "File" value 
+with "other". If there is no flag from command line is given, it will be replaced with "main".
 
-\section{Setup and Database}
+\section{Input and Output}
 
-Setup consumes the configuration and based on the values initializes pools; 
-creates and combines features and filters; reads in the data; and creates
-the printer.
-
-\todo[inline]{Database}
-
-\section{Reader and Printer}
-
-One problem with data is that it comes in many different forms. For example reading in 
-words and single letters requires different behaviors.
-
-One thing that may be helpful is supporting different binary formats.
-
-\section{Sets}
-
-Since we need a collection how to store the matching positions it suggests
-the need for a set datatype.
-
-If we have predictable distribution we can pack the sets better. 
-
-Although such optimizations can be avoided, if during storing pools the
-sets are packed using some compression algorithm.
+\todo[inline]{About importance of separating the input reader and output printer from the algorithmic code}
 
 \section{Pools}
 
 There can be different performance characteristics when using a particular implementation. 
-Most importantly to support parallelism they should be ideally lock-free, but we can use locked version as well.
-
-For the pools we have several choices: lifo, fifo or priority.
+Most importantly to support parallelism they should be ideally lock-free,
+but we can use locked version as well.
 
 If we use a fifo queue as the in pool the algorithm does a breadth first search of patterns.
 This can be problematic since we would need a lot of memory to hold all the patterns in memory.
 
-A lifo queue for in pool is a more reasonable choice for memory problems since we need to hold less patterns in memory.
+A lifo queue for in pool is a more reasonable choice for memory problems 
+since we need to hold less patterns in memory.
 
-A priority queue suits for the out pool since we can easily then use some feature to sort 
-the queue and choose only a limited amount. A lock-free priority queue would be preferred
-but it has many details to work correctly. \todo{link to lock-free queues}
+A priority queue suits for the output pool since we can easily then use some feature to sort 
+the queue. A lock-free priority queue would be preferred, but it can be hard to get right. \todo{link to lock-free queues}
 
-One simple solution to make priority queue concurrent is to use mutexes when storing or
-retrieving values. This also would mean that, if the priority queue is used intensively, it can become a bottleneck.
+Trivial solution would be to use locks for enqueuing and dequeuing, but under high contention it
+will become a bottleneck.
 
-We can use some knowledge about our priority-queue behavior. We know that we usually
-have a limited-size and the amount of patterns suitable for putting into the output
-queue is several magnitudes larger; this means most of the queries put into the result queue can be discarded.
+We know that most of the time we do not need all the results, but only the best. 
+We also know that the result limit is usually several magnitudes smaller than the 
+number of output candidates; this means most of the queries put into the result 
+queue will be immediately discarded.
 
-So, if the query is worse than the worst in the priority queue, it can
-be discarded immediately without doing push/pop. If we allow for that check
+Uf the query is worse than the worst in the priority queue, it can be 
+discarded immediately without doing push/pop. If we allow for that check
 to fail once in a while - we can make it mostly lock-free.
 
 \begin{algorithm}[H]
@@ -134,16 +112,14 @@ to fail once in a while - we can make it mostly lock-free.
         \Return
     \EndIf
 
-    \Statef{mutex.lock}
+    \Statef{acquire~lock}
     \Statef{queue.put(new~element)}
     \If{$queue.length > queue.limit$}
         \Statef{current~worst \gets queue.pop()}
     \EndIf
-    \Statef{mutex.unlock}
+    \Statef{release~lock}
 \end{algorithmic}
 \end{algorithm}
-
-We assume the assignments to be atomic.
 
 \section{Features and Filters}
 
