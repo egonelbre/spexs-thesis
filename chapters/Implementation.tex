@@ -175,6 +175,108 @@ Of course there are some filters that cannot be defined by features hence
 there is still possibility to make separate filters. Such as disallowing
 star symbol in the beginning of the pattern.
 
+\section{Synchronized Graph Traversal}
+
+Implementing search over data structures requires synchronization such that there are a certain number of workers and that they wouldn't die of starvation. \emph{spexs} can be seen as a graph traversal algorithm with some extra logic.
+
+The simplest form without synchronization is:
+
+\begin{algorithm}[H]
+    \caption{Graph traversal}
+\begin{algorithmic}[1]
+    \Require{$graph$, $start$, $fn$}
+    \Ensure{All nodes in $graph$ get processed with $fn$}
+
+    \algblockdefx[SPAWN]{Spawn}{EndSpawn}{\bf{spawn}}
+
+    \Statef{unvisited \gets \{ start \})}
+    \Statef{visited \gets \{\}}
+    
+    \Spawn
+        \While{$unvisited$ not empty}
+            \Statef{node \gets unvisited.take()}
+            \Statef{visited.put(node)}
+            \Statef{fn(node)}
+            \For{ $next \in neighbors(node)$ }
+                \If{ $next \not\in visited$ }
+                    \Statef{unvisited.put(next)}
+                \EndIf
+            \EndFor
+        \EndWhile
+    \EndSpawn
+
+    \Statef{wait~for~workers}
+\end{algorithmic}
+\end{algorithm}
+
+This would not work correctly with multiple workers since there are
+race conditions and the workers can die early due to starvation.
+
+The solution is to control worker startup and only terminate workers 
+if all have finished and there are no more items in unvisited set.
+
+\begin{algorithm}[H]
+    \caption{Synchronized graph traversal}
+\begin{algorithmic}[1]
+    \Require{$graph$, $start$, $fn$}
+    \Ensure{All nodes in $graph$ get processed with $fn$}
+
+    \algblockdefx[SPAWN]{Spawn}{EndSpawn}{\textbf{spawn}}{}
+
+    \Statef{added \gets Semaphore(0)}
+    \Statef{terminate \gets false}
+    \Statef{mutex \gets Mutex()}
+    \Statef{workers \gets 0}
+
+    \Statef{unvisited \gets \{ start \}}
+    \Statef{visited \gets \{\}}
+
+    \Statef{added.signal()}
+    
+    \Spawn
+        \While{$true$}
+            \Statef{added.wait()}
+            \Statef{mutex.lock()}
+            \If{ $terminate$ }
+                \Statef{added.signal()}
+                \Statef{mutex.unlock()}
+                \State{\textbf{break}}
+            \EndIf
+
+            \Statef{node \gets unvisited.take()}
+            \Statef{visited.put(node)}
+            \Statef{workers \gets workers + 1}
+            \Statef{mutex.unlock()}
+
+            \Statef{fn(node)}
+
+            \For{ $next \in neighbors(node)$ }
+                \Statef{mutex.lock()}
+                \If{ $next \not\in visited$ }
+                    \Statef{unvisited.put(next)}
+                    \Statef{added.signal()}
+                \EndIf
+                \Statef{mutex.unlock()}
+            \EndFor
+
+            \Statef{mutex.lock()}
+            \Statef{workers \gets workers - 1}
+            \If{$workers = 0~and~unvisited = \{\} $}
+                \Statef{terminate \gets true}
+                \Statef{added.signal()}
+            \EndIf
+            \Statef{mutex.unlock()}
+        \EndWhile
+    \EndSpawn
+
+    \Statef{wait~for~workers}
+\end{algorithmic}
+\end{algorithm}
+
+We use $mutex$ to protect variables and data structures. 
+Semaphore $added$ tracks how many items are in the $unvisited$ set, if the process finally terminates it is turned into a turnstile on line 31 and 13. 
+Variable $workers$ tracks how many workers are busy.
+
 \section{Debugging}
 
 Debugging is a important part of development process hence the need for 
