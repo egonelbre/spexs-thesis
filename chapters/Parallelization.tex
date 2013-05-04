@@ -1,20 +1,16 @@
 \chapter{Parallelization}
 
-Here we describe how we can partition the algorithm to support parallelism.
-A proof of concept for fully parallelized code can be seen in appendix A.
+Here we describe how we can partition the algorithm to support parallelism. A proof of concept for fully parallelized code can be seen in appendix A.
 
 \section{Process}
 
-The main process of the algorithm as described by dataflow diagram.\cite{Kahn74,Lee95} 
-Circles denote processes and unfinished rectangles denote data stores.
+The main process of the algorithm as described by dataflow diagram.\cite{Kahn74,Lee95} Circles denote processes and unfinished rectangles denote data stores.
 
 \begin{figure}[H]
 	\input{./diagrams/process.tex}
 \end{figure}
 
-We can see that the different query extensions do not share a dependency, except the dataset.
-Since dataset itself is read-only for a given process, it means we can use multiple extender processes. 
-The same applies for extendability and output filter.
+We can see that the different query extensions do not share a dependency, except the dataset. Since dataset itself is read-only for a given process, it means we can use multiple extender processes. The same applies for extendability and output filter.
 
 \begin{figure}[H]
 	\input{./diagrams/process2.tex}
@@ -23,6 +19,8 @@ The same applies for extendability and output filter.
 We can add more processes in a similar fashion without affecting the end result. Although this will introduce a source of indeterminism.
 
 \section{Extending}
+
+\todo[inline]{explain map reduce}
 
 Since much of the work is done in \emph{extender} it could be useful to parallelize it as well:
 
@@ -42,16 +40,13 @@ Since much of the work is done in \emph{extender} it could be useful to parallel
 
 \todo[inline]{figure out how to make it readable}
 
-This practically may not give much improvement on conventional CPUs, but could be benefitial for
-highly parallel processors such as GPGPU or FPGA.
+This practically may not give much improvement on conventional CPUs, but could be benefitial for highly parallel processors such as GPGPU or FPGA.
 
 \section{Distributed process}
 
-Since the dataset and the process memory consumption can get quite it would also be benefitial to
-be able to partition the dataset between multiple machines.
+Since the dataset and the process memory consumption can get quite it would also be benefitial to be able to partition the dataset between multiple machines.
 
-The extension results for a given query stays inside the sequence which means we can partition by dividing
-sequences to separate datasets.
+The extension results for a given query stays inside the sequence which means we can partition by dividing sequences to separate datasets.
 
 The whole dataset is required only for filtering, since even one of the simplest operations ("counting matches in dataset") requires full knowledge of all matches over the dataset. We can use partial results ($Z$) to reduce the communication overhead.
 

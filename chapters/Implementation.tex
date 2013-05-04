@@ -3,17 +3,14 @@
 Here we discuss a practical implementation, \emph{spexs2}, for
 pattern discovery in sequences. 
 
-In this chapter we will discuss a practical implementation, \emph{spexs2}, for 
-pattern discovery in sequences. We only discuss parts that we consider non-trivial 
-or interesting and could be useful in implementing other algorithms.
+In this chapter we will discuss a practical implementation, \emph{spexs2}, for pattern discovery in sequences. We only discuss parts that we consider non-trivial or interesting and could be useful in implementing other algorithms.
 
 Information about the full source code is in the Appendix B and C.
 
 \section{Architecture}
 
 The main criteria for designing program have been described in D. Parnas
-paper On the Decomposition of Programs. It suggests decomposing into
-isolated units and parts that are likely to change together. \cite{Parnas72}
+paper "On the Decomposition of Programs"\cite{Parnas72}. It suggests decomposing into isolated units and parts that are likely to change together.
 
 We chose the following decomposition for the application:
 
@@ -45,21 +42,19 @@ The algorithm was decomposed based on the generalization:
 \end{description}
 \end{small}
 
+\tow{why is this important}
+
+\missingfigure{architecture flow}
+
 \section{Configuration}
 
-One problem with flexible algorithms is that they a lot of ways to be run.
-This often leads to having tens or hundereds of program flags.
-To avoid this problem we first decided to use a \emph{json} file for the program
-configuration. Using \emph{json} requires exact placement of commas and quotes that
-caused a lot of problems, hence we started using \emph{yaml} that is more suitable for
-human input.
+One problem with flexible algorithms is that there are a lot of ways to be run. This often leads to having tens or hundereds of program flags. 
 
-\todo[inline]{Short example of a configuration file.}
+To avoid this problem we first decided to use a \emph{json} file for the program configuration. Using \emph{json} requires exact placement of commas and quotes that caused a lot of problems, hence we started using \emph{yaml} that is more suitable for human input.
 
-When running the program from command line it can be uncomfortable to
-make little changes to the configuration files. In these cases a command line
-flag would be much easier. To solve this problem we added markup into the 
-json files so they could be replaced with a flag.
+\tow{Short example of a configuration file.}
+
+When running the program from command line it can be uncomfortable to make little changes to the configuration files. In these cases a command line flag would be much easier. To solve this problem we added markup into the json files so they could be replaced with a flag.
 
 For example, inside the configuration file:
 
@@ -69,39 +64,35 @@ For example, inside the configuration file:
         ...
 \end{verbatim}
 
-Using \emph{spexs2 --conf conf.json input=other} would replace the "File" value 
-with "other". If there is no flag from command line is given, it will be replaced with "main".
+Using \emph{spexs2 --conf conf.json input=other} would replace the "File" value with "other". If there is no flag from command line is given, it will be replaced with "main".
+
+\tow{profiles}
 
 \section{Input and Output}
 
-\todo[inline]{About importance of separating the input reader and output printer from the algorithmic code}
+\tow{about importance of separating the input reader and output printer from the algorithmic code}
+
+\section{Alphabet and Database}
+
+\tow{about problems with large alphabets and datasets}
 
 \section{Pools}
 
-There can be different performance characteristics when using a particular implementation. 
-Most importantly to support parallelism they should be ideally lock-free,
-but we can use locked version as well.
+There can be different performance characteristics when using a particular implementation. Most importantly to support parallelism they should be ideally lock-free, but we can use locked version as well.
 
-If we use a fifo queue as the in pool the algorithm does a breadth first search of patterns.
-This can be problematic since we would need a lot of memory to hold all the patterns in memory.
+\todo[inline]{remove the lock-free stuff}
 
-A lifo queue for in pool is a more reasonable choice for memory problems 
-since we need to hold less patterns in memory.
+If we use a fifo queue as the in pool the algorithm does a breadth first search of patterns. This can be problematic since we would need a lot of memory to hold all the patterns in memory.
 
-A priority queue suits for the output pool since we can easily then use some feature to sort 
-the queue. A lock-free priority queue would be preferred, but it can be hard to get right. \todo{link to lock-free queues}
+A lifo queue for in pool is a more reasonable choice for memory problems since we need to hold less patterns in memory.
 
-Trivial solution would be to use locks for enqueuing and dequeuing, but under high contention it
-will become a bottleneck.
+A priority queue suits for the output pool since we can easily then use some feature to sort the queue. A lock-free priority queue would be preferred, but it can be hard to get right. \todo{link to lock-free queues}
 
-We know that most of the time we do not need all the results, but only the best. 
-We also know that the result limit is usually several magnitudes smaller than the 
-number of output candidates; this means most of the queries put into the result 
-queue will be immediately discarded.
+Trivial solution would be to use locks for enqueuing and dequeuing, but under high contention it will become a bottleneck.
 
-Uf the query is worse than the worst in the priority queue, it can be 
-discarded immediately without doing push/pop. If we allow for that check
-to fail once in a while - we can make it mostly lock-free.
+We know that most of the time we do not need all the results, but only the best. We also know that the result limit is usually several magnitudes smaller than the number of output candidates; this means most of the queries put into the result queue will be immediately discarded.
+
+Uf the query is worse than the worst in the priority queue, it can be discarded immediately without doing push/pop. If we allow for that check to fail once in a while - we can make it mostly lock-free.
 
 \begin{algorithm}[H]
     \caption{priority queue push}
@@ -123,23 +114,19 @@ to fail once in a while - we can make it mostly lock-free.
 
 \section{Features and Filters}
 
-One problem is that the amount of possible filters it's useful to construct them from some other features. 
-Or if we wish to use multiple filters we can combine them.
+\tow{simpler and examples}
 
-We can use these features to find out something about the query.
-They each feature is defined as:
+One problem is that the amount of possible filters it's useful to construct them from some other features. Or if we wish to use multiple filters we can combine them.
+
+We can use these features to find out something about the query. They each feature is defined as:
 
 \begin{verbatim}
 type Feature func(q *Query) (float64, string)
 \end{verbatim}
 
-Most of features are in $\Re$, but for some there
-is some extended information that we may wish to know - hence
-the need for additional string value. One of the simplest
-is Pattern representation.
+Most of features are in $\Re$, but for some there is some extended information that we may wish to know - hence the need for additional string value. One of the simplest is Pattern representation.
 
-Also many of the features are defined in terms of multiple datasets.
-We can use a closure to easily define a more generic feature.
+Also many of the features are defined in terms of multiple datasets. We can use a closure to easily define a more generic feature.
 
 Example:
 
@@ -152,13 +139,11 @@ func Matches(dataset []int) Feature {
 }
 \end{verbatim}
 
-Here the Matches function creates a feature function defined
-for dataset.
+Here the Matches function creates a feature function defined for dataset.
 
 We can use the name in the configuration file as "Matches(fore)".
 
-If a feature returns a floating point value we can easily turn that
-into a filter by specifying a minimum or/and maximum value.
+If a feature returns a floating point value we can easily turn that into a filter by specifying a minimum or/and maximum value.
 
 For example to give a lower and higher limits to some feature:
 
@@ -171,11 +156,11 @@ func featureFilter(feature Feature, min float64, max float64) Filter {
 }
 \end{verbatim}
 
-Of course there are some filters that cannot be defined by features hence
-there is still possibility to make separate filters. Such as disallowing
-star symbol in the beginning of the pattern.
+Of course there are some filters that cannot be defined by features hence there is still possibility to make separate filters. Such as disallowing star symbol in the beginning of the pattern.
 
 \section{Synchronized Graph Traversal}
+
+\tow{relation to spexs}
 
 Implementing search over data structures requires synchronization such that there are a certain number of workers and that they wouldn't die of starvation. \emph{spexs} can be seen as a graph traversal algorithm with some extra logic.
 
@@ -209,11 +194,9 @@ The simplest form without synchronization is:
 \end{algorithmic}
 \end{algorithm}
 
-This would not work correctly with multiple workers since there are
-race conditions and the workers can die early due to starvation.
+This would not work correctly with multiple workers since there are race conditions and the workers can die early due to starvation.
 
-The solution is to control worker startup and only terminate workers 
-if all have finished and there are no more items in unvisited set.
+The solution is to control worker startup and only terminate workers if all have finished and there are no more items in unvisited set.
 
 \begin{algorithm}[H]
     \caption{Synchronized graph traversal}
@@ -273,14 +256,15 @@ if all have finished and there are no more items in unvisited set.
 \end{algorithmic}
 \end{algorithm}
 
-We use $mutex$ to protect variables and data structures. 
-Semaphore $added$ tracks how many items are in the $unvisited$ set, if the process finally terminates it is turned into a turnstile on line 31 and 13. 
-Variable $workers$ tracks how many workers are busy.
+We use $mutex$ to protect variables and data structures. Semaphore $added$ tracks how many items are in the $unvisited$ set, if the process finally terminates it is turned into a turnstile on line 31 and 13. Variable $workers$ tracks how many workers are busy.
 
 \section{Debugging}
 
-Debugging is a important part of development process hence the need for 
-more information how the algorithm is working.
+\tow{relation to spexs}
+
+Debugging is an important part of development process hence the need for more information how the algorithm is working.
+
+\todo{mention that these aren't always run}
 
 Often this is resolved by adding some debug statments:
 

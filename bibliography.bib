@@ -1,10 +1,4 @@
-@phdthesis{Vilo02,
-    author = {Jaak Vilo},
-    title = {Pattern Discovery from Biosequences},
-    year = {2002},
-    school = {University of Helsinki},
-}
-
+% generic
 @article{Parnas72,
     author = {Parnas, D. L.},
     title = {On the criteria to be used in decomposing systems into modules},
@@ -69,3 +63,82 @@
     publisher = {ACM},
     address = {New York, NY, USA},
 } 
+
+% algorithms
+
+@phdthesis{spexs,
+    author = {Jaak Vilo},
+    title = {Pattern Discovery from Biosequences},
+    year = {2002},
+    school = {University of Helsinki},
+}
+
+@article{TEIRESIAS,
+    author = {Rigoutsos, I and Floratos, A}, 
+    title = {Combinatorial pattern discovery in biological sequences: The TEIRESIAS algorithm.},
+    volume = {14}, 
+    number = {1}, 
+    pages = {55-67}, 
+    year = {1998}, 
+    doi = {10.1093/bioinformatics/14.1.55}, 
+    abstract ={MOTIVATION: The discovery of motifs in biological sequences is an important problem. RESULTS: This paper presents a new algorithm for the discovery of rigid patterns (motifs) in biological sequences. Our method is combinatorial in nature and able to produce all patterns that appear in at least a (user-defined) minimum number of sequences, yet it manages to be very efficient by avoiding the enumeration of the entire pattern space. Furthermore, the reported patterns are maximal: any reported pattern cannot be made more specific and still keep on appearing at the exact same positions within the input sequences. The effectiveness of the proposed approach is showcased on a number of test cases which aim to: (i) validate the approach through the discovery of previously reported patterns; (ii) demonstrate the capability to identify automatically highly selective patterns particular to the sequences under consideration. Finally, experimental analysis indicates that the algorithm is output sensitive, i.e. its running time is quasi-linear to the size of the generated output.}, 
+    URL = {http://bioinformatics.oxfordjournals.org/content/14/1/55.abstract}, 
+    eprint = {http://bioinformatics.oxfordjournals.org/content/14/1/55.full.pdf+html}, 
+    journal = {Bioinformatics} 
+}
+
+@Article{Verbumculus,
+    author =       {A. Apostolico and F. Gong and S. Lonardi},
+    title =        {Verbumculus and the Discovery of Unusual Words},
+    journal =      {Journal of Computer Science and Technology},
+    year =         {2003},
+    volume =       {19},
+    number =       {1},
+    pages =        {22-41},
+    url =          "http://www.cs.ucr.edu/~stelo/papers/verb03.ps.gz",
+}
+
+@article{MobyDick,
+    author = {Bussemaker, Harmen J. and Li, Hao and Siggia, Eric D.}, 
+    title = {Building a dictionary for genomes: Identification of presumptive regulatory sites by statistical analysis},
+    volume = {97}, 
+    number = {18}, 
+    pages = {10096-10100}, 
+    year = {2000}, 
+    doi = {10.1073/pnas.180265397}, 
+    abstract ={The availability of complete genome sequences and mRNA expression data for all genes creates new opportunities and challenges for identifying DNA sequence motifs that control gene expression. An algorithm, “MobyDick,” is presented that decomposes a set of DNA sequences into the most probable dictionary of motifs or words. This method is applicable to any set of DNA sequences: for example, all upstream regions in a genome or all genes expressed under certain conditions. Identification of words is based on a probabilistic segmentation model in which the significance of longer words is deduced from the frequency of shorter ones of various lengths, eliminating the need for a separate set of reference data to define probabilities. We have built a dictionary with 1,200 words for the 6,000 upstream regulatory regions in the yeast genome; the 500 most significant words (some with as few as 10 copies in all of the upstream regions) match 114 of 443 experimentally determined sites (a significance level of 18 standard deviations). When analyzing all of the genes up-regulated during sporulation as a group, we find many motifs in addition to the few previously identified by analyzing the subclusters individually to the expression subclusters. Applying MobyDick to the genes derepressed when the general repressor Tup1 is deleted, we find known as well as putative binding sites for its regulatory partners.}, 
+    URL = {http://www.pnas.org/content/97/18/10096.abstract}, 
+    eprint = {http://www.pnas.org/content/97/18/10096.full.pdf+html}, 
+    journal = {Proceedings of the National Academy of Sciences} 
+}
+
+@article{RSAT,
+    author = {Thomas-Chollier, Morgane and Sand, Olivier and Turatsinze, Jean-Valéry and Janky, Rekin's and Defrance, Matthieu and Vervisch, Eric and Brohée, Sylvain and van Helden, Jacques}, 
+    title = {RSAT: regulatory sequence analysis tools},
+    volume = {36}, 
+    number = {suppl 2}, 
+    pages = {W119-W127}, 
+    year = {2008}, 
+    doi = {10.1093/nar/gkn304}, 
+    abstract ={The regulatory sequence analysis tools (RSAT, http://rsat.ulb.ac.be/rsat/) is a software suite that integrates a wide collection of modular tools for the detection of cis-regulatory elements in genome sequences. The suite includes programs for sequence retrieval, pattern discovery, phylogenetic footprint detection, pattern matching, genome scanning and feature map drawing. Random controls can be performed with random gene selections or by generating random sequences according to a variety of background models (Bernoulli, Markov). Beyond the original word-based pattern-discovery tools (oligo-analysis and dyad-analysis), we recently added a battery of tools for matrix-based detection of cis-acting elements, with some original features (adaptive background models, Markov-chain estimation of P-values) that do not exist in other matrix-based scanning tools. The web server offers an intuitive interface, where each program can be accessed either separately or connected to the other tools. In addition, the tools are now available as web services, enabling their integration in programmatic workflows. Genomes are regularly updated from various genome repositories (NCBI and EnsEMBL) and 682 organisms are currently supported. Since 1998, the tools have been used by several hundreds of researchers from all over the world. Several predictions made with RSAT were validated experimentally and published.}, 
+    URL = {http://nar.oxfordjournals.org/content/36/suppl_2/W119.abstract}, 
+    eprint = {http://nar.oxfordjournals.org/content/36/suppl_2/W119.full.pdf+html}, 
+    journal = {Nucleic Acids Research} 
+}
+
+@techreport{Hausler05,
+    hal_id = {inria-00070303},
+    url = {http://hal.inria.fr/inria-00070303},
+    title = {{Motif Discovery on Promotor Sequences}},
+    author = {H{\"a}u{\ss}ler, Maximilian and Nicolas, Jacques},
+    abstract = {{Transcriptional regulation is the mechanism in the cell that controls when and how genes are expressed into proteins. This document gives an overview over current computational approaches that try to predict "motifs" that control the process. Motifs are short degenerate words or patterns within promotor sequences, putative binding sites, which are commonly usually upstream of a gene. The two common approaches in bioinformatics (matching against known representatives and ab initio prediction) are presented. For the latter, we describe algorithmical details of most existing implementations and introduce a tool that could simplify everyday work with these programs.}},
+    keywords = {PROMOTOR ANALYSIS / PROMOTER ANALYSIS / MOTIF DISCOVERY / MOTIF MATCHING / PATTERN DISCOVERY / BINDING SITE PREDICTION / TRANSCRIPTIONAL REGULATION / BIOINFORMATICS / MACHINE LEARNING},
+    language = {Anglais},
+    affiliation = {Bioinformatics Organization , SYMBIOSE - INRIA - IRISA},
+    pages = {136},
+    type = {Rapport de recherche},
+    institution = {INRIA},
+    number = {RR-5714},
+    year = {2005},
+    pdf = {http://hal.inria.fr/inria-00070303/PDF/RR-5714.pdf},
+}

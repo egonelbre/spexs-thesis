@@ -1,8 +1,6 @@
-\chapter{Generalization}
+\chapter{SPEXS Generalization}
 
-In this chapter we show how to make the algorithm more 
-abstract by allowing flexibilty through function composition and
-finding minimal requirements for the data-structures.
+In this chapter we show how to make SPEXS algorithm more abstract by allowing flexibilty through function composition and finding minimal requirements for the data-structures.
 
 \section{Algorithm}
 
@@ -31,54 +29,39 @@ The algorithm in a more conventional view is:
 \end{algorithmic}
 \end{algorithm}
 
-When the algorithm starts we create an empty pattern query $\epsilon$ and put 
-into the \emph{in} pool. The \emph{in} pool contains queries whose patterns
-should be further examined.
+When the algorithm starts we create an empty pattern query $\epsilon$ and put into the \emph{in} pool. The \emph{in} pool contains queries whose patterns should be further examined.
 
-We pick a query from the \emph{in} pool for extending. The extending means
-generating all queries whose pattern size is larger by one. There can be
-several such queries.
+We pick a query from the \emph{in} pool for extending. The extending means generating all queries whose pattern size is larger by one. There can be several such queries.
 
-If any of the queries should be further examined as defined by the
-\emph{extendable} query filter, it will be put into the \emph{in} pool.
+If any of the queries should be further examined as defined by the \emph{extendable} query filter, it will be put into the \emph{in} pool.
 
-If the query is fit for output we as defined by the \emph{outputtable} filter,
-it will be put into the \emph{out} pool.
+If the query is suitable for output as defined by the \emph{outputtable} filter, it will be put into the \emph{out} pool. 
 
-If we extend each pattern at each step by one we guarantee that we
-examine all the patterns that conform to our criteria.
+If we extend each pattern at each step by one we guarantee that we examine all the patterns that conform to our criteria as defined by \emph{extendable} filter.
 
 \section{Pools}
 
-Pool is an abstract datatype for a collection of queries. The pool
-allows queries to be put into it and taken from it, also we can
-ask whether the pool is empty or not.
+\tow{only importance}
 
-It has no guarantees on how the queries are stored internally and
-in which order they are taken out. This gives an option to persist the
-queries if needed.
+It has no guarantees on how the queries are stored internally and in which order they are taken out. This gives an option to store on disk the queries if needed.
 
-In practice this means we can use any collection such as list, set,
-queue as a pool. This gives us different performance and memory characteristics.
+In practice this means we can use any collection such as list, set, queue as a pool. This gives us different performance and memory characteristics.
 
 \section{Filtering}
 
-Filtering allows us to reduce the number of queries we have to examine and
-allows to select a subset of patterns by some criteria.
+Filtering allows us to reduce the number of queries we have to examine and allows to select a subset of patterns by some criteria. \eg
 
-If we have interestingness measure we can create filter from it by
-defining it's minimum or maximum value. One very useful example 
-would be a filter for limiting the pattern length.
+If we have interestingness measure we can create filter from it by defining it's minimum or maximum value. One very useful example would be a filter for limiting the pattern length. \eg
 
-By separating the extension and output filter, as opposed to original SPEXS, 
-we can still limit output without affecting the extension process.
-For example if we wish to see only patterns of length 3 we cannot do
-it with one filter, since we still would need to extend patterns of length 0, 1 and 2.
+By making extension and output filter independent, as opposed to original SPEXS, we can still limit output without affecting the extension process. For example if we wish to see only patterns of length 3 we cannot do it with one filter, since we still would need to extend patterns of length 0, 1 and 2.
 
 \section{Extending}
 
-The extending process is at the core of the algorithm and there are
-several ways of doing it.
+The extending process is at the core of the algorithm and there are several ways of doing it.
+
+\tow{motivation}
+
+\tow{comments}
 
 The idea of extending method is:
 
@@ -113,16 +96,11 @@ The idea of extending method is:
 \end{algorithmic}
 \end{algorithm}
 
-The behavior of \emph{extender} depends on how \emph{next} is 
-implemented, we shall look at different ways how to implement it.
-The different implementations can capture more complex patterns,
-but often at the cost of performance.
+The behavior of \emph{extender} depends on how \emph{next} is implemented, we shall look at different ways how to implement it. The different implementations can capture more complex patterns, but often at the cost of performance.
 
 \subsection{Sequences}
 
-The simplest case how the next function behaves is when we are 
-only looking for simple sequences -- the alphabet for patterns
-and sequences is the same.
+The simplest case how the next function behaves is when we are only looking for simple sequences -- the alphabet for patterns and sequences is the same.
 
 Let's consider a sequence $ACGCCGATCGC$ and a pattern $CG$.
 
@@ -130,37 +108,25 @@ Let's consider a sequence $ACGCCGATCGC$ and a pattern $CG$.
 	\input{./diagrams/sequence.tex}
 \end{figure}
 
-Initially we have matches only for query $CG$. Then by taking
-the \emph{next} token from the sequence we can build up
-querys $CGA$ and $CGC$.
+Initially we have matches only for query $CG$. Then by taking the \emph{next} token from the sequence we can build up querys $CGA$ and $CGC$.
 
 \subsection{Groups}
 
-One common addition in a pattern language is capturing a group
-of tokens. For example we can use $X = [AC]$ to denote both tokens $A, T$. 
-By adding where either one transitions we can capture such groups in 
-the extension process.
+One common addition in a pattern language is capturing a group of tokens. For example we can use $X = [AC]$ to denote both tokens $A, C$. By adding where either one transitions we can capture such groups in the extension process.\
 
 \begin{figure}[H]
 	\input{./diagrams/groups.tex}
 \end{figure}
 
-We shall omit the extension examples since the following of corresponding 
-edges is trivial and anologous to previous examples.
-
 \subsection{Star}
 
-Another possible extension is the \emph{dot-star} or more simply capturing
-a run of elements. Here we just show the expanded sequence with $*$ symbol.
+Another possible extension is the \emph{dot-star} or more simply capturing a run of elements. Here we just show the expanded sequence with $*$ symbol.
 
 \begin{figure}[H]
 	\input{./diagrams/star.tex}
 \end{figure}
 
-Here we immediately notice how the complexity increases by introducing 
-pattern token. Since this is a intermediary step isn't necessary we can 
-instead extend with $*Y$, where $Y$ is some other token. This means we 
-avoid this single large query and have multiple smaller queries.
+Here we immediately notice how the complexity increases by introducing pattern token. \tow{properly} We can skip this intermediary step isn't necessary we can instead extend with $*Y$, where $Y$ is some other token. This means we avoid this single large query and have multiple smaller queries.
 
 \begin{figure}[H]
 	\input{./diagrams/star2.tex}
@@ -176,9 +142,11 @@ Here we have limited the run length to be either 2 or 3.
 
 \subsection{Optimizations}
 
-We can further optimize \emph{group next} by inferring the positions from 
-simple \emph{sequence next}. We can see that the positions of a group 
-extension is the same as the union of positions by the group tokens.
+We can further optimize \emph{group next} by inferring the positions from simple \emph{sequence next}. We can see that the positions of a group extension is the same as the union of positions by the group tokens.
 
-If we have a group token $\gamma$ that contains $tokens(\gamma)$ then 
-the \emph{matches} for such group is $$matches(p\gamma, D) = \bigcup_{t \in tokens(\gamma)} matches(pt, D) $$
+If we have a group token $\gamma$ that contains $tokens(\gamma)$ then the \emph{matches} for such group is $$matches(p\gamma, D) = \bigcup_{t \in tokens(\gamma)} matches(pt, D) $$
+
+
+\section{Combining}
+
+\tow{what follows, how used}

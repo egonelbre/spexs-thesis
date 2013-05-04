@@ -1,18 +1,19 @@
 \chapter{Algorithms}
 
-There are many itemset discovery algorithms, but only few are general and can discover more complex patterns.
+There are many itemset discovery algorithms, but only few are general and 
+can discover more complex patterns. \insertref{???}
 
-\section{SPEXS}
+\section{Common algorithms}
 
-SPEXS is an pattern discovery algorithm described by Vilo et al.
-This algorithm finds patterns from a sequence.
-We take this as our basis for developing a new parallel algorithm.
-In this chapter we describe original algorithm so that we can
-later show the changes made to this algorithm.
+\subsection{SPEXS}
+
+SPEXS is an pattern discovery algorithm described by Vilo et al. \cite{spexs}
+This algorithm finds patterns from a sequence. We take this as our basis for developing a new parallel algorithm. In this chapter we describe original algorithm so that we can later show the changes made to this algorithm.
 
 We describe the general representation of the SPEXS algorithm. 
 The original algorithm was as follows:
 
+\todo[inline]{move algorithm to generalization}
 
 \begin{algorithm}[H]
 	\caption{The SPEXS algorithm}
@@ -20,7 +21,7 @@ The original algorithm was as follows:
 	\Require{String $S$, pattern class $\sym{P}$, output criteria, search order, and fitness measure $\sym{F}$}
 	\Ensure{Patterns $\pi \in \sym{P}$ fulfilling all criteria, and output in the order of fitness $\sym{F}$}
 
-	\State{Convert input into sequences into a single sequence}
+	\State{Convert input sequences into a single sequence}
 	\State{Initiate data structures}
 
 	\Statef{Root \gets new node}
@@ -30,14 +31,14 @@ The original algorithm was as follows:
 
 	\While{$N \gets dequeue(\sym{Q})$}
 		\State{ Create all possible 
-			extensions $P \in \sym{P}$ of $N$ using $N.pos$ and $S$ }
-		\For{ extension $P$ of $N$}
-			\If{pattern $P$ and position list $P.pos$ fulfill the criteria}
-				\Statef{N.child \gets P}
-				\State{calculate $\sym{F}(P,S)$}
-				\Statef{enqueue(\sym{Q},P,order)}
-				\If{ $P$ fulfills the output criteria}
-					\State{store $P$ into ouput queue $\sym{O}$}
+			extensions $p \in \sym{P}$ of $N$ using $N.pos$ and $S$ }
+		\For{ extension $p$ of $N$}
+			\If{pattern $p$ and position list $p.pos$ fulfill the criteria}
+				\Statef{N.child \gets p}
+				\State{calculate $\sym{F}(p,S)$}
+				\Statef{enqueue(\sym{Q},p,order)}
+				\If{ $p$ fulfills the output criteria}
+					\State{store $p$ into ouput queue $\sym{O}$}
 				\EndIf
 			\EndIf
 		\EndFor
@@ -54,6 +55,26 @@ is longer by 1. If any of the queries is fit, by some criteria,
 it will be put into the main queue, for further extension, 
 and output queue for possible output.
 
-\section{TEIRESIAS}
+\subsection{TEIRESIAS}
 
-\todo[inline]{write about it}
+\tow{overview} \cite{TEIRESIAS}
+
+\subsection{Verbumculus}
+
+\tow{overview} \cite{Verbumculus}
+
+\subsection{MobyDick}
+
+\tow{overview} \cite{MobyDick}
+
+\subsection{RSAT}
+
+\tow{overview} \cite{RSAT}
+
+\subsection{VanHelden}
+
+\tow{overview} \cite{VanHelden}
+
+\section{Reviews}
+
+\tow{about some reviews}
