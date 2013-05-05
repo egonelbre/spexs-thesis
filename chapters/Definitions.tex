@@ -1,10 +1,6 @@
 \chapter{Definitions}
 
-Pattern discovery is a research area aiming to discover unknown patterns
-in a given set of data structures that are frequent and interesting according 
-to some measure.
-
-Since the discovery algorithms are highly dependent on the patterns, that are being searched, the algorithm must be minimal in the requirements on the dataset to be applicable as wide range of inputs as possible. This also means that the pattern structures are dependent on the initial data. \eg
+Pattern discovery is a research area aiming to discover unknown patterns in a given set of data structures that are frequent and interesting according to some measure. In this chapter we formally define necessary terms used in this thesis.
 
 \section{Sequence and Dataset}
 
@@ -16,69 +12,72 @@ Any sequence $S=a_1 a_2 ... a_n, \forall a_i \in \Sigma$ is called a \emph{seque
 over the token set $\Sigma$. If the length of the
 string is $0$, it is called an empty sequence or $\epsilon$.
 
-For example $ACGTGCCATC$ is a sequence where $\Sigma = \{A, C, G, T\}$.
+\begin{exmp}
+\R{ACGTGCCATC} is a sequence where $\Sigma = \{\R{A}, \R{C}, \R{G}, \R{T}\}$.
+\end{exmp}
 
-A \emph{dataset} is a set of sequences. For example a document can be considered as a dataset, where the sentences are sequences and each word is a token in the alphabet. \eg
+A \emph{dataset} is a collection of sequences.
+
+\begin{exmp}
+In a document sentences can be considered as a \emph{dataset}, where a single sentence is a \emph{sequences} and each word is a \emph{token} in the alphabet. Text \R{This is some example. This is an other example.} has sequences \{ [\R{This is an example}], [\R{This is an other example}] \} and the alphabet is $\Sigma =$ \{\R{this}, \R{is}, \R{an}, \R{example}, \R{other}\}.	
+\end{exmp}
 
 \section{Pattern}
 
-\todo[inline]{use simpler definition for pattern}
+Our aim is to discover repetetive and common structures in data. We call such structures \emph{patterns}. A generic way to define a \emph{pattern} is as a set of all the sub-structures it represents. This means we can say whether some data sub-structure is represented by a pattern.
 
-A \emph{pattern} is a structure that defines a set of sequences. 
-Pattern is usually denoted by a sequence over an extended alphabet. \eg
+The \emph{pattern structure} is usually dependent on the data-structures which it represents. For example sequence patterns are usually represented sequences, graph patterns are represented as graphs; but sequence patterns could also be represented as a graph.
 
-\tow{pattern size}
+We denote the set of structures that a pattern structure $p$ defines as $all(p)$. If $\alpha \in all(p)$, where $\alpha$ is a structure then we say that
+structure $\alpha$ \emph{matches exactly} pattern $p$. We say that $\alpha$ \emph{matches} $p$ if any of structure $all(p)$ is a sub-structure of $\alpha$.
 
-We denote the set of sequences that a pattern $p$ defines as $all(p)$.
-If $\alpha \in all(p)$, where $\alpha$ is a sequence then we say that
-sequence $\alpha$ \emph{matches exactly} pattern $p$. We say that $\alpha$
-\emph{matches} $p$ if any of sequences $all(p)$ is a subsequence of $\alpha$.
+In this thesis we only consider sequential pattern structures and use \emph{pattern} to mean \emph{sequential pattern structure}. We represent such patterns with regular expressions\insertref{regexp}. 
 
-The most commonly used pattern descriptions are regular expressions. For example $.[AT]$ denotes a set $\{AA, AT, CA, CT, GA, GT, TA, TT\}$ and this would match $CCTC$ and exactly match $AT$. A \emph{match} is a location set where the pattern in the sequence ends.
+\tow{about regexps}
+
+\emph{Pattern size} is the length of the pattern sequence.
+
+\begin{exmp}
+\R{.[AT]} is a pattern of size 2 and denotes a set 
+\{ \R{AA}, \R{AT}, \R{CA}, \R{CT}, \R{GA}, \R{GT}, \R{TA}, \R{TT}\}; it matches \R{CCTC} and exactly matches \R{AT}.	
+\end{exmp}
 
 We denote the set of all pattern $p$ \emph{matches} in a dataset $D$ as $matches(p, D) = \{ match(p, \alpha) | \alpha \in D, matches(p, \alpha) \}$.
 
 \section{Query}
 
-\tow{motivation}
+We need to somehow understand where given pattern $p$ is located in a dataset $D$. This compound structure $q = <D, p, matches(p, D)>$ is called a \emph{query}.
 
-A \emph{query} is a compound structure $<D, p, matches(p, D)>$, 
-where $D$ is the dataset and $p$ a pattern. \eg
+\begin{exmp}
+Let out dataset be $D = [ \text{\R{ACGT}}, \text{\R{TXCGA}} ]$ and our pattern be $p = \text{\R{C.}}$. The corresponding query is $<D, p, \{ [1,3], [2,4]\}>$, which means that the pattern $p$ ends in sequence 1 at position 3 and in sequence 2 at position 4.
+\end{exmp}
 
 \subsection{Query features}
 
-\tow{motivation}
+When we talk about how "interesting" a pattern is, we are actually evaluating the query, since the pattern requires a context where it can be "interesting".
 
-\emph{Query feature} is a function $f: Q \mapsto A$, 
-where $Q$ is the query type. It gives information about 
-the query such as the pattern representation, 
-length, number of matches in the dataset.
+Queries can have different properties: length, number of matches in the dataset, pattern textual representation etc. Such properties can be represented by a function that take a query as an input and return the property. Formally a \emph{query feature} is a function $f: Query \mapsto Any$.
 
-\emph{Query interestingness} is a function $f: Q \mapsto Ord$ 
-of the query whose results are well-ordered. This functions result allows to
-say whether one query is more interesting than the other.
-For convenience it is useful to represent that value in
-$\Re$.
+We also need to see how "interesting" one query is compared to the others. \emph{Query interestingness} is a function $f: Query \mapsto Value$ where the $Value$-s are well-ordered. This gives a measure to compare two different queries. Often we can represent such interestingness measures as a real number.
 
-\emph{Query filter} is a function $f: Q \mapsto Bool$ of the query whose result
-is a boolean.
+We should also be able to somehow specify criterias for query. \emph{Query filter} is a function $f: Query \mapsto Boolean$ and shows whether the query matches the criteria.
 
-\subsection{Pool}
+\begin{exmp}
+Pattern occurences in a document is a interestingness measure. Whether query pattern is at least 3 tokens is a query filter.
+\end{exmp}
 
-\tow{proper definition}
+\section{Pool}
 
-Pool is an abstract datatype for a collection of queries. The pool allows queries to be put into it and taken from it, also we can ask whether the pool is empty or not.
+\emph{Pool} is an abstract datatype for a collection of queries. The pool allows queries to be stored. The only operations that pool must provide is "push", for adding a query, and "pop", for getting a query.
 
-It has no guarantees on how the queries are stored internally and in which order they are taken out. This gives an option to persist the queries if needed.
-
-\eg
-
-\tow{in practice}
+\begin{exmp}
+Stacks and queues both satisfy the pool requirement. We could also define a pool that stores the queries on the disk; also it could pack or reorder the queries for performance reasons.
+\end{exmp}
 
 \section{Pattern Discovery}
 
-In this thesis \emph{pattern discovery} is a process of finding the most interesting subset of sequential patterns, according to some query interestingness, in a sequence dataset.
+In this thesis \emph{pattern discovery} is a process of finding the most interesting subset, according to a query interestingness, of sequential patterns, that conform to some criteria, in a sequence dataset.
 
-\tow{other possibilities}
-
-For example "Finding most common nucleotide patterns that are at least 3 nucleotides long from a shotgun sequencing output." \emph{Most common} defines our interestingness measure. \emph{At least 3 nucleotides} is the pattern subset criteria. \emph{Sequencing output} is our dataset and \emph{nucleotides} define the token alphabet.
+\begin{exmp}
+Let our search problem be "Finding most common nucleotide patterns that are at least 3 nucleotides long from a shotgun sequencing output.", then \emph{most common} defines our interestingness measure. \emph{At least 3 nucleotides} is the pattern subset criteria. \emph{Sequencing output} is our dataset and \emph{nucleotides} define the token alphabet.
+\end{exmp}

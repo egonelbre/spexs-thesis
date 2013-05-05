@@ -1,6 +1,6 @@
 \chapter{Parallelization}
 
-Here we describe how we can partition the algorithm to support parallelism. A proof of concept for fully parallelized code can be seen in appendix A.
+Here we discuss different ways how we can partition the algorithm to support parallelism.
 
 \section{Process}
 
@@ -20,29 +20,32 @@ We can add more processes in a similar fashion without affecting the end result.
 
 \section{Extending}
 
-\todo[inline]{explain map reduce}
-
-Since much of the work is done in \emph{extender} it could be useful to parallelize it as well:
+\emph{Extender} can be parallelized by using MapReduce\cite{MapReduce} concepts. We use here Clojure\cite{clojure} reducers library to show how this can be implemented.
 
 \begin{algorithm}[H]
-	\caption{Parallel Extender with Group optimization}
-\begin{algorithmic}[1]
-	\Require{Query $q$, function $next : \sym{I} \rightarrow [(\sym{I}, \sym{P})]$ }
-	\Ensure{Set of querys that have been extended by one step}
+	\caption{Parallel extender}
+\begin{lstlisting}[language=Lisp]
+(require '[clojure.core.reducers :as r])
 
-	\Statef{nexts \gets map(next, positions(q.matches)) }
-	\Statef{matches \gets groupBy(fst, nexts) }
-	\Statef{result \gets map(queryMaker(q), matches) }
-	\Statef{optimized \gets map( (x) \rightarrow (union(matches(x))), groups) }
-	\Statef{return union(result, optimized)}
-\end{algorithmic}
+; fold-join based grouping function
+(defn group-map-by [g f coll]
+  (r/fold 
+   (r/monoid (partial merge-with into) (constantly {}))
+   (fn [ret x]
+     (let [k (g x)]
+       (assoc ret k (conj (get ret k []) (f x)))))
+   coll))
+
+(defn extend [dataset query]
+   (let [ steps   (r/mapcat #(walk dataset %) (:positions query))
+          grouped (group-map-by :token :position steps)]
+        (r/map #(child-query q %) grouped))))
+\end{lstlisting}
 \end{algorithm}
 
-\todo[inline]{figure out how to make it readable}
+This may not give much improvement on desktop CPUs, since we already can process multiple queries at the same time. This parallelization could be benefitial for highly parallel processors such as GPGPUs or FPGAs.
 
-This practically may not give much improvement on conventional CPUs, but could be benefitial for highly parallel processors such as GPGPU or FPGA.
-
-\section{Distributed process}
+\section{Distributed processes}
 
 Since the dataset and the process memory consumption can get quite it would also be benefitial to be able to partition the dataset between multiple machines.
 

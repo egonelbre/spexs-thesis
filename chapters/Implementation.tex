@@ -10,9 +10,9 @@ Information about the full source code is in the Appendix B and C.
 \section{Architecture}
 
 The main criteria for designing program have been described in D. Parnas
-paper "On the Decomposition of Programs"\cite{Parnas72}. It suggests decomposing into isolated units and parts that are likely to change together.
+paper "On the Criteria To Be Used in Decomposing Systems into Modules"\cite{Parnas72}. It suggests decomposing into isolated units and parts that are likely to change together.
 
-We chose the following decomposition for the application:
+We chose the following module decomposition for the application:
 
 \begin{small}
 \begin{description}
@@ -23,32 +23,16 @@ We chose the following decomposition for the application:
     \item[Database] a collection of datasets
     \item[Algorithm] the SPEXS2 algorithm
     \item[Printer] prints the result queries
-    \item[Debugging] utilities for the program
 \end{description}
 \end{small}
 
-The algorithm was decomposed based on the generalization:
+The program starts by interpreting flags, then it marshals configuration file onto an internal structure, this configuration is given into setup module. Setup module initializes (as defined by configuration) a reader, a printer and also prepares structures for algorithm. Then the reader reads input to the database. Then the algorithm is activated and finally it is printed out with Printer.
 
-\begin{small}
-\begin{description}
-    \itemsep-0.5em
-    \item[Pattern] represents a pattern
-    \item[Query] stores the pattern with database and pattern
-    \item[Set] stores matching positions
-    \item[Pool] stores queries
-    \item[Extender] drives algorithms extending step
-    \item[Feature] computes a value from a query
-    \item[Filter] filters a query
-\end{description}
-\end{small}
-
-\tow{why is this important}
-
-\missingfigure{architecture flow}
+This structure is universal for algorithm implementations and allows easily to add more configuration options, different input formats and different output formats. By changing the configuration, reader and printer we could make it a web service instead of running it on a command line.
 
 \section{Configuration}
 
-One problem with flexible algorithms is that there are a lot of ways to be run. This often leads to having tens or hundereds of program flags. 
+One problem with flexible algorithms is that there are a lot of ways to be run. This can lead to having tens or hundereds of command-line flags for the application.
 
 To avoid this problem we first decided to use a \emph{json} file for the program configuration. Using \emph{json} requires exact placement of commas and quotes that caused a lot of problems, hence we started using \emph{yaml} that is more suitable for human input.
 
@@ -66,7 +50,7 @@ For example, inside the configuration file:
 
 Using \emph{spexs2 --conf conf.json input=other} would replace the "File" value with "other". If there is no flag from command line is given, it will be replaced with "main".
 
-\tow{profiles}
+The configuration file can be problematic for running the first time. You first need to find a configuration file for your application. To remedy this problem the application could provide sample configuration files that can be used directly from the command line.
 
 \section{Input and Output}
 
@@ -93,24 +77,6 @@ Trivial solution would be to use locks for enqueuing and dequeuing, but under hi
 We know that most of the time we do not need all the results, but only the best. We also know that the result limit is usually several magnitudes smaller than the number of output candidates; this means most of the queries put into the result queue will be immediately discarded.
 
 Uf the query is worse than the worst in the priority queue, it can be discarded immediately without doing push/pop. If we allow for that check to fail once in a while - we can make it mostly lock-free.
-
-\begin{algorithm}[H]
-    \caption{priority queue push}
-\begin{algorithmic}[1]   
-    \Statef{worst \gets current~worst}
-        
-    \If{$ worst > new~element $}
-        \Return
-    \EndIf
-
-    \Statef{acquire~lock}
-    \Statef{queue.put(new~element)}
-    \If{$queue.length > queue.limit$}
-        \Statef{current~worst \gets queue.pop()}
-    \EndIf
-    \Statef{release~lock}
-\end{algorithmic}
-\end{algorithm}
 
 \section{Features and Filters}
 
@@ -158,39 +124,34 @@ func featureFilter(feature Feature, min float64, max float64) Filter {
 
 Of course there are some filters that cannot be defined by features hence there is still possibility to make separate filters. Such as disallowing star symbol in the beginning of the pattern.
 
-\section{Synchronized Graph Traversal}
+\section{Synchronized Tree Traversal}
 
-\tow{relation to spexs}
+\emph{spexs2} can be seen as a pattern tree traversal algorithm with some extra logic. Implementing search over a tree requires synchronization such that there are only a certain number of workers and that they wouldn't die of starvation.
 
-Implementing search over data structures requires synchronization such that there are a certain number of workers and that they wouldn't die of starvation. \emph{spexs} can be seen as a graph traversal algorithm with some extra logic.
-
-The simplest form without synchronization is:
+Without synchronization the parallel version looks like:
 
 \begin{algorithm}[H]
-    \caption{Graph traversal}
+    \caption{Tree traversal}
 \begin{algorithmic}[1]
-    \Require{$graph$, $start$, $fn$}
-    \Ensure{All nodes in $graph$ get processed with $fn$}
+    \Ensure{All nodes in tree get processed with fn}
 
-    \algblockdefx[SPAWN]{Spawn}{EndSpawn}{\bf{spawn}}
+    \Function{visit}{tree, start, fn, examine?}
+        \Let{$unvisited$}{\{ start \})}
+        
+        \Spawn
+            \While{$unvisited$ not empty}
+                \Let{$node$}{$unvisited$.take()}
+                \State fn($node$)
+                \For{ $child \in$ children($node$) }
+                    \If{ examine?($child$) }
+                        \State $unvisited$.put($child$)
+                    \EndIf
+                \EndFor
+            \EndWhile
+        \EndSpawn
 
-    \Statef{unvisited \gets \{ start \})}
-    \Statef{visited \gets \{\}}
-    
-    \Spawn
-        \While{$unvisited$ not empty}
-            \Statef{node \gets unvisited.take()}
-            \Statef{visited.put(node)}
-            \Statef{fn(node)}
-            \For{ $next \in neighbors(node)$ }
-                \If{ $next \not\in visited$ }
-                    \Statef{unvisited.put(next)}
-                \EndIf
-            \EndFor
-        \EndWhile
-    \EndSpawn
-
-    \Statef{wait~for~workers}
+        \State{wait for workers}
+    \EndFunction
 \end{algorithmic}
 \end{algorithm}
 
@@ -201,58 +162,53 @@ The solution is to control worker startup and only terminate workers if all have
 \begin{algorithm}[H]
     \caption{Synchronized graph traversal}
 \begin{algorithmic}[1]
-    \Require{$graph$, $start$, $fn$}
     \Ensure{All nodes in $graph$ get processed with $fn$}
 
-    \algblockdefx[SPAWN]{Spawn}{EndSpawn}{\textbf{spawn}}{}
-
-    \Statef{added \gets Semaphore(0)}
-    \Statef{terminate \gets false}
-    \Statef{mutex \gets Mutex()}
-    \Statef{workers \gets 0}
-
-    \Statef{unvisited \gets \{ start \}}
-    \Statef{visited \gets \{\}}
-
-    \Statef{added.signal()}
-    
-    \Spawn
-        \While{$true$}
-            \Statef{added.wait()}
-            \Statef{mutex.lock()}
-            \If{ $terminate$ }
-                \Statef{added.signal()}
-                \Statef{mutex.unlock()}
-                \State{\textbf{break}}
-            \EndIf
-
-            \Statef{node \gets unvisited.take()}
-            \Statef{visited.put(node)}
-            \Statef{workers \gets workers + 1}
-            \Statef{mutex.unlock()}
-
-            \Statef{fn(node)}
-
-            \For{ $next \in neighbors(node)$ }
-                \Statef{mutex.lock()}
-                \If{ $next \not\in visited$ }
-                    \Statef{unvisited.put(next)}
-                    \Statef{added.signal()}
+    \Function{Visit}{graph, start, fn, examine?}
+        \Let{added}     {new semaphore(0)}
+        \Let{$terminate$} {false}
+        \Let{mutex}     {new mutex()}
+        \Let{$workers$}   {0}
+        \Let{$unvisited$} {\{ start \}}
+        \State $added$.signal()
+        
+        \Spawn
+            \While{$true$}
+                \State added.wait()
+                \State mutex.lock()
+                \If{ $terminate$ }
+                    \State added.signal()
+                    \State mutex.unlock()
+                    \State{\textbf{break}}
                 \EndIf
-                \Statef{mutex.unlock()}
-            \EndFor
 
-            \Statef{mutex.lock()}
-            \Statef{workers \gets workers - 1}
-            \If{$workers = 0~and~unvisited = \{\} $}
-                \Statef{terminate \gets true}
-                \Statef{added.signal()}
-            \EndIf
-            \Statef{mutex.unlock()}
-        \EndWhile
-    \EndSpawn
+                \Let{$node$}{$unvisited$.take()}
+                \Let{$workers$}{$workers$ + 1}
+                \State mutex.unlock()
+                \Statex
+                \State fn($node$)
+                \Statex
+                \For{ $child \in$ children($node$) }
+                    \State mutex.lock()
+                    \If{ examine?($child$) }
+                        \State $unvisited$.put($child$)
+                        \State added.signal()
+                    \EndIf
+                    \State mutex.unlock()
+                \EndFor
+                \Statex
+                \State mutex.lock()
+                \Let{$workers$}{$workers - 1$}
+                \If{$workers = 0$ and $unvisited = \{\}$}
+                    \Let{$terminate$}{true}
+                    \State added.signal()
+                \EndIf
+                \State mutex.unlock()
+            \EndWhile
+        \EndSpawn
 
-    \Statef{wait~for~workers}
+        \State{wait for workers}
+    \EndFunction
 \end{algorithmic}
 \end{algorithm}
 
@@ -260,64 +216,72 @@ We use $mutex$ to protect variables and data structures. Semaphore $added$ track
 
 \section{Debugging}
 
-\tow{relation to spexs}
+Seeing how the algorithm works is very useful to get an understanding how the algorithm works. This often can help to either improve the input configuration or debug the program itself. Often this is resolved by adding debug statments.
 
-Debugging is an important part of development process hence the need for more information how the algorithm is working.
+For example:
 
-\todo{mention that these aren't always run}
-
-Often this is resolved by adding some debug statments:
-
-\begin{verbatim}
-for i := 0; i < 100; i += 1{
-    printf("picking")
-    a := pick()
-    printf("picked %v", a)
-
-    printf("picking")
-    b := pick()
-    printf("picked %v", b)
-    
-    out.put(a + b)
+\begin{lstlisting}
+func Spexs(s *Setup) {
+    for q, ok := s.In.Pop(); ok {
+        trace("started extending %v", q)
+        extended := s.Extend(q)
+        trace("extension result %v", extended)
+        for qx := range extended {
+            if s.Extendable(qx) {
+                trace(" > extendable %v" qx)
+                s.In.Push(qx)
+            }
+            if s.Outputtable(qx) {
+                trace(" > outputtable %v" qx)
+                s.Out.Push(qx)
+            }
+        }
+    }
 }
-\end{verbatim}
+\end{lstlisting}
 
-This can be harmful to the readability of the code. To fix this debugging problem we use closures.
+Such statements make it harder to read the actual code, also it's hard to modify the statements for debugging or provide different ways of debugging.
 
-\begin{verbatim}
-type PickFunc func()Thing
-func debuggable(fn PickFunc) PickFunc {
-    return func() Thing {
-        printf("start picking")
-        p := fn()
-        printf("picked %v" p)
-        return p
+We can use lexical closures to make it simpler:
+
+\begin{lstlisting}
+type Extender func(q Query) []Query
+
+func AddDebuggingStatements(s *Setup) {
+    fn := s.Extend
+    s.Extend := func(q Query) []Query {
+        trace("started extending %v", q)
+        extended := fn(q)
+        trace("extension result %v", extended)
+        
+        for qx := range extended {
+            trace(" > %v", qx)
+            trace(" > extendable %v", s.Extendable(qx))
+            trace(" > outputtable %v", s.Outputtable(qx))
+        }
+        return extended
     }
 }
 
-pick = debuggable(pick)
-for i := 0; i < 100; i += 1{
-    a := pick()
-    b := pick()
-    out.put(a + b)
-}
-\end{verbatim}
-
-As we can see the algorithm implementation is much more readable and 
-we can inject different debugging statements without actually changing the algorithm.
-
-Also we can now change the ways how to add debug info. One of would 
-be a full stepwise debugger.
-
-\begin{verbatim}
-func debuggable(fn PickFunc) PickFunc {
-    return func() Thing {
-        mutex.lock()
-        p := fn()
-        while not continue
-            interact with user
-        mutex.unlock()
-        return p
+func Spexs(s *Setup) {
+    for q, ok := s.In.Pop(); ok {
+        extended := s.Extend(q)
+        for qx := range extended {
+            if s.Extendable(qx) {
+                s.In.Push(qx)
+            }
+            if s.Outputtable(qx) {
+                s.Out.Push(qx)
+            }
+        }
     }
 }
-\end{verbatim}
+
+func run(){
+    S := CreateSpexsSetup()
+    AddDebuggingStatements(S)
+    Spexs(S)
+}
+\end{lstlisting}
+
+We have removed the debugging statements from the algorithm. We could define other such "debug statement injectors" that provide different levels of details. This method of course has a slight performance impact due to the additional indirection. This can be extended to provide user interaction and other features.

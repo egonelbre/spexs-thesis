@@ -19,15 +19,50 @@
 
 % algorithm environment
 \newcommand{\sym}{\mathcal}
-\newcommand*\Let[2]{\State $#1 \gets #2$}
-\newcommand*\Statef[1]{\State $#1$}
+\newcommand*\Let[2]{\State #1 $\gets$ #2}
+\newcommand{\func}[2]{\textbf{fn}(#1)\{#2\}}
+
+\algblockdefx[SPAWN]{Spawn}{EndSpawn}{\textbf{start workers}}{}
+
 \algrenewcommand\algorithmicrequire{\textbf{Input:}}
 \algrenewcommand\algorithmicensure{\textbf{Output:}}
 
+% for representing tokens
+\newcommand{\R}[1]{\colorbox{black!15}{\texttt{#1}}}
+
+% defintions
+
+%\theoremstyle{plain}% default
+%\newtheorem{thm}{Theorem}[section]
+%\newtheorem{lem}[thm]{Lemma}
+%\newtheorem{prop}[thm]{Proposition}
+
+\theoremstyle{definition}
+%\newtheorem{defn}{Definition}[section]
+%\newtheorem{conj}{Conjecture}[section]
+\newtheorem{exmp}{Example}[section]
+
+%\theoremstyle{remark}
+%\newtheorem*{rem}{Remark}
+%\newtheorem*{note}{Note}
+%\newtheorem{case}{Case}
 
 % todo things
 \newcommand{\insertref}[1]{\todo[color=green!40,fancyline]{cite #1}}
 \newcommand{\tow}[1]{\todo[inline]{write #1}}
+\newcommand{\hmm}[1]{\todo[fancyline]{#1}}
 
 \newcommand{\eg}{\todo[fancyline]{add examples}}
 \newcommand{\WIP}{\todo[color=blue!40,inline]{Work in progress}}
+
+
+
+\lstset{ %
+    basicstyle=\scriptsize,
+    breaklines=false,
+    numbers=left,
+    numberstyle=\tiny\color{black!80},
+    stringstyle=\it,
+    escapechar=@,
+    columns=fixed
+}

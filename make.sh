@@ -3,5 +3,12 @@
 rm -rf build/*
 cp -r *.tex *.bib chapters figures diagrams appendices build
 cd build
-pdflatex --shell-escape main && bibtex main && pdflatex main && pdflatex main
+FLAGS="-draftmode -interaction=batchmode -quiet"
+pdflatex $FLAGS --shell-escape main
+bibtex main
+pdflatex $FLAGS main
+pdflatex -quiet main
+
 cp main.pdf ../Thesis.pdf
+
+echo -e "\n"

@@ -1,5 +1,7 @@
 \chapter{SPEXS Generalization}
 
+\WIP
+
 In this chapter we show how to make SPEXS algorithm more abstract by allowing flexibilty through function composition and finding minimal requirements for the data-structures.
 
 \section{Algorithm}
@@ -9,23 +11,25 @@ The algorithm in a more conventional view is:
 \begin{algorithm}[H]
 	\caption{The spexs2 algorithm}
 \begin{algorithmic}[1]
-	\Require{$dataset$, $in$ pool, $out$ pool, $extender$,
-		$extendable$ filter, $outputtable$ filter, $postprocess$ function }
+	\Require{$dataset$, $in$ and $out$ are pools, $extend$ is an extender function, $extend?$, $output?$ are filters}
 	\Ensure{Patterns satisfying filters and $extender$ are in $out$ pool}
-	\Statef{\varepsilon \gets NewEmptyQuery(dataset)}
-	\Statef{in.put(\varepsilon)}
-	\While{$q \gets in.take()$}
-		\Statef{extended \gets extender(q, dataset)}
-		\For{ $qx \in extended$ }
-			\If{ $extendable(qx)$ }
-				\Statef{in.put(qx)}
-			\EndIf
-			\If{ $outputtable(qx)$ }
-				\Statef{out.put(qx)}
-			\EndIf
-		\EndFor
-		\Statef{postprocess(q)}
-	\EndWhile
+	\Statex
+	\Function{spexs2}{dataset, in, out, extend, extend?, output?}
+		\Let{$\epsilon$}{NewEmptyQuery(dataset)}
+		\State in.put($\epsilon$)
+		\While{$q \gets $ in.pop()}
+			\Let{extended}{extend($q$, dataset)}
+			\For{ $qx \in $ extended }
+				\If{ extend?($qx$) }
+					\State in.push($qx$)
+				\EndIf
+				\If{ output?($qx$) }
+					\State out.push($qx$)
+				\EndIf
+			\EndFor
+			\State postprocess($q$)
+		\EndWhile
+	\EndFunction
 \end{algorithmic}
 \end{algorithm}
 
@@ -40,8 +44,6 @@ If the query is suitable for output as defined by the \emph{outputtable} filter,
 If we extend each pattern at each step by one we guarantee that we examine all the patterns that conform to our criteria as defined by \emph{extendable} filter.
 
 \section{Pools}
-
-\tow{only importance}
 
 It has no guarantees on how the queries are stored internally and in which order they are taken out. This gives an option to store on disk the queries if needed.
 
@@ -68,30 +70,30 @@ The idea of extending method is:
 \begin{algorithm}[H]
 	\caption{SPEXS2 extender}
 \begin{algorithmic}[1]
-	\Require{$q$ query, $next$ function}
+	\Require{$q$ query, $walk$ function}
 	\Ensure{result contains queries that have been extended by one}
 	
-	\Statef{nexts \gets new~collection}
-	\For{$pos \in positions(q.matches)$}
-		\Statef{(token, loc) \gets next(q.document, pos)}
-		\Statef{nexts.put((token, pos))}
+	\Let{steps}{new collection([Token, Pos])}
+	\For{pos $\in$ positions($q$.matches)}
+		\Let{[token, loc]}{walk($q$.document, pos)}
+		\State steps.add([token, pos])
 	\EndFor
 
-	\Statef{matches \gets new~map~of~token~to~position~set }
-	\For{$(token, loc) \in nexts$}
+	\Let{matches}{new map(Token $\mapsto$ [Pos])}
+	\For{$[token, loc] \in steps$}
 		\If{$matches[token]$ doesn't exist}
-			\Statef{matches[token] \gets \{\} }
+			\Let{matches[token]}{empty set}
 		\EndIf
-		\Statef{matches[token] \gets matches[token] + loc }
+		\Let{matches[token]}{matches[token] + loc}
 	\EndFor
 
-	\Statef{querys \gets new~collection}
-	\For{$(token, positions) \in matches$}
-		\Statef{qx \gets new~query}
-		\Statef{qx.document \gets q.document}
-		\Statef{qx.pattern \gets q.pattern + token}
-		\Statef{qx.positions \gets positions}
-		\Statef{querys.add(qx)}
+	\Let{queries}{new collection([Query])}
+	\For{(token, positions) $\in$ matches}
+		\Let{$qx$}{new query}
+		\Let{$qx$.document}{$q$.document}
+		\Let{$qx$.pattern}{$q$.pattern + token}
+		\Let{$qx$.positions}{positions}
+		\State queries.add($qx$)
 	\EndFor
 \end{algorithmic}
 \end{algorithm}

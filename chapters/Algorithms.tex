@@ -1,9 +1,9 @@
-\chapter{Algorithms}
+\chapter{Algorithms\hmm{better title needed}}
 
 There are many itemset discovery algorithms, but only few are general and 
 can discover more complex patterns. \insertref{???}
 
-\section{Common algorithms}
+\section{Algorithms}
 
 \subsection{SPEXS}
 
@@ -21,24 +21,23 @@ The original algorithm was as follows:
 	\Require{String $S$, pattern class $\sym{P}$, output criteria, search order, and fitness measure $\sym{F}$}
 	\Ensure{Patterns $\pi \in \sym{P}$ fulfilling all criteria, and output in the order of fitness $\sym{F}$}
 
-	\State{Convert input sequences into a single sequence}
-	\State{Initiate data structures}
+	\State Convert input sequences into a single sequence
+	\State Initiate data structures
 
-	\Statef{Root \gets new node}
-	\Statef{Root.label \gets \epsilon}
-	\Statef{Root.pos \gets (1,2,...,n)}
-	\Statef{enqueue(\sym{Q}, Root, order)}
+	\Let{Root}{new node}
+	\Let{Root.label}{$\epsilon$}
+	\Let{Root.pos}{(1,2,...,n)}
+	\State enqueue($\sym{Q}$, Root, order)
 
-	\While{$N \gets dequeue(\sym{Q})$}
-		\State{ Create all possible 
-			extensions $p \in \sym{P}$ of $N$ using $N.pos$ and $S$ }
+	\While{$N \gets$ dequeue($\sym{Q}$)}
+		\State Create all possible extensions $p \in \sym{P}$ of $N$ using $N$.pos and $S$
 		\For{ extension $p$ of $N$}
-			\If{pattern $p$ and position list $p.pos$ fulfill the criteria}
-				\Statef{N.child \gets p}
-				\State{calculate $\sym{F}(p,S)$}
-				\Statef{enqueue(\sym{Q},p,order)}
+			\If{pattern $p$ and position list $p$.pos fulfill the criteria}
+				\Let{$N$.child}{$p$}
+				\State calculate $\sym{F}(p,S)$
+				\State enqueue($\sym{Q}$,$p$,order)
 				\If{ $p$ fulfills the output criteria}
-					\State{store $p$ into ouput queue $\sym{O}$}
+					\State store $p$ into ouput queue $\sym{O}$
 				\EndIf
 			\EndIf
 		\EndFor
@@ -70,10 +69,6 @@ and output queue for possible output.
 \subsection{RSAT}
 
 \tow{overview} \cite{RSAT}
-
-\subsection{VanHelden}
-
-\tow{overview} \cite{VanHelden}
 
 \section{Reviews}
 
