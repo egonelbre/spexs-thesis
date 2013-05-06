@@ -79,30 +79,30 @@
     \pagestyle{plain}
     \tableofcontents
 
-    \input{./defs.tex}
+    \input defs.tex
 
-    \input{./chapters/Introduction.tex}
-    \input{./chapters/Definitions.tex}
-    \input{./chapters/Algorithms.tex}
-    \input{./chapters/Generalization.tex}
-    \input{./chapters/Parallelization.tex}
-    \input{./chapters/Implementation.tex}
-    \input{./chapters/Results.tex}
-    \input{./chapters/Conclusions.tex}
+    \input chapters/Introduction.tex
+    \input chapters/Definitions.tex
+    \input chapters/Algorithms.tex
+    \input chapters/Generalization.tex
+    \input chapters/Parallelization.tex
+    \input chapters/Implementation.tex
+    \input chapters/Results.tex
+    \input chapters/Conclusions.tex
     
     \addcontentsline{toc}{chapter}{\numberline{}Bibliography}
 
     {%\scriptsize
     	\nocite{*}
-        \small
+        \renewcommand*{\bibfont}{\small}
         \printbibliography
     }   
 
     \begin{appendix}
-        \input{./appendices/spexs2.tex}
-        \input{./appendices/SourceCode.tex}
-        \input{./appendices/epps.tex}
+        \input appendices/spexs2.tex
+        \input appendices/SourceCode.tex
+        \input appendices/epps.tex
     \end{appendix}
 
-    \input{./license.tex}
+    \input license.tex
 \end{document}
