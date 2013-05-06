@@ -3,9 +3,9 @@
 rm -rf build/*
 cp -r *.tex *.bib chapters figures diagrams appendices build
 cd build
-FLAGS="-draftmode -interaction=batchmode -quiet"
+FLAGS="-draftmode"
 pdflatex $FLAGS --shell-escape main
-bibtex main
+biber main
 pdflatex $FLAGS main
 pdflatex -quiet main
 

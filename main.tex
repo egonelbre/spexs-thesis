@@ -12,10 +12,10 @@
 \usepackage[utf8]{inputenc}
 
 % usability
-\usepackage {makeidx}
-\usepackage {float}
-\usepackage {afterpage}
-\usepackage {etoolbox}
+\usepackage{makeidx}
+\usepackage{float}
+\usepackage{afterpage}
+\usepackage{etoolbox}
 
 % formatting
 \usepackage{amsmath}
@@ -47,6 +47,10 @@
 \makeindex
 
 \input{./diagrams/defs.tex}
+
+\usepackage{csquotes}
+\usepackage[backend=biber,style=alphabetic,backend=biber]{biblatex}
+\addbibresource{bibliography.bib}
 
 \begin{document}
     %settings
@@ -90,9 +94,8 @@
 
     {%\scriptsize
     	\nocite{*}
-        \bibliographystyle{ieeetr}
-        \bibliography{bibliography}
-    }
+        \printbibliography
+    }   
 
     \begin{appendix}
         \input{./appendices/spexs2.tex}
