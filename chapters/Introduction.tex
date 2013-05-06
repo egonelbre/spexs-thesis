@@ -1,23 +1,39 @@
 \chapter{Introduction}
 \label{c:introduction}
 
-\tow{at least 3-4 pages}
-
 \section{Motivation and background}
 
-One of the problems arising in dataset analysis is the discovery of interesting patterns. These patterns can show how the dataset is formed, how it repeats itself or can be characteristic to some particular subset of the data.
+One of the problems arising in dataset analysis is the discovery of interesting patterns. These patterns can show how the dataset is formed, how it repeats itself or they can be characteristic to some particular subset of the data.
 
 For example a protein motif in a genomic sequence could predict disease. Patterns in medical diagnoses could show relations between diseases. Repeating pattern in source code could show how code could be minimized. \insertref{something}
 
 Research in pattern discovery is mainly driven by biology, which means most of the discovery algorithms have been designed for genomic sequences in mind. The techniques could be potentially useful elsewhere, so the algorithms should be generic as possible.\insertref{something}
 
-With genomic sequences there is another problem, the amount of data\cite{HowIsGenomeDoing}. The data collected are growing with increasing speed, which means we need to use more computational resources to analyse them. This means the pattern discovery algorithms should take advantage of multicore processors, distributed systems and highly parallel computers.
+With genomic sequences there is another problem, the amount of data\cite{HowIsGenomeDoing}. The data collected are growing with increasing speed, which means we need to use more computational resources to analyse them. This means the pattern discovery algorithms should take advantage of multicore processors, highly parallel processors and clusters.
 
 \tow{a priori vs some prior knowledge}
 
 \tow{broad examples from nat processing, code}
 
 \tow{usual limitations, alphabet, pattern language...}
+
+\section{Algorithm parallelization}
+
+Taking an existing algorithm and making it parallel can be sometimes easier than writing an parallel algorithm from scratch. Existing algorithms may have already proven themselves in practice and have already good concepts. Algorithm parallelization can be divided into three subproblems:
+
+\begin{enumerate}
+	\item generalizing the algorithm,
+	\item decomposing to independent tasks and
+	\item reifying the generalized version with parallelization in mind.
+\end{enumerate}
+
+Generalizing the algorithm means loosening the order constraints and using minimal abstract data types for data storage. Here mathematical definitions and formulation of the problem is helpful. The less constraints there are the more freedom we have to change the implementation side.
+
+Decomposing the algorithm means dividing it into independed tasks that could be ran in parallel. This also means trying to minimize the interaction and dependencies that "algorithm pieces" have.
+
+Reifying the algorithm means finding suitable data structures for parallelization and mapping the independent tasks to different processes. The suitable structures and mapping to processes is dependent on the target architecture. For example data-structures involving vector operations work better on highly parallel processors.
+
+Generalizing and decomposition steps can also make the algorithm simpler. Generalization makes algorithm more applicable to other fields, since there are less dependencies on the original problem.
 
 \section{Contributions of this work}
 
@@ -32,9 +48,5 @@ The practical implementation \emph{spexs2} is already being used in several proj
 \section{Structure of the thesis}
 
 In this thesis we explore an algorithm for parallel pattern discovery. We choose an existing algorithm SPEXS\cite{spexs} and show how it can be parallelized.
-
-The problem of algorithm parallelization can usually be divided into generalization and reification. Usually algorithms are designed in some particular setting, which they are constrained by their data structures, input and output; and specialized to some particular case to increase the performance. Generalization means that we relax as many constraints as possible, trying to get a mathematical formulation of the algorithm. Also we try decompose the algorithm into independent parts that could be analysed separately.
-
-Reification means that we can parallelize the algorithm by replacing these "abstract" notitions by parallel algorithms, data-structures and run the decomposed parts in parallel (if possible).
 
 In Chapter \ref{c:definitions} we introduce the terminology. In Chapter \ref{c:algorithms} we give an overview of already existing algorithms and discuss why SPEXS\cite{spexs} was chosen as a base for parallelization. We generalize the SPEXS algorithm in Chapter \ref{c:generalization} and reify it in Chapter \ref{c:parallelization}. We discuss an implementation of the parallelized algorithm in Chapter \ref{c:implementation} and in Chapter \ref{c:results} show its possible applications and performance characteristics. The conclusions are presented in Chapter \ref{c:conclusions}.

@@ -6,7 +6,7 @@ pattern discovery in sequences.
 
 In this chapter we will discuss a practical implementation, \emph{spexs2}, for pattern discovery in sequences. We only discuss parts that we consider non-trivial or interesting and could be useful in implementing other algorithms.
 
-Information about the full source code is in the Appendix B and C.
+Information about the full source code is in the Appendix \ref{add:spexs2}.
 
 \section{Architecture}
 
@@ -27,7 +27,7 @@ We chose the following module decomposition for the application:
 \end{description}
 \end{small}
 
-The program starts by interpreting flags, then it marshals configuration file onto an internal structure, this configuration is given into setup module. Setup module initializes (as defined by configuration) a reader, a printer and also prepares structures for algorithm. Then the reader reads input to the database. Then the algorithm is activated and finally it is printed out with Printer.
+The program starts by interpreting flags, then it marshals configuration file onto an internal data structure, this configuration structure as an input to the setup module. Setup module initializes (as defined by configuration) a reader, a printer and also prepares structures for algorithm. Then the reader reads input to the database. Then the algorithm is activated and finally it is printed out with Printer.
 
 This structure is universal for algorithm implementations and allows easily to add more configuration options, different input formats and different output formats. By changing the configuration, reader and printer we could make it a web service instead of running it on a command line.
 
@@ -35,93 +35,117 @@ This structure is universal for algorithm implementations and allows easily to a
 
 One problem with flexible algorithms is that there are a lot of ways to be run. This can lead to having tens or hundereds of command-line flags for the application.
 
-To avoid this problem we first decided to use a \emph{json} file for the program configuration. Using \emph{json} requires exact placement of commas and quotes that caused a lot of problems, hence we started using \emph{yaml} that is more suitable for human input.
+To avoid this problem we decided to use a \emph{json} file for the program configuration. This format is widely known and well structured. For example a configuration file for pattern discovery in protein sequences:
 
-\tow{Short example of a configuration file.}
-
-When running the program from command line it can be uncomfortable to make little changes to the configuration files. In these cases a command line flag would be much easier. To solve this problem we added markup into the json files so they could be replaced with a flag.
-
-For example, inside the configuration file:
-
-\begin{verbatim}
-    "Datasets" : {
-        "fore" : { "File" : "$input:main$"
+\begin{lstlisting}
+{
+    "Dataset": {
+        "fore" : { "File" : "$inp$" },
+        "back" : { "File" : "$ref$" }
+    },
+    "Reader" : {
+        "Method" : "Delimited"
+    },
+    "Extension": {
+        "Method": "Group",
+        "Groups" : {
+            "." : { "elements" : "ACDEFGHIKLMNPRQSTVWY"}
+        },
+        "Extendable": {
+            "PatGroups()" : {"max" : 3},
+            "PatLength()" : {"max" : 6},
+            "Matches(fore)" : {"min" : 20},
+            "NoStartingGroup()" : {}
+        },
         ...
-\end{verbatim}
+    },
+    "Output": {
+        "SortBy": ["-Hyper(fore, back)"],
+        "Count": 100
+    },
+    "Printer" : {
+        "Method" : "Formatted",
+        "Format": "Pat?()\tMatches(fore)\tMatches(back)\tHyper(fore,back)\n"
+    }
+}
+\end{lstlisting}
 
-Using \emph{spexs2 --conf conf.json input=other} would replace the "File" value with "other". If there is no flag from command line is given, it will be replaced with "main".
+In hindsight \emph{json} for configuration may not be the best option due to rigidity. Users can often forget to add or remove a comma or forget to add quotes. This suggests that formats such as \emph{rson} or \emph{yaml} would be better choices.
 
-The configuration file can be problematic for running the first time. You first need to find a configuration file for your application. To remedy this problem the application could provide sample configuration files that can be used directly from the command line.
+Other problem with configuration files is that they are harder to modify than command-line flags. By mixing command-line flags and configuration files we can get a solution that works better in practice than either of them independently.
+
+One easy way to implement is to add custom syntax into the configuration file:
+
+\begin{lstlisting}
+    "Datasets" : {
+        "fore" : { "File" : "$argument:default$"
+        ...
+\end{lstlisting}
+
+Now some command-flags can be interpreted as replacements into the configuration file. Using \cmdline{spexs2 --conf conf.json argument=other} would transform the configuration file into:
+
+\begin{lstlisting}
+    "Datasets" : {
+        "fore" : { "File" : "other"
+        ...
+\end{lstlisting}
+
+If no such parameter is given then the default value "main" can be used.
+
+Configuration files are also problematic for running the first time. As a user you need to find a configuration file that suits your needs, then modify it and finally run it. To remedy this problem the application can embed sample configuration files so called "profiles" that can be used directly from the command line. This means you can directly use \cmdline{spexs2 -p=protein input=some.data min-p=1.0}.
 
 \section{Input and Output}
+
+\WIP
 
 \tow{about importance of separating the input reader and output printer from the algorithmic code}
 
 \section{Alphabet and Database}
 
+\WIP
+
 \tow{about problems with large alphabets and datasets}
 
 \section{Pools}
 
-There can be different performance characteristics when using a particular implementation. Most importantly to support parallelism they should be ideally lock-free, but we can use locked version as well.
+\WIP
 
-\todo[inline]{remove the lock-free stuff}
+There can be different performance characteristics when using a particular implementation.
 
 If we use a fifo queue as the in pool the algorithm does a breadth first search of patterns. This can be problematic since we would need a lot of memory to hold all the patterns in memory.
 
-A lifo queue for in pool is a more reasonable choice for memory problems since we need to hold less patterns in memory.
+A lifo queue for input pool is a more reasonable choice for memory problems since we need to hold less patterns in memory.
 
-A priority queue suits for the output pool since we can easily then use some feature to sort the queue. A lock-free priority queue would be preferred, but it can be hard to get right. \todo{link to lock-free queues}
+A priority queue suits for the output pool since we can easily then use some feature to sort the queue.
 
-Trivial solution would be to use locks for enqueuing and dequeuing, but under high contention it will become a bottleneck.
+\section{Query features, interestingness and filters}
 
-We know that most of the time we do not need all the results, but only the best. We also know that the result limit is usually several magnitudes smaller than the number of output candidates; this means most of the queries put into the result queue will be immediately discarded.
+When we first described the query features we showed that filters and interestingness are a special case query features. In \emph{spexs2} the features are used to print information about the results.
 
-Uf the query is worse than the worst in the priority queue, it can be discarded immediately without doing push/pop. If we allow for that check to fail once in a while - we can make it mostly lock-free.
+The filters can be very similar to features in their implementation. For example a filter for pattern length is similar to the pattern length feature.
 
-\section{Features and Filters}
+Although implementing all combinations is possible we can use function composition to avoid such repetition.
 
-\tow{simpler and examples}
+Since most of the features implemented could also be used as a interestingness measure we used a simplification for the "Feature" function defintion:
 
-One problem is that the amount of possible filters it's useful to construct them from some other features. Or if we wish to use multiple filters we can combine them.
-
-We can use these features to find out something about the query. They each feature is defined as:
-
-\begin{verbatim}
+\begin{lstlisting}
 type Feature func(q *Query) (float64, string)
-\end{verbatim}
+\end{lstlisting}
 
-Most of features are in $\Re$, but for some there is some extended information that we may wish to know - hence the need for additional string value. One of the simplest is Pattern representation.
+Which means that the function returns two types, a real value and a string. In the implementation there are only few features that return arbitrary types so it was easier to convert it into a string. The only place where such features were needed is for printing. For example one of such features is the representation of the pattern.
 
-Also many of the features are defined in terms of multiple datasets. We can use a closure to easily define a more generic feature.
+By specifying a minimum or a maximum value for a feature we can turn it into a filter. One way to do it is using a lexical closure. For example:
 
-Example:
-
-\begin{verbatim}
-func Matches(dataset []int) Feature {
-    return func(q *Query) (float64, string) {
-        matches := countf(q.Pos, dataset)
-        return matches, ""
-    }
-}
-\end{verbatim}
-
-Here the Matches function creates a feature function defined for dataset.
-
-We can use the name in the configuration file as "Matches(fore)".
-
-If a feature returns a floating point value we can easily turn that into a filter by specifying a minimum or/and maximum value.
-
-For example to give a lower and higher limits to some feature:
-
-\begin{verbatim}
-func featureFilter(feature Feature, min float64, max float64) Filter {
+\begin{lstlisting}
+func MakeFeatureFilter(fn Feature, min float64, max float64) Filter {
     return func(q *Query) bool {
         v, _ := feature(q)
         return (min <= v) && (v <= max)
     }
 }
-\end{verbatim}
+\end{lstlisting}
+
+In languages which do not support such composition we can also use object composition or function pointers. 
 
 Of course there are some filters that cannot be defined by features hence there is still possibility to make separate filters. Such as disallowing star symbol in the beginning of the pattern.
 
