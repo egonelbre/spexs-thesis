@@ -1,12 +1,17 @@
 \chapter{Introduction}
+\label{c:introduction}
 
 \tow{at least 3-4 pages}
 
 \section{Motivation and background}
 
-Collecting new data is being collected more rapidly \cite{HowIsGenomeDoing} . The average size of each dataset has also been increasing. This suggests that the only way to keep up with analysis is to parallelize algorithms.
+One of the problems arising in dataset analysis is the discovery of interesting patterns. These patterns can show how the dataset is formed, how it repeats itself or can be characteristic to some particular subset of the data.
 
-One of drivers of such large datasets is analysis of genomic and proteomic sequences. \tow{todo}
+For example a protein motif in a genomic sequence could predict disease. Patterns in medical diagnoses could show relations between diseases. Repeating pattern in source code could show how code could be minimized. \insertref{something}
+
+Research in pattern discovery is mainly driven by biology, which means most of the discovery algorithms have been designed for genomic sequences in mind. The techniques could be potentially useful elsewhere, so the algorithms should be generic as possible.\insertref{something}
+
+With genomic sequences there is another problem, the amount of data\cite{HowIsGenomeDoing}. The data collected are growing with increasing speed, which means we need to use more computational resources to analyse them. This means the pattern discovery algorithms should take advantage of multicore processors, distributed systems and highly parallel computers.
 
 \tow{a priori vs some prior knowledge}
 
@@ -14,18 +19,22 @@ One of drivers of such large datasets is analysis of genomic and proteomic seque
 
 \tow{usual limitations, alphabet, pattern language...}
 
+\section{Contributions of this work}
+
+We have derived a new parallel algorithm called SPEXS2 for discovering interesting patterns from a set of sequences. We describe SPEXS2 in a generic way and show how to extend it further. 
+
+The practical and "ideal" versions of an algorithm can often diverge due to performance and implementation details, therefore we also explain problems and possible solutions with implementing such algorithm. We also have provided a concise implementation of the algorithm that captures the generic description more closely.
+
+Then we show some possible applications for the algorithm and analyse parallelization benefits.
+
+The practical implementation \emph{spexs2} is already being used in several projects ... \tow{about current use}
+
 \section{Structure of the thesis}
 
-In this thesis we explore an algorithm for finding patterns and show how
-generalizations can make it scalable and flexible, and simpler both in 
-theory and implementation compared with non-abstract version.
+In this thesis we explore an algorithm for parallel pattern discovery. We choose an existing algorithm SPEXS\cite{spexs} and show how it can be parallelized.
 
-\tow{the basic premise of parallelization}
+The problem of algorithm parallelization can usually be divided into generalization and reification. Usually algorithms are designed in some particular setting, which they are constrained by their data structures, input and output; and specialized to some particular case to increase the performance. Generalization means that we relax as many constraints as possible, trying to get a mathematical formulation of the algorithm. Also we try decompose the algorithm into independent parts that could be analysed separately.
 
-In the the Chapter 2 we give definitions for terminology that is used to
-describe the alogrithm. In the Chapter 3 we investigate the original
-SPEXS algorithm \cite{spexs} and other algorithms \insertref{other algorithms}. We generalize the SPEXS algorithm
-to get a flexible algorithm in Chapter 4 and we partition the algorithm
-to make it suitable for parallelization in Chapter 5. In Chapter 6 we
-discuss the implementation of SPEXS. In Chapter 7 we show possible applications
-for the algorithm.
+Reification means that we can parallelize the algorithm by replacing these "abstract" notitions by parallel algorithms, data-structures and run the decomposed parts in parallel (if possible).
+
+In Chapter \ref{c:definitions} we introduce the terminology. In Chapter \ref{c:algorithms} we give an overview of already existing algorithms and discuss why SPEXS\cite{spexs} was chosen as a base for parallelization. We generalize the SPEXS algorithm in Chapter \ref{c:generalization} and reify it in Chapter \ref{c:parallelization}. We discuss an implementation of the parallelized algorithm in Chapter \ref{c:implementation} and in Chapter \ref{c:results} show its possible applications and performance characteristics. The conclusions are presented in Chapter \ref{c:conclusions}.
