@@ -1,14 +1,18 @@
-\chapter{Algorithms\hmm{better title needed}}
+\chapter{Overview\hmm{better title needed}}
 
-There are many itemset discovery algorithms, but only few are general and 
-can discover more complex patterns. \insertref{???}
+\WIP
+
+In this chapter we give a overview of different algorithms used for pattern discovery.
+
+\hmm{Reorganize somehow}
 
 \section{Algorithms}
 
+Overview of different combinatorial algorithms.
+
 \subsection{SPEXS}
 
-SPEXS is an pattern discovery algorithm described by Vilo et al. \cite{spexs}
-This algorithm finds patterns from a sequence. We take this as our basis for developing a new parallel algorithm. In this chapter we describe original algorithm so that we can later show the changes made to this algorithm.
+SPEXS is an pattern discovery algorithm described in "Pattern Discovery from Biosequences"\cite{spexs}. This algorithm finds patterns from a sequence. We take this as our basis for developing a new parallel algorithm. In this chapter we describe original algorithm so that we can later show the changes made to this algorithm.
 
 We describe the general representation of the SPEXS algorithm. 
 The original algorithm was as follows:
@@ -36,8 +40,8 @@ The original algorithm was as follows:
 				\Let{$N$.child}{$p$}
 				\State calculate $\sym{F}(p,S)$
 				\State enqueue($\sym{Q}$,$p$,order)
-				\If{ $p$ fulfills the output criteria}
-					\State store $p$ into ouput queue $\sym{O}$
+				\If{$p$ fulfills the output criteria}
+					\State store $p$ in output queue $\sym{O}$
 				\EndIf
 			\EndIf
 		\EndFor
@@ -56,20 +60,59 @@ and output queue for possible output.
 
 \subsection{TEIRESIAS}
 
-\tow{overview} \cite{TEIRESIAS}
+TEIRESIAS\cite{TEIRESIAS} is an algorithm for the discovery of rigid patterns in biological sequences. \tow{more}
+
+TEIRESIAS operates in two phases: scanning and convolution. Scanning phase identifies elementary patterns that are frequent. During convolution these elementary patterns are combined to make larger patterns.
+
+This method is a divide and conquer method to only consider frequent patterns.
+
+patterns with any symbol 
+
+\tow{more} 
 
 \subsection{Verbumculus}
 
-\tow{overview} \cite{Verbumculus}
+Verbumculus\cite{Verbumculus} is...
+
+statistical analysis, pattern matching
+
+no complex patterns
+
+\tow{more}
 
 \subsection{MobyDick}
 
-\tow{overview} \cite{MobyDick}
+MobyDick\cite{MobyDick}...
+statistical prediction of frequent
+
+no complex patterns
+
+\tow{more} 
 
 \subsection{RSAT}
 
-\tow{overview} \cite{RSAT}
+RSAT\cite{RSAT} is ...
+
+matrix based pattern
+
+\tow{more}
+
+\subsection{Other}
+
+\cite{NetworkMotifsDiscovery, GenericMotifSequential}
 
 \section{Reviews}
 
+\cite{CombinatorialSubtle, SurveyDNAMotif, SurveyMotifDiscovery}
+
 \tow{about some reviews}
+
+\section{Problems}
+
+\WIP
+
+Algorithms are fixed and hard to extend with new pattern types, structures and optimizations. Generalization usually comes at the cost of performance and complexity. \tow{more}
+
+Sequential algorithms do not take advantage of multicore processors. \tow{more}
+
+Data that exceeds computer memory can't work efficiently... can't be distributed efficiently. \tow{more}

@@ -64,6 +64,19 @@
     address = {New York, NY, USA},
 } 
 
+% state
+
+@article{HowIsGenomeDoing,
+  title={How is the Human Genome Project doing, and what have we learned so far?},
+  author={Guyer, Mark S and Collins, Francis S},
+  journal={Proceedings of the National Academy of Sciences},
+  volume={92},
+  number={24},
+  pages={10841--10848},
+  year={1995},
+  publisher={National Acad Sciences}
+}
+
 % algorithms
 @phdthesis{spexs,
     author = {Jaak Vilo},
@@ -142,24 +155,79 @@
     pdf = {http://hal.inria.fr/inria-00070303/PDF/RR-5714.pdf},
 }
 
+@article{GenericMotifSequential,
+    author = {Jensen, Kyle L. and Styczynski, Mark P. and Rigoutsos, Isidore and Stephanopoulos, Gregory N.}, 
+    title = {A generic motif discovery algorithm for sequential data},
+    volume = {22}, 
+    number = {1}, 
+    pages = {21-28}, 
+    year = {2006}, 
+    doi = {10.1093/bioinformatics/bti745}, 
+    abstract ={Motivation: Motif discovery in sequential data is a problem of great interest and with many applications. However, previous methods have been unable to combine exhaustive search with complex motif representations and are each typically only applicable to a certain class of problems.Results: Here we present a generic motif discovery algorithm (Gemoda) for sequential data. Gemoda can be applied to any dataset with a sequential character, including both categorical and real-valued data. As we show, Gemoda deterministically discovers motifs that are maximal in composition and length. As well, the algorithm allows any choice of similarity metric for finding motifs. Finally, Gemoda's output motifs are representation-agnostic: they can be represented using regular expressions, position weight matrices or any number of other models for any type of sequential data. We demonstrate a number of applications of the algorithm, including the discovery of motifs in amino acids sequences, a new solution to the (l,d)-motif problem in DNA sequences and the discovery of conserved protein substructures.Availability: Gemoda is freely available at http://web.mit.edu/bamel/gemodaContact: gregstep@mit.eduSupplementary Information: Available at http://web.mit.edu/bamel/gemoda}, 
+    URL = {http://bioinformatics.oxfordjournals.org/content/22/1/21.abstract}, 
+    eprint = {http://bioinformatics.oxfordjournals.org/content/22/1/21.full.pdf+html}, 
+    journal = {Bioinformatics} 
+}
+
+@inproceedings{NetworkMotifsDiscovery,
+    title={Strategies for network motifs discovery},
+    author={Ribeiro, Pedro and Silva, Fernando and Kaiser, Marcus},
+    booktitle={e-Science, 2009. e-Science'09. Fifth IEEE International Conference on},
+    pages={80--87},
+    year={2009},
+    organization={IEEE}
+}
+
+%reviews
+
+@inproceedings{CombinatorialSubtle,
+    title={Combinatorial approaches to finding subtle signals in DNA sequences},
+    author={Pevzner, Pavel A and Sze, Sing-Hoi and others},
+    booktitle={Proceedings of the Eighth International Conference on Intelligent Systems for Molecular Biology},
+    volume={8},
+    pages={269--278},
+    year={2000}
+}
+
+@article{SurveyDNAMotif,
+    title={A survey of DNA motif finding algorithms},
+    author={Das, Modan and Dai, Ho-Kwok},
+    journal={BMC bioinformatics},
+    volume={8},
+    number={Suppl 7},
+    pages={S21},
+    year={2007},
+    publisher={BioMed Central Ltd}
+}
+
+@article{SurveyMotifDiscovery,
+    title={A survey of motif discovery methods in an integrated framework},
+    author={Sandve, Geir Kjetil and Drablos, Finn},
+    journal={Biol Direct},
+    volume={1},
+    number={11},
+    year={2006}
+}
+
 %other
+
 @conference{clojure, 
-  title={{The Clojure programming language}}, 
-  author={Hickey, R.}, 
-  booktitle={Proceedings of the 2008 symposium on Dynamic languages}, 
-  year={2008}, 
-  organization={ACM New York, NY, USA} 
+    title={{The Clojure programming language}}, 
+    author={Hickey, R.}, 
+    booktitle={Proceedings of the 2008 symposium on Dynamic languages}, 
+    year={2008}, 
+    organization={ACM New York, NY, USA} 
 }
 
 @inproceedings{SteeleFold,
-  author    = {Guy L. Steele Jr.},
-  title     = {Organizing functional code for parallel execution or, foldl
+    author    = {Guy L. Steele Jr.},
+    title     = {Organizing functional code for parallel execution or, foldl
                and foldr considered slightly harmful},
-  booktitle = {ICFP},
-  year      = {2009},
-  pages     = {1-2},
-  ee        = {http://doi.acm.org/10.1145/1596550.1596551},
-  bibsource = {DBLP, http://dblp.uni-trier.de}
+    booktitle = {ICFP},
+    year      = {2009},
+    pages     = {1-2},
+    ee        = {http://doi.acm.org/10.1145/1596550.1596551},
+    bibsource = {DBLP, http://dblp.uni-trier.de}
 }
 
 @online{ReducerAnatomy,
@@ -177,3 +245,4 @@
     year = {2012},
     url = {http://clojure.com/blog/2012/05/08/reducers-a-library-and-model-for-collection-processing.html}
 }
+
