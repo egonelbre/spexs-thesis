@@ -60,7 +60,7 @@ This is a concise implementation of the parallel spexs2 algorithm. It is present
         (let [[q & qs] in
               querys (spexs-step ds q extend)
               new-in  (concat qs  (filter extend? querys))
-              new-out (concat out (filter output? querys))]
+              new-out (concat out (filter output? new-in))]
           (recur new-in new-out))
         out))))
 

@@ -1,8 +1,6 @@
 \chapter{SPEXS Generalization}
 \label{c:generalization}
 
-\WIP
-
 In this chapter we show how to make SPEXS algorithm more abstract by allowing flexibilty through function composition and finding minimal requirements for the data-structures.
 
 \section{Algorithm}
@@ -22,9 +20,9 @@ The algorithm in a more conventional view is:
 			\For{ $qx \in $ extended }
 				\If{ extend?($qx$) }
 					\State in.push($qx$)
-				\EndIf
-				\If{ output?($qx$) }
-					\State out.push($qx$)
+					\If{ output?($qx$) }
+						\State out.push($qx$)
+					\EndIf
 				\EndIf
 			\EndFor
 		\EndWhile
@@ -54,54 +52,29 @@ Filtering allows us to reduce the number of queries we have to examine and allow
 
 Although there is only one filter "function" specified the filter could be a composite of multiple filters.
 
-By making extension and output filter independent, as opposed to original SPEXS, we can still limit output without affecting the extension process. For example if we wish to see only patterns of length 3 we cannot do it with one filter, since we still would need to extend patterns of length 0, 1 and 2.
+\begin{exmp}
+Pattern length is greater than three and pattern occurs at least 10 times in the dataset can be seen as a single filter that is composed of two filters.
+\end{exmp}
 
 \section{Extending}
 
-The extending process is at the core of the algorithm and there are several ways of doing it.
+The extending process is at the core of the algorithm and there are several ways of doing it. The main criteria is that the extending should guarantee that all possible patterns get eventually enumerated.
 
-\tow{motivation}
+Extender is analogous to an inductive step. Our base case is formulated by \emph{prepare} step in the SPEXS2 algorithm and the induction steps are carried out by the extender.
 
-\tow{comments}
+\begin{exmp}
+We start with an empty query and we know all the locations of it. If our extender generates all the queries where the patterns are longer by 1 then we are guaranteed to enumarate all the patterns.
+\end{exmp}
 
-\tow{simplify and generalize more}
+\begin{exmp}
+We can start with the empty query and all queries with patterns of length 1. Now if our extender generates queries where the patterns are longer by 2 we can also examine all of the queries.
+\end{exmp}
 
-\WIP
+The extender determines which patterns and pattern classes will be generated. We can modify and compose different extenders to get new patterns. Often more complex patterns can adversely affect performance.
 
-The idea of extending method is:
+\tow{grouping and single pattern generation}
 
-\begin{algorithm}[H]
-	\caption{SPEXS2 extender}
-\begin{algorithmic}[1]
-	\Require{$q$ query, $walk$ function}
-	\Ensure{result contains queries that have been extended by one}
-	
-	\Let{steps}{new collection([Token, Pos])}
-	\For{pos $\in$ positions($q$.matches)}
-		\Let{[token, loc]}{walk($q$.document, pos)}
-		\State steps.add([token, pos])
-	\EndFor
-
-	\Let{matches}{new map(Token $\mapsto$ [Pos])}
-	\For{$[token, loc] \in steps$}
-		\If{$matches[token]$ doesn't exist}
-			\Let{matches[token]}{empty set}
-		\EndIf
-		\Let{matches[token]}{matches[token] + loc}
-	\EndFor
-
-	\Let{queries}{new collection([Query])}
-	\For{(token, positions) $\in$ matches}
-		\Let{$qx$}{new query}
-		\Let{$qx$.document}{$q$.document}
-		\Let{$qx$.pattern}{$q$.pattern + token}
-		\Let{$qx$.positions}{positions}
-		\State queries.add($qx$)
-	\EndFor
-\end{algorithmic}
-\end{algorithm}
-
-The behavior of \emph{extender} depends on how \emph{walk} is implemented, we shall look at different ways how to implement it. The different implementations can capture more complex patterns, but often at the cost of performance.
+If we visualize the sequences as graphs we can extend it with possible extensions.
 
 \subsection{Sequences}
 
@@ -145,14 +118,25 @@ We can also limit the length of the run.
 
 Here we have limited the run length to be either 2 or 3.
 
-\subsection{Optimizations}
+\subsection{Optimized groups}
 
-We can further optimize \emph{group next} by inferring the positions from simple \emph{sequence next}. We can see that the positions of a group extension is the same as the union of positions by the group tokens.
+Instead of immediately extending the group tokens we can take the output of an other extender and combine its results. If we have a group token $\gamma$ that contains $tokens(\gamma)$ then the \emph{matches} for such group is $$matches(p\gamma, D) = \bigcup_{t \in tokens(\gamma)} matches(pt, D) $$
 
-If we have a group token $\gamma$ that contains $tokens(\gamma)$ then the \emph{matches} for such group is $$matches(p\gamma, D) = \bigcup_{t \in tokens(\gamma)} matches(pt, D) $$
+\begin{exmp}
+A pattern \R{A[CTG]} is located in document $D$ at positions $matches(\R{AC}, D) + matches(\R{AT}, D) + matches(\R{AG}, D)$.
+\end{exmp}
+
+
+\subsection{Optional tokens}
+
+\tow{ combine current matches(q) + ... }
 
 \section{Summary}
 
-\tow{what follows, how used}
+The extender was shown to work via graphs, practically it is much more reasonable to minimize it as already mentioned in "Pattern Discovery from Biosequences"\cite{spexs}.
 
-\tow{minimal requirements for the dataset}
+Since the best way to visualize was on graphs suggests that the SPEXS2 algorithm could be potentially extended to work on trees and then on graphs.\hmm{?}
+
+From the previous results we can also derive the minimal requirements for the dataset. First we need to get the initial empty query - which means we should be somehow be able to get all the positions where a pattern could start. The other operator is finding the next position and token from a given position.
+
+To use this generic version of the SPEXS algorithm we need to 1. choose our pool structures, 2. choose our filters, 3. choose our extender and preparation and 4. dataset implementation.

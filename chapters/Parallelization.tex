@@ -8,13 +8,13 @@ Here we discuss different ways how we can partition the algorithm to support par
 The main process of the algorithm as described by dataflow diagram.\cite{Kahn74,Lee95} Circles denote processes and unfinished rectangles denote data stores.
 
 \begin{figure}[H]
-	\input{./diagrams/process.tex}
+	\scalebox{0.8}{\input{./diagrams/process.tex}}
 \end{figure}
 
 We can see that the different query extensions do not share a dependency, except the dataset. Since dataset itself is read-only for a given process, it means we can use multiple extender processes. The same applies for extendability and output filter.
 
 \begin{figure}[H]
-	\input{./diagrams/process2.tex}
+  \scalebox{0.8}{\input{./diagrams/process2.tex}}
 \end{figure}
 
 We can add more processes in a similar fashion without affecting the end result. Although this will introduce a source of indeterminism.
@@ -52,10 +52,12 @@ Since the dataset and the process memory consumption can get quite it would also
 
 The extension results for a given query stays inside the sequence which means we can partition by dividing sequences to separate datasets.
 
-The whole dataset is required only for filtering, since even one of the simplest operations ("counting matches in dataset") requires full knowledge of all matches over the dataset. We can use partial results ($Z$) to reduce the communication overhead.
+The whole dataset is required only for filtering, since even one of the simplest operations ("counting matches in dataset") requires full knowledge of all matches over the dataset. We can calculate partial results and let the filters communicate the results. This could be also done in a seprate process instead of directly communicating.
 
 \begin{figure}[H]
-	\input{./diagrams/process3.tex}
+	\scalebox{0.8}{\input{./diagrams/process3.tex}}
 \end{figure}
 
-For example to see whether some query is over some count limit we first count matches in the partial datasets, then send the partial results to a process that adds these results together. Depending on that result we can decide whether it needs further processing.
+\begin{exmp}
+For example to see whether some query is over some count limit we first count matches in the partial datasets. Then send the partial results to a each other and add these results together locally. Depending on that result we know how to proceed.
+\end{exmp}

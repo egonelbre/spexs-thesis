@@ -1,20 +1,20 @@
 \begin{tikzpicture}[auto]
 	\node[pool] (in) {In};
-	\node[process, right of=in, node distance=14em] (ext) {Extender};
-	\node[process, below left of=ext] (extable) {Extend?};
+	\node[process, right of=in] (ext) {Extender};
+	\node[process, below of=ext] (extable) {Extend?};
 
-	\node[process, below right of=ext] (outable) {Output?};
+	\node[process, right of=extable] (outable) {Output?};
 	\node[pool, right of=outable] (out) {Out};
 
-	\node[dataset, below of=ext] (dataset) {Dataset};
+	\node[dataset, right of=ext] (dataset) {Dataset};
 
 	\draw[needs] (dataset) to (ext);
 	\draw[needs] (dataset) to (outable);
 	\draw[needs] (dataset) to (extable);
 
 	\draw[chan] (in) to node{p} (ext);
-	\draw[chan]	(ext) to node{pX} (outable);
 	\draw[chan] (ext) to node{pX} (extable);
+	\draw[chan]	(extable) to node{pX} (outable);
 	\draw[chan, bend left] (extable) to node{pX} (in);
 	\draw[chan] (outable) to node{pX} (out);
 \end{tikzpicture}
