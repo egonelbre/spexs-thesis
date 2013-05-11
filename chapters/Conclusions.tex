@@ -1,30 +1,8 @@
 \chapter{Conclusions}
 \label{c:conclusions}
 
-\WIP
+In this thesis we analysed how to develop a parallel pattern discovery algorithm. We showed how we can take an already exisiting algorithm and parallelize it by generalizing, decomposing and then reifying. Finding the general idea of the algorithm can simplify the algorithm and provide more intuitive way of interpreting it. Decomposing allows us to talk about separate parts of algorithm and modify them without affecting the general idea of the algorithm. If we have an abstract algorithm we can substitute those parts with parallel structures and algorithms.
 
-\tow{results 1}
+As a practical part we implemented a parallelized algorithm based on \emph{spexs}\cite{spexs}. We discussed several problems of implementing an algorithm and discussed interesting approaches to these problems. The program has been designed to be easily extendable for different inputs, filters and interestingness criteria. We discussed different possible uses for the implementation and analysed the performance gained from parallelization.
 
-\tow{results 2}
-
-\tow{context, compare}
-
-\tow{strength + limitations}
-
-\tow{speed}
-
-\tow{so what? why is it important}
-
-\tow{what is next?}
-
-\tow{strong conclusions}
-
-\tow{take home message}
-
-In this thesis we showed how by making an algorithm more abstract and general we can also make it parallel. We showed that this algorithm can find patterns from sequences.
-
-Although we showed that we can apply this algorithm on NFAs we did not analyze the performance characteristics. This suggests that this algorithm may be able to work on trees and graph, but would require slight modifications.
-
-We also demonstrated how to make the algorithm more concrete and work well on some particular datasets. This also took into consideration further development and flexibility of the algorithm.
-
-The SPEXS2 implementation currently is already used in biosequenceing and text mining.
+Approaches suggested in this thesis could be used to generalize and parallelize other algorithms. Finding generic algorithms can be an easy way of discovering new optimizations, new algorithms and new potential applications for algorithms. If these generalizations can be implemented practically we make the implementation easily extendable and also usable for wider range of problems.

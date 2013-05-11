@@ -74,37 +74,47 @@ The extender determines which patterns and pattern classes will be generated. We
 
 \tow{grouping and single pattern generation}
 
-If we visualize the sequences as graphs we can extend it with possible extensions.
+If we visualize the sequences as graphs we can extend it with possible extensions. For simplicity we use nucleotides as our alphabet $\Sigma = \{ \R{A}, \R{C}, \R{G}, \R{T} \}$.
 
 \subsection{Sequences}
 
-The simplest case how the next function behaves is when we are only looking for simple sequences -- the alphabet for patterns and sequences is the same.
-
-Let's consider a sequence $ACGCCGATCGC$ and a pattern $CG$.
+The simplest case how the \emph{next} function behaves is when we are only looking for simple sequences. Let's consider a sequence \R{ACGCCGATCGC} and a pattern \R{CG}.
 
 \begin{figure}[H]
 	\input{./diagrams/sequence.tex}
 \end{figure}
 
-Initially we have matches only for query $CG$. Then by taking the \emph{next} token from the sequence we can build up querys $CGA$ and $CGC$.
+Initially we have matches only for query \R{CG}. Then by taking the \emph{next} token from the sequence we can build up querys \R{CGA} and \R{CGC}.
 
-\subsection{Groups}
+\subsection{Group tokens}
 
-One common addition in a pattern language is capturing a group of tokens. For example we can use $X = [AC]$ to denote both tokens $A, C$. By adding where either one transitions we can capture such groups in the extension process.\
+One common addition in a pattern language is matching a group of tokens. For example we can use $\R{X} = \R{[AC]}$ to denote both tokens \R{A}, \R{C}. By adding where either one transitions we can capture such groups in the extension process.
 
 \begin{figure}[H]
 	\input{./diagrams/groups.tex}
 \end{figure}
 
+There is a universal group \R{.} or \emph{wildcard} that matches any token in the alphabet.
+
+\begin{exmp}
+Pattern \R{T.} would match patterns \R{TA}, \R{TC}, \R{TG}, \R{TT}.
+\end{exmp}
+
 \subsection{Star}
 
-Another possible extension is the \emph{dot-star} or more simply capturing a run of elements. Here we just show the expanded sequence with $*$ symbol.
+Another possible extension is capturing a run of wildcards.
+
+\begin{exmp}
+A pattern \R{A.*T} would match \R{ACT}, \R{ATTC}, \R{ATTTC}.
+\end{exmp}
+
+Here we just show the expanded sequence with \R{*} symbol.
 
 \begin{figure}[H]
 	\input{./diagrams/star.tex}
 \end{figure}
 
-Here we immediately notice how the complexity increases by introducing pattern token. \tow{properly} We can skip this intermediary step isn't necessary we can instead extend with $*Y$, where $Y$ is some other token. This means we avoid this single large query and have multiple smaller queries.
+Here we immediately notice how the complexity increases by introducing pattern token. \tow{properly} We can skip this intermediary step isn't necessary we can instead extend with \R{.*Y}, where \R{Y} is some token. This means we avoid this single large query and have multiple smaller queries.
 
 \begin{figure}[H]
 	\input{./diagrams/star2.tex}
@@ -118,25 +128,46 @@ We can also limit the length of the run.
 
 Here we have limited the run length to be either 2 or 3.
 
-\subsection{Optimized groups}
+\subsection{Optimized group tokens}
 
-Instead of immediately extending the group tokens we can take the output of an other extender and combine its results. If we have a group token $\gamma$ that contains $tokens(\gamma)$ then the \emph{matches} for such group is $$matches(p\gamma, D) = \bigcup_{t \in tokens(\gamma)} matches(pt, D) $$
+Instead of immediately extending the group tokens we can take the output of an other extender and combine its results. If we have a group token $\gamma$ that contains $tokens(\gamma)$ then the \emph{matches} for such group is $$matches(p\gamma, D) = \bigcup_{t \in tokens(\gamma)} matches(pt, D) $$.
 
 \begin{exmp}
 A pattern \R{A[CTG]} is located in document $D$ at positions $matches(\R{AC}, D) + matches(\R{AT}, D) + matches(\R{AG}, D)$.
 \end{exmp}
 
+\subsection{Other possible extensions}
 
-\subsection{Optional tokens}
+By adding a multi-step from a node to itself and to the next node we can capture optional tokens.
 
-\tow{ combine current matches(q) + ... }
+\begin{exmp}
+A optional token \R{Y?} means that the token \R{Y} can occur either zero or one time. For example \R{AT?} matches \R{A} and \R{AT}.
+\end{exmp}
+
+The graph for such token would look like:
+
+\begin{figure}[H]
+	\input{./diagrams/star4.tex}
+\end{figure}
+
+ Similarly we can use the same technique for optimization as for the group tokens ($matches(pY, D) = matches(p) \cup matches(pY)$, where $Y$ is a token).
+
+\subsection{Alternative extensions}
+
+We mentioned that we can also extend by different number of tokens at a time as long as we guarantee that all patterns will be searched. For optimality we also do not want to iterate over the same pattern multiple times. As a simple example the sequence \R{ACGC} could be iterated with setup:
+
+\begin{figure}[H]
+	\input{./diagrams/star5.tex}
+\end{figure}
+
+Since we have all the patterns of length 0 and 1, by adding patterns with length 2 we can be sure to enumerate all of them. This also means that finding groups should be adjusted by combining all the combinations of groupings.
 
 \section{Summary}
 
-The extender was shown to work via graphs, practically it is much more reasonable to minimize it as already mentioned in "Pattern Discovery from Biosequences"\cite{spexs}.
+The extender was shown to work via graphs, practically it is much more reasonable to minimize it as simple sequence already mentioned in "Pattern Discovery from Biosequences"\cite{spexs}. The additional extension links shown in the graphs can either be precalculated or calculated at runtime.
 
-Since the best way to visualize was on graphs suggests that the SPEXS2 algorithm could be potentially extended to work on trees and then on graphs.\hmm{?}
+From the previous results we can also derive the minimal requirements for the dataset. First we need to get the initial empty query - which means we should be somehow be able to get all the positions where a pattern could start. The other operator is finding the next position and token from a given position. Finding of next positions from a given positions on sequence can be interpreted as a forward iterator.
 
-From the previous results we can also derive the minimal requirements for the dataset. First we need to get the initial empty query - which means we should be somehow be able to get all the positions where a pattern could start. The other operator is finding the next position and token from a given position.
+Since the best way to visualize was on graphs suggests that the \emph{spexs2} algorithm could be made to work on trees and then on graphs. Finding sequential patterns from a tree should be straightforward since the generic algorithm is oblivious to the amount of following tokens any position can have. Graphs can be more difficult since we need to remove duplicates caused by other extensions.
 
 To use this generic version of the SPEXS algorithm we need to 1. choose our pool structures, 2. choose our filters, 3. choose our extender and preparation and 4. dataset implementation.

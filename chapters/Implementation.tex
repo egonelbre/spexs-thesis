@@ -8,6 +8,18 @@ In this chapter we will discuss a practical implementation, \emph{spexs2}, for p
 
 Information about the full source code is in the Appendix \ref{add:spexs2}.
 
+\section{Language}
+
+The language choice in a project can be difficult and is very subjective. Here we discuss why Go was used instead of some other alternative.
+
+Since this project should be a reference implementation and should be as readable as possible. This means that languages Fortran, C++, Java are probably not the best choices due to their complexity. Clojure, Haskell and OCaml can represent abstract code very well, but the amount of effort required to learn them is very high. Languages such as Matlab, Octave, Python or R would be ideal due to their ease of use, but they have performance problems\insertref{}.
+
+There are newer languages Go, D and Julia that suit the problem better. D is an high performance language that was designed as an replacement for C++, but still has a steep learning curve. Julia is a high-performance dynamic language designed for technical computing, but at the time of starting the project had significant language runtime bugs. Go is a systems language designed to be simple, but it is worse in performance than D nor Julia.
+
+Go seemed to be the best choice due its simplicity, stability and concurrency support. The performance characteristics also seemed good enough. Language simplicity has several benefits: ease of learning, readability and portability. Ease of learning means that if some new feature is needed a contributor can learn the language fast. Readability means that it is a better reference implementation. Portability means that most of the language semantics and structures can be directly translated to other languages if there is a need for better performance.
+
+In summary Go is a nice compromise between Python and C.
+
 \section{Architecture}
 
 The main criteria for designing program have been described in D. Parnas
@@ -94,29 +106,59 @@ If no such parameter is given then the default value "main" can be used.
 
 Configuration files are also problematic for running the first time. As a user you need to find a configuration file that suits your needs, then modify it and finally run it. To remedy this problem the application can embed sample configuration files so called "profiles" that can be used directly from the command line. This means you can directly use \cmdline{spexs2 -p=protein input=some.data min-p=1.0}.
 
-\section{Input and Output}
-
-\WIP
-
-\tow{about importance of separating the input reader and output printer from the algorithmic code}
-
 \section{Alphabet and Database}
 
-\WIP
+\emph{spexs2} was designed also to work with texts and words. To support such large alphabets we first needed to map each token to an identifier (an integer) and convert the sequences to a sequence of these identifiers. Unfortunately this is problematic for large datasets since this can take a lot of time as compared to just copying the file to memory.
 
-\tow{about problems with large alphabets and datasets}
+There are analyses that may require many datasets. For example instead of comparing two datasets at a time you may want to compare pair-wise multiple datasets at the same time. Supporting multiple datasets in the code is rather trivial, but exposing this to the user is more interesting.
+
+To support multiple datasets we first added a name for each dataset in the configuration:
+
+\begin{lstlisting}
+    "Datasets" : {
+        "A" : { "File" : "$A$" },
+        "B" : { "File" : "$B$" },
+        "C" : { "File" : "$C$" },
+        ...
+\end{lstlisting}
+
+We also use the command-line argument syntax to make it easier to use. Now when we are defining filters we need to specify how exactly they are calculated. For example we can not just say ratio of occurrences in dataset since that would be ambigous. We used syntax similar to function calls in the configuration file:
+
+\begin{lstlisting}
+    ...
+    "Extension": {
+        "Outputtable": {
+            "OccurencesRatio(A, B)" : {"min" : 2},
+            ...
+\end{lstlisting}
+
+This allows to clearly see that the occurences ratio between datasets A and B must be at least 2. Obviously we can also define features that take more arguments.
 
 \section{Pools}
 
-\WIP
+The input pool can direct the flow of extending process. This means that the order of can have performance and memory impact. The performance doesn't get affected as much because the algorithm is exhaustive and hence every query gets examined, unless it is terminated early or the filters tuned during runtime.
 
-There can be different performance characteristics when using a particular implementation.
+There are several ways run the extension process: breadth first, depth first, most frequent first, least frequent first and others. Breadth first and depth first can easily be achieved by a queue and a stack respectively. We can use priority queues to implement other ways of extending.
 
-If we use a fifo queue as the in pool the algorithm does a breadth first search of patterns. This can be problematic since we would need a lot of memory to hold all the patterns in memory.
+The major concern was running on large datasets which meant that the memory consumption important. Although the most frequent first can arrive to the interesting results faster it can also use a lot of memory due to unextended less frequent nodes.
 
-A lifo queue for input pool is a more reasonable choice for memory problems since we need to hold less patterns in memory.
+The least frequent approach would minimize the memory use since the least frequent would be most likely to be discarded by filters. This requires the use of a priority queue. The depth first approach would also use little memory but can use a stack.
 
-A priority queue suits for the output pool since we can easily then use some feature to sort the queue.
+Since we need concurrent access to the pool it requires very fast adding and removing operations. This means that the depth-first ordering is more suitable since adding and removing from stack is faster than from priority queues.
+
+For the output queue a priority queue is the obvious choice since we usually only want a limited number of the most interesting results.
+
+\section{Query and Location set}
+
+The structure of query required some special consideration. The proposed solution in "Pattern Discovery from Biosequences" was to use a trie for remembering each pattern and then use optimized set for storing locations inside the database. Since the algorithm must now work concurrently using a simple trie was not an option because adding a child to the parent from multiple processes causes a race condition. 
+
+The first approach was to flip the trie, which means instead of parent pointing to the child the child points to the parent. The original tree can be extracted by reversing the links after the algorithm has finished. This started causing problems since we are working in a garbage collected enviornment and each pointer adds overhead to the garbage collection. Rough estimation also suggested that memory benefit from using trie is minimal.
+
+The second approach was just to copy the any needed content to the child and not to link them. This worked out very well.
+
+The other problem was how to store the position list. Initially it seemed that a very tightly packed set structure is required to keep the memory usage of the program minimal. This of course would have impacted the performance. This actually turned out not to be the case since all the queries could be packed with any packing algorithm when they are stored in the pools and that had similar memory benefit with a simpler code.
+
+One interesting optimization we found was a related to storing sparse positions. A simple way to implement large bitset is using a hash map to a small bitarray. We use the first bits as the key and the rest store as a position in the bitarray. We know that the occurrences of a pattern are likely to be sparse, hence it is also quite likely there are only bitarrays where only a single bit is set. The soltion is to move last bits to the front of the integer. This makes the last bits to be less uniform and hence the packing will be better. Rough memory testing showed that this made the structure use about 2x less memory.
 
 \section{Query features, interestingness and filters}
 
