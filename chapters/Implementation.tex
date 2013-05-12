@@ -10,15 +10,15 @@ Information about the full source code is in the Appendix \ref{add:spexs2}.
 
 \section{Language}
 
-The language choice in a project can be difficult and is very subjective. Here we discuss why Go was used instead of some other alternative.
+The language choice in a project is very subjective. Usually the language chosen is either the language that the author feels most comfortable with or widely used language that has many libraries. This project used Go for practical implementation and here we discuss the \emph{opinions} why such choice was made. The information here was collected from several sources\cite{HammerPrinciple,LanguageShootout,LoopRecognition,go,clojure,julia} and should be seen as opinions rather than facts.
 
-Since this project should be a reference implementation and should be as readable as possible. This means that languages Fortran, C++, Java are probably not the best choices due to their complexity. Clojure, Haskell and OCaml can represent abstract code very well, but the amount of effort required to learn them is very high. Languages such as Matlab, Octave, Python or R would be ideal due to their ease of use, but they have performance problems\insertref{}.
+This project should be a reference implementation and should be as readable as possible; this means that languages such as Fortran, C++, Java are probably not the best choices due to their complexity. The project deals with a lot of generic code; this means Clojure, Haskell and OCaml would be useful, but it would require a lot of effort if someone wishes to contribute and doesn't know the language. Languages such as Matlab, Octave or R would be ideal due to their ease of use, but their speed or memory performance is worse than C.
 
-There are newer languages Go, D and Julia that suit the problem better. D is an high performance language that was designed as an replacement for C++, but still has a steep learning curve. Julia is a high-performance dynamic language designed for technical computing, but at the time of starting the project had significant language runtime bugs. Go is a systems language designed to be simple, but it is worse in performance than D nor Julia.
+There are newer languages Go, D and Julia that suit the problem better. D is an high performance language that was designed as an replacement for C++, but still has a steep learning curve. Julia is a high-performance dynamic language designed for technical computing, but at the time of starting the project it had significant language runtime bugs. Go is a systems language designed to be simple, but it is worse in performance than D and Julia.
 
 Go seemed to be the best choice due its simplicity, stability and concurrency support. The performance characteristics also seemed good enough. Language simplicity has several benefits: ease of learning, readability and portability. Ease of learning means that if some new feature is needed a contributor can learn the language fast. Readability means that it is a better reference implementation. Portability means that most of the language semantics and structures can be directly translated to other languages if there is a need for better performance.
 
-In summary Go is a nice compromise between Python and C.
+In summary, Go is a nice compromise between Python and C. It adds additional rigidity and concurrency primitives and is a simple language.
 
 \section{Architecture}
 
@@ -164,17 +164,29 @@ One interesting optimization we found was a related to storing sparse positions.
 
 When we first described the query features we showed that filters and interestingness are a special case query features. In \emph{spexs2} the features are used to print information about the results.
 
-The filters can be very similar to features in their implementation. For example a filter for pattern length is similar to the pattern length feature.
-
-Although implementing all combinations is possible we can use function composition to avoid such repetition.
-
-Since most of the features implemented could also be used as a interestingness measure we used a simplification for the "Feature" function defintion:
+Since most of the features implemented could also be used as a interestingness measure we used a simplification for the "Feature" function definition:
 
 \begin{lstlisting}
 type Feature func(q *Query) (float64, string)
 \end{lstlisting}
 
 Which means that the function returns two types, a real value and a string. In the implementation there are only few features that return arbitrary types so it was easier to convert it into a string. The only place where such features were needed is for printing. For example one of such features is the representation of the pattern.
+
+And an implementation of a Feature constructor:
+
+\begin{lstlisting}
+// the count of matching sequences
+func Matches(datasets []int) Feature {
+    return func(q *Query) (float64, string) {
+        matches := q.Matches()
+        return countf(matches, group), ""
+    }
+}    
+\end{lstlisting}
+
+The argument to the function defines over which datasets the resulting function counts matches. To bind this constructor to the configuration we register it and with reflection use the function name as the name used in the configuration file.
+
+The filters can be very similar to features in their implementation. For example a filter for pattern length is similar to the pattern length feature. Although implementing all combinations is possible we can use function composition to avoid such repetition.
 
 By specifying a minimum or a maximum value for a feature we can turn it into a filter. One way to do it is using a lexical closure. For example:
 
@@ -187,9 +199,9 @@ func MakeFeatureFilter(fn Feature, min float64, max float64) Filter {
 }
 \end{lstlisting}
 
-In languages which do not support such composition we can also use object composition or function pointers. 
+Of course there are some filters that cannot be defined by features hence there is still possibility to make separate filters. For example disallowing a wildcard in the beginning of the pattern.
 
-Of course there are some filters that cannot be defined by features hence there is still possibility to make separate filters. Such as disallowing star symbol in the beginning of the pattern.
+In languages which do not support such composition we could use object composition and/or function pointers.
 
 \section{Synchronized Tree Traversal}
 
@@ -283,7 +295,7 @@ We use $mutex$ to protect variables and data structures. Semaphore $added$ track
 
 \section{Debugging}
 
-Seeing how the algorithm works is very useful to get an understanding how the algorithm works. This often can help to either improve the input configuration or debug the program itself. Often this is resolved by adding debug statments.
+Seeing how the algorithm runs is very useful to get an understanding how the algorithm works. This often can help to either improve the input configuration or debug the program itself. Often such tracing is implemented by adding debug statments.
 
 For example:
 
@@ -351,4 +363,4 @@ func run(){
 }
 \end{lstlisting}
 
-We have removed the debugging statements from the algorithm. We could define other such "debug statement injectors" that provide different levels of details. This method of course has a slight performance impact due to the additional indirection. This can be extended to provide user interaction and other features.
+We have removed the debugging statements from the algorithm. We could define other "debug statement injectors" that provide different levels of details. This method of course has a slight performance impact due to the additional indirection. This can be extended to provide user interaction and other features.

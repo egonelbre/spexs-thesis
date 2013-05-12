@@ -48,7 +48,13 @@ We can also use different types of structures as pools. For example using a queu
 
 \section{Filtering}
 
-Filtering allows us to reduce the number of queries we have to examine and allows to select a subset of patterns by some criteria. \eg
+Filtering allows us to reduce the number of queries we have to examine and allows to select a subset of queries by some criteria.
+
+The filters can make the decision, whether the query should be extended, based on any available information. For example query pattern, number of occurences, metadata in sequences, metadata in dataset or use data from configuration.
+
+\begin{exmp}
+We can add metadata to the sequence about the datafile. We count the occurences of a query in each datafile and then if the ratio between counts is smaller than some number defined in the configuration.
+\end{exmp}
 
 Although there is only one filter "function" specified the filter could be a composite of multiple filters.
 
@@ -72,9 +78,17 @@ We can start with the empty query and all queries with patterns of length 1. Now
 
 The extender determines which patterns and pattern classes will be generated. We can modify and compose different extenders to get new patterns. Often more complex patterns can adversely affect performance.
 
-\tow{grouping and single pattern generation}
+The general idea for extending is to find all the following patterns from all the previous query positions and then group the similar patterns into queries.
 
-If we visualize the sequences as graphs we can extend it with possible extensions. For simplicity we use nucleotides as our alphabet $\Sigma = \{ \R{A}, \R{C}, \R{G}, \R{T} \}$.
+This process can be visualized with graphs. We make the sequence into a graph where the links between nodes are the sequence tokens. Each pattern then can walk the edges and match find the ending position for each pattern.
+
+For example the sequence \R{ACGCCGATCGC} would look like:
+
+\begin{figure}[H]
+	\input{./diagrams/sequence2.tex}
+\end{figure}
+
+For simplicity we use nucleotides as our alphabet $\Sigma = \{ \R{A}, \R{C}, \R{G}, \R{T} \}$ in the following examples.
 
 \subsection{Sequences}
 
@@ -105,28 +119,26 @@ Pattern \R{T.} would match patterns \R{TA}, \R{TC}, \R{TG}, \R{TT}.
 Another possible extension is capturing a run of wildcards.
 
 \begin{exmp}
-A pattern \R{A.*T} would match \R{ACT}, \R{ATTC}, \R{ATTTC}.
+A pattern \R{A.*T} would match \R{ACT}, \R{ATTC}, \R{ATTTC} and so on.
 \end{exmp}
 
-Here we just show the expanded sequence with \R{*} symbol.
+On the graph instead of \R{.*} we use only \R{*} symbol.
 
 \begin{figure}[H]
 	\input{./diagrams/star.tex}
 \end{figure}
 
-Here we immediately notice how the complexity increases by introducing pattern token. \tow{properly} We can skip this intermediary step isn't necessary we can instead extend with \R{.*Y}, where \R{Y} is some token. This means we avoid this single large query and have multiple smaller queries.
+Constructing more complicated patterns increases the amount of queries required to enumerate. There are of course optimizations to avoid intermediary steps and repeated walking on the dataset. For example we can skip the extension with only \R{.*} and instead extend with \R{.*Y}, where \R{Y} is a token from the alphabet. This means we avoid this one large query and instead have multiple smaller queries.
 
 \begin{figure}[H]
 	\input{./diagrams/star2.tex}
 \end{figure}
 
-We can also limit the length of the run.
+We can limit the length of the run to speed up the process. Limiting the run length to be either 2 or 3 would look like:
 
 \begin{figure}[H]
 	\input{./diagrams/star3.tex}
 \end{figure}
-
-Here we have limited the run length to be either 2 or 3.
 
 \subsection{Optimized group tokens}
 
@@ -154,17 +166,17 @@ The graph for such token would look like:
 
 \subsection{Alternative extensions}
 
-We mentioned that we can also extend by different number of tokens at a time as long as we guarantee that all patterns will be searched. For optimality we also do not want to iterate over the same pattern multiple times. As a simple example the sequence \R{ACGC} could be iterated with setup:
+We mentioned that we can also extend by different number of tokens at a time as long as we guarantee that all patterns will be searched. For optimality we also do not want to iterate over the same pattern multiple times. As a simple example the sequence \R{ACGCGA} could be iterated with setup:
 
 \begin{figure}[H]
 	\input{./diagrams/star5.tex}
 \end{figure}
 
-Since we have all the patterns of length 0 and 1, by adding patterns with length 2 we can be sure to enumerate all of them. This also means that finding groups should be adjusted by combining all the combinations of groupings.
+Since at the starting point we have all the patterns of length 0 and 1, by adding patterns with length 2 we can be sure to enumerate all of them. Of course the previous methods for group and star patterns require modification.
 
 \section{Summary}
 
-The extender was shown to work via graphs, practically it is much more reasonable to minimize it as simple sequence already mentioned in "Pattern Discovery from Biosequences"\cite{spexs}. The additional extension links shown in the graphs can either be precalculated or calculated at runtime.
+The extender was shown to work via graphs, practically it is much more reasonable to minimize it as simple sequence as already mentioned in "Pattern Discovery from Biosequences"\cite{spexs}. The additional extension links shown in the graphs can either be precalculated or calculated at runtime.
 
 From the previous results we can also derive the minimal requirements for the dataset. First we need to get the initial empty query - which means we should be somehow be able to get all the positions where a pattern could start. The other operator is finding the next position and token from a given position. Finding of next positions from a given positions on sequence can be interpreted as a forward iterator.
 

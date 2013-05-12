@@ -1,7 +1,7 @@
 \chapter{Parallelization}
 \label{c:parallelization}
 
-Here we discuss different ways how we can partition the algorithm to support parallelism.
+Here we discuss different ways how we can reify the algorithm to support parallelism. There are often several ways of making program parallel. Using parallelization means that there is additionally a need for some communication and synchronization to make the processes arrive at the final result. So it is useful to find as many possible parallelizations, but it is not wise to use all of them.
 
 \section{Process}
 
@@ -17,11 +17,15 @@ We can see that the different query extensions do not share a dependency, except
   \scalebox{0.8}{\input{./diagrams/process2.tex}}
 \end{figure}
 
-We can add more processes in a similar fashion without affecting the end result. Although this will introduce a source of indeterminism.
+We can add more processes in a similar fashion without affecting the end result. Although such concurrency will introduce a source of indeterminism.
 
 \section{Extending}
 
-\emph{Extender} can be parallelized by using MapReduce concepts\cite{MapReduce,SteeleFold}. We use Clojure\cite{clojure} reducers library to show how this can be implemented.
+The extender can be parallelized via map and reduce concepts\cite{MapReduce,SteeleFold}. The extender was based on two concepts finding the \emph{next} positions from previous pattern position and then group those positions together to find the next queries.
+
+The finding the next position from a position can be easily implemented via mapping by using the \emph{next} function of the dataset. The grouping requires some attention - the grouping is itself a reduction into a map by key with joining.
+
+The pseudo-code representation for such function compositions would be very difficult and would require a lot of new syntax. Therefore we present this idea in Clojure\cite{clojure} which should be readable to people who know lisp. We use the reducers library to show how the extension can be implemented.
 
 \begin{algorithm}[H]
 	\caption{Parallel extender}
@@ -44,13 +48,13 @@ We can add more processes in a similar fashion without affecting the end result.
 \end{lstlisting}
 \end{algorithm}
 
-This may not give much improvement on desktop CPUs, since we already can process multiple queries at the same time. This parallelization could be benefitial for highly parallel processors such as GPGPUs or FPGAs.
+Such approach may not give much improvement on desktop CPUs, since we already can process multiple queries at the same time. This parallelization could be benefitial for highly parallel processors such as GPGPUs or FPGAs.
 
 \section{Distributed processes}
 
-Since the dataset and the process memory consumption can get quite it would also be benefitial to be able to partition the dataset between multiple machines.
+Since the dataset and the process memory consumption can get quite large it would also be benefitial to be able to partition the dataset between multiple machines. This can also help on a single machine since we can interlace running the different processes and store the non-running process in non-volatile memory.
 
-The extension results for a given query stays inside the sequence which means we can partition by dividing sequences to separate datasets.
+The extension results for a given query stays inside the sequence which means we can partition by assigning sequences to separate datasets.
 
 The whole dataset is required only for filtering, since even one of the simplest operations ("counting matches in dataset") requires full knowledge of all matches over the dataset. We can calculate partial results and let the filters communicate the results. This could be also done in a seprate process instead of directly communicating.
 
@@ -61,3 +65,5 @@ The whole dataset is required only for filtering, since even one of the simplest
 \begin{exmp}
 For example to see whether some query is over some count limit we first count matches in the partial datasets. Then send the partial results to a each other and add these results together locally. Depending on that result we know how to proceed.
 \end{exmp}
+
+Such distribution could be used to separate the process into more managable chunks, but adds significant communication overhead.
