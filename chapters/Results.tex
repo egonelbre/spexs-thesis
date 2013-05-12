@@ -15,9 +15,57 @@ Here we show examples for the program:
 
 \todo[inline]{make an example}
 
-\subsection{Text mining}
+\subsection{Text patterns}
 
-\todo[inline]{make an example}
+As an example how text patterns could provide useful feedback is to run it on a chapter of thesis. It could find overused words and phrases. To test this claim we ran the algorithm on Chapter \ref{c:implementation}.
+
+To prepare the text we separated each sentence to a separate sequence. Then we removed all the non-textual characters and replaced them with spaces. The text was then converted to lowercase. We could additionally stem the text, but it didn't provide any useful improvements for this text.
+
+We use a group $"bind" = [and, or, if, then, else, the, a, an, my]$ do define words that do not carry much meaning.
+
+As a starting point we searched patterns that may have group symbols and are at least 4 patterns long. We limited the output to 10 results:
+
+\begin{Verbatim}
+Matches(inp)    'Pat?()'
+2       'this means that the'
+2       'a practical implementation spexs2 for'
+2       'a practical implementation spexs2'
+2       'discuss a practical implementation spexs2'
+2       'discuss a practical implementation'
+2       'discuss a practical implementation spexs2 for'
+2       'discuss (bind) practical implementation spexs2 for'
+2       'discuss (bind) practical implementation'
+2       'discuss (bind) practical implementation spexs2'
+2       'for pattern discovery in'
+\end{Verbatim}
+
+Repetition of such long word sequences looks very interesting. Further investigation revealed that there was a sentence that was rewritten and the previous version wasn't removed. After removing the repeating sentence we reran and also lowered the pattern length limit to 3.
+
+\begin{Verbatim}
+Matches(inp)    'Pat?()'
+5       'the configuration file'
+4       'a lot of'
+3       'this means that'
+3       'in the configuration'
+3       'means that the'
+3       'there are only'
+3       'in (bind) configuration'
+3       'pattern discovery in'
+3       'we can use'
+3       'of (bind) pattern'
+2       'into (bind) configuration file'
+2       'in (bind) configuration file'
+2       'pattern discovery in sequences'
+2       'into the configuration file'
+2       'for pattern discovery in'
+2       'this means that the'
+2       'in the configuration file'
+2       'be the best'
+2       'go is a'
+2       'the algorithm is'
+\end{Verbatim}
+
+We see repetitions such as "this means that", "in the configuration", "we can use" and "pattern discover in", which suggests we can improve the text in such places. So it can find rather simple patterns. Usefulness of the algorithm for such natural language processing tasks should be further examined.
 
 \subsection{Code mining}
 
@@ -28,6 +76,8 @@ Here we show examples for the program:
 The version used were \emph{spexs2.1.1@f1d6f7 (spexs2)} compiled with \emph{go1.1rc3} and \emph{spexs.0.2.a01}.
 
 Unfortunately I was unable to run \emph{spexs} with large datasets 5e6 protein sequences.
+
+For performance analysis we used 400,000 protein sequences with length 12. Limited number of wildcards to 3 and searched all patterns with at least 5 matches in the dataset.
 
 The original \emph{spexs} works faster in 1 thread case which is to be expected due to 
 runtime and language differences. 

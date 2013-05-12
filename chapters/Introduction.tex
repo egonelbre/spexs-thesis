@@ -5,11 +5,14 @@
 
 One of the problems arising in dataset analysis is the discovery of interesting patterns. These patterns can show how the dataset is formed, how it repeats itself or they can be characteristic to some particular subset of the data.
 
-For example a protein motif in a genomic sequence could predict disease. Patterns in medical diagnoses could show relations between diseases. Repeating pattern in source code could show how code could be minimized.
+For example a protein motif in a genomic sequence could predict disease. Patterns in medical diagnoses could show relations between diseases. Repeating pattern in source code could show how code could be minimized. Patterns in event logs could find causes for an error event.
 
 Research in pattern discovery is mainly driven by biology, which means most of the discovery algorithms have been designed for genomic sequences in mind. The techniques are usually constrained to the genomic sequences, but these algorithms could be useful elsewhere. The algorithms probably could be useful in other fields as well.
 
 With genomic sequences there is another problem, the amount of data\cite{HowIsGenomeDoing}. The data collected are growing with increasing speed, which means we need to use more computational resources to analyse them. This means the pattern discovery algorithms should take advantage of multicore processors, highly parallel processors and clusters.
+
+
+Pattern discovery itself 
 
 \tow{a priori vs some prior knowledge}
 
@@ -18,6 +21,8 @@ With genomic sequences there is another problem, the amount of data\cite{HowIsGe
 The usual limitations of algorithms are in the patterns themselves.
 
 \tow{usual limitations, alphabet, pattern language...}
+
+
 
 \section{Algorithm parallelization}
 

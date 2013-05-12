@@ -1,9 +1,6 @@
 \chapter{Implementation}
 \label{c:implementation}
 
-Here we discuss a practical implementation, \emph{spexs2}, for
-pattern discovery in sequences. 
-
 In this chapter we will discuss a practical implementation, \emph{spexs2}, for pattern discovery in sequences. We only discuss parts that we consider non-trivial or interesting and could be useful in implementing other algorithms.
 
 Information about the full source code is in the Appendix \ref{add:spexs2}.
@@ -12,11 +9,11 @@ Information about the full source code is in the Appendix \ref{add:spexs2}.
 
 The language choice in a project is very subjective. Usually the language chosen is either the language that the author feels most comfortable with or widely used language that has many libraries. This project used Go for practical implementation and here we discuss the \emph{opinions} why such choice was made. The information here was collected from several sources\cite{HammerPrinciple,LanguageShootout,LoopRecognition,go,clojure,julia} and should be seen as opinions rather than facts.
 
-This project should be a reference implementation and should be as readable as possible; this means that languages such as Fortran, C++, Java are probably not the best choices due to their complexity. The project deals with a lot of generic code; this means Clojure, Haskell and OCaml would be useful, but it would require a lot of effort if someone wishes to contribute and doesn't know the language. Languages such as Matlab, Octave or R would be ideal due to their ease of use, but their speed or memory performance is worse than C.
+This project should be a reference implementation and should be as readable as possible; languages such as Fortran, C++, Java are probably not the best choices due to their complexity. The project deals with a lot of generic code; this means Clojure, Haskell and OCaml would be useful, but it would require a lot of effort if someone wishes to contribute and doesn't know the language. Languages such as Matlab, Octave or R would be ideal due to their ease of use, but their speed or memory performance is worse than C.
 
 There are newer languages Go, D and Julia that suit the problem better. D is an high performance language that was designed as an replacement for C++, but still has a steep learning curve. Julia is a high-performance dynamic language designed for technical computing, but at the time of starting the project it had significant language runtime bugs. Go is a systems language designed to be simple, but it is worse in performance than D and Julia.
 
-Go seemed to be the best choice due its simplicity, stability and concurrency support. The performance characteristics also seemed good enough. Language simplicity has several benefits: ease of learning, readability and portability. Ease of learning means that if some new feature is needed a contributor can learn the language fast. Readability means that it is a better reference implementation. Portability means that most of the language semantics and structures can be directly translated to other languages if there is a need for better performance.
+Go seemed to be the best choice due its simplicity, stability and concurrency support. The performance characteristics also seemed good enough. Language simplicity has several benefits: ease of learning, readability and portability. Ease of learning makes contributors can learn the language fast. Readability means that it is a better reference implementation. Portability means that most of the language semantics and structures can be directly translated to other languages if there is a need for better performance.
 
 In summary, Go is a nice compromise between Python and C. It adds additional rigidity and concurrency primitives and is a simple language.
 
@@ -122,7 +119,7 @@ To support multiple datasets we first added a name for each dataset in the confi
         ...
 \end{lstlisting}
 
-We also use the command-line argument syntax to make it easier to use. Now when we are defining filters we need to specify how exactly they are calculated. For example we can not just say ratio of occurrences in dataset since that would be ambigous. We used syntax similar to function calls in the configuration file:
+We also use the command-line argument syntax to make it easier to use. Now when we are defining filters we need to specify how exactly they are calculated. For example we can not just say ratio of occurrences in dataset since that would be ambigous. We used syntax similar to function calls in the configuration:
 
 \begin{lstlisting}
     ...
@@ -136,7 +133,7 @@ This allows to clearly see that the occurences ratio between datasets A and B mu
 
 \section{Pools}
 
-The input pool can direct the flow of extending process. This means that the order of can have performance and memory impact. The performance doesn't get affected as much because the algorithm is exhaustive and hence every query gets examined, unless it is terminated early or the filters tuned during runtime.
+The input pool can direct the flow of extending process, which in turn can affect performance and memory. The performance doesn't get affected as much because the algorithm is exhaustive and hence every query gets examined, unless it is terminated early or the filters tuned during runtime.
 
 There are several ways run the extension process: breadth first, depth first, most frequent first, least frequent first and others. Breadth first and depth first can easily be achieved by a queue and a stack respectively. We can use priority queues to implement other ways of extending.
 
@@ -144,7 +141,7 @@ The major concern was running on large datasets which meant that the memory cons
 
 The least frequent approach would minimize the memory use since the least frequent would be most likely to be discarded by filters. This requires the use of a priority queue. The depth first approach would also use little memory but can use a stack.
 
-Since we need concurrent access to the pool it requires very fast adding and removing operations. This means that the depth-first ordering is more suitable since adding and removing from stack is faster than from priority queues.
+Since we need concurrent access to the pool it requires very fast adding and removing operations. The depth-first ordering is more suitable since stack operations are faster than priority queues.
 
 For the output queue a priority queue is the obvious choice since we usually only want a limited number of the most interesting results.
 
