@@ -1,0 +1,6 @@
+Timings
+s > time:30.14s cpu:98% mem:1407328kB waits:55
+s > time:29.56s cpu:99% mem:1407296kB waits:20
+s > time:29.91s cpu:98% mem:1407280kB waits:22
+s > time:30.24s cpu:99% mem:1407328kB waits:54
+s > time:30.24s cpu:98% mem:1407296kB waits:24
