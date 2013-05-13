@@ -7,24 +7,23 @@ One of the problems arising in dataset analysis is the discovery of interesting 
 
 For example a protein motif in a genomic sequence could predict disease. Patterns in medical diagnoses could show relations between diseases. Repeating pattern in source code could show how code could be minimized. Patterns in event logs could find causes for an error event.
 
-Research in pattern discovery is mainly driven by biology, which means most of the discovery algorithms have been designed for genomic sequences in mind. The techniques are usually constrained to the genomic sequences, but these algorithms could be useful elsewhere. The algorithms probably could be useful in other fields as well.
+Research in pattern discovery is mainly driven by biology, which means most of the discovery algorithms have been designed for genomic sequences in mind. The techniques are usually constrained to the genomic sequences, but these algorithms could be useful elsewhere. The algorithms probably could be useful in other fields as well. Searching new ways of using pattern discovery should be actively researched, progresses in any field can help other fields as well.
 
 With genomic sequences there is another problem, the amount of data\cite{HowIsGenomeDoing}. The data collected are growing with increasing speed, which means we need to use more computational resources to analyse them. This means the pattern discovery algorithms should take advantage of multicore processors, highly parallel processors and clusters.
 
+\subsection{Pattern Discovery}
 
-Pattern discovery itself 
+Patterns can arise from different places: images, text, sounds, sequences, graphs, signals and more. The pattern representation can vary depending on the data itself and the parts that the pattern captures. Patterns in graphs can be sub-graphs with some additional info. Patterns represented in an image can be a weighted collection of different features.
 
-\tow{a priori vs some prior knowledge}
+Pattern discovery is trying to find \emph{a priori} unknown patterns in data that are interesting by some formal criteria. We could look for patterns that are frequent in data or have a "interesting" structure. A pattern that occurs more frequently than expected by chance may be considered interesting. Graph pattern having circular shape may also be considered interesting.
 
-\tow{broad examples from nat processing, code}
+When choosing a pattern structure we should take into account the data, expected results and efficiency. Theoretically we could choose an abstract pattern structure that can represent all possible patterns, but practically this could be inefficient and be irrelevant to the problem. Finding image features from a visualization of sound would not probably produce anything meaningful.
 
-The usual limitations of algorithms are in the patterns themselves.
+When choosing a pattern rating method we shuld take into account that many patterns can occur by chance.  A pattern that specifies "something" is very frequent although it isn't very meaningful. There have been proposed many rating functions such as pattern occurances, ratio of pattern occurances between datasets, binomial and hypergeometric probability estimate and Z-score.
 
-\tow{usual limitations, alphabet, pattern language...}
+Although the idea of pattern discovery there are many parameters to choose from and is a difficult problem.
 
-
-
-\section{Algorithm parallelization}
+\subsection{Algorithm parallelization}
 
 Taking an existing algorithm and making it parallel can be sometimes easier than writing an parallel algorithm from scratch. Existing algorithms may have already proven themselves in practice and have already good concepts. Algorithm parallelization can be divided into three subproblems:
 
