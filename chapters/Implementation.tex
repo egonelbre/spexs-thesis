@@ -7,13 +7,13 @@ Information about the full source code is in the Appendix \ref{add:spexs2}.
 
 \section{Language}
 
-The language choice in a project is very subjective. Usually the language chosen is either the language that the author feels most comfortable with or widely used language that has many libraries. This project used Go for practical implementation and here we discuss the \emph{opinions} why such choice was made. The information here was collected from several sources\cite{HammerPrinciple,LanguageShootout,LoopRecognition,go,clojure,julia} and should be seen as opinions rather than facts.
+The language choice in a project is very subjective. Usually the language chosen is either the language that the author feels most comfortable with or widely used language that has many libraries. The decision to use Go was based on several informal sources\cite{HammerPrinciple,LanguageShootout,LoopRecognition,go,clojure,julia} and the following discussion should be seen as opinions rather than facts.
 
 This project should be a reference implementation and should be as readable as possible; languages such as Fortran, C++, Java are probably not the best choices due to their complexity. The project deals with a lot of generic code; this means Clojure, Haskell and OCaml would be useful, but it would require a lot of effort if someone wishes to contribute and doesn't know the language. Languages such as Matlab, Octave or R would be ideal due to their ease of use, but their speed or memory performance is worse than C.
 
 There are newer languages Go, D and Julia that suit the problem better. D is an high performance language that was designed as an replacement for C++, but still has a steep learning curve. Julia is a high-performance dynamic language designed for technical computing, but at the time of starting the project it had significant language runtime bugs. Go is a systems language designed to be simple, but it is worse in performance than D and Julia.
 
-Go seemed to be the best choice due its simplicity, stability and concurrency support. The performance characteristics also seemed good enough. Language simplicity has several benefits: ease of learning, readability and portability. Ease of learning makes contributors can learn the language fast. Readability means that it is a better reference implementation. Portability means that most of the language semantics and structures can be directly translated to other languages if there is a need for better performance.
+Go seemed to be the best choice due its simplicity, stability and concurrency support. The performance characteristics also seemed good enough. Language simplicity has several benefits: ease of learning, readability and simplicity. Ease of learning means people can more easily contribute to the project. Readability means that it serves a better reference implementation. Simplicity means that most of the language semantics and structures can be directly translated to other languages if there is a need for better performance.
 
 In summary, Go is a nice compromise between Python and C. It adds additional rigidity and concurrency primitives and is a simple language.
 
@@ -46,7 +46,7 @@ One problem with flexible algorithms is that there are a lot of ways to be run. 
 
 To avoid this problem we decided to use a \emph{json} file for the program configuration. This format is widely known and well structured. For example a configuration file for pattern discovery in protein sequences:
 
-\begin{lstlisting}
+\begin{file}
 {
     "Dataset": {
         "fore" : { "File" : "$inp$" },
@@ -74,30 +74,30 @@ To avoid this problem we decided to use a \emph{json} file for the program confi
     },
     "Printer" : {
         "Method" : "Formatted",
-        "Format": "Pat?()\tMatches(fore)\tMatches(back)\tHyper(fore,back)\n"
+        "Format": "Pat?()\t...\tHyper(fore,back)\n"
     }
 }
-\end{lstlisting}
+\end{file}
 
-In hindsight \emph{json} for configuration may not be the best option due to rigidity. Users can often forget to add or remove a comma or forget to add quotes. This suggests that formats such as \emph{rson} or \emph{yaml} would be better choices.
+In hindsight \emph{json} for configuration may not be the best option due to rigidity. Users can often forget to add or remove leading commas or forget to add quotes. This suggests that formats such as \emph{rson} or \emph{yaml} would be better choices.
 
 Other problem with configuration files is that they are harder to modify than command-line flags. By mixing command-line flags and configuration files we can get a solution that works better in practice than either of them independently.
 
 One easy way to implement is to add custom syntax into the configuration file:
 
-\begin{lstlisting}
-    "Datasets" : {
-        "fore" : { "File" : "$argument:default$"
-        ...
-\end{lstlisting}
+\begin{file}
+"Datasets" : {
+    "fore" : { "File" : "$argument:default$"
+    ...
+\end{file}
 
 Now some command-flags can be interpreted as replacements into the configuration file. Using \cmdline{spexs2 --conf conf.json argument=other} would transform the configuration file into:
 
-\begin{lstlisting}
-    "Datasets" : {
-        "fore" : { "File" : "other"
-        ...
-\end{lstlisting}
+\begin{file}
+"Datasets" : {
+    "fore" : { "File" : "other"
+    ...
+\end{file}
 
 If no such parameter is given then the default value "main" can be used.
 
@@ -111,23 +111,23 @@ There are analyses that may require many datasets. For example instead of compar
 
 To support multiple datasets we first added a name for each dataset in the configuration:
 
-\begin{lstlisting}
-    "Datasets" : {
-        "A" : { "File" : "$A$" },
-        "B" : { "File" : "$B$" },
-        "C" : { "File" : "$C$" },
-        ...
-\end{lstlisting}
+\begin{file}
+"Datasets" : {
+    "A" : { "File" : "$A$" },
+    "B" : { "File" : "$B$" },
+    "C" : { "File" : "$C$" },
+    ...
+\end{file}
 
 We also use the command-line argument syntax to make it easier to use. Now when we are defining filters we need to specify how exactly they are calculated. For example we can not just say ratio of occurrences in dataset since that would be ambigous. We used syntax similar to function calls in the configuration:
 
-\begin{lstlisting}
-    ...
-    "Extension": {
-        "Outputtable": {
-            "OccurencesRatio(A, B)" : {"min" : 2},
-            ...
-\end{lstlisting}
+\begin{file}
+...
+"Extension": {
+    "Outputtable": {
+        "OccurencesRatio(A, B)" : {"min" : 2},
+        ...
+\end{file}
 
 This allows to clearly see that the occurences ratio between datasets A and B must be at least 2. Obviously we can also define features that take more arguments.
 
@@ -163,15 +163,15 @@ When we first described the query features we showed that filters and interestin
 
 Since most of the features implemented could also be used as a interestingness measure we used a simplification for the "Feature" function definition:
 
-\begin{lstlisting}
+\begin{file}
 type Feature func(q *Query) (float64, string)
-\end{lstlisting}
+\end{file}
 
 Which means that the function returns two types, a real value and a string. In the implementation there are only few features that return arbitrary types so it was easier to convert it into a string. The only place where such features were needed is for printing. For example one of such features is the representation of the pattern.
 
 And an implementation of a Feature constructor:
 
-\begin{lstlisting}
+\begin{file}
 // the count of matching sequences
 func Matches(datasets []int) Feature {
     return func(q *Query) (float64, string) {
@@ -179,7 +179,7 @@ func Matches(datasets []int) Feature {
         return countf(matches, group), ""
     }
 }    
-\end{lstlisting}
+\end{file}
 
 The argument to the function defines over which datasets the resulting function counts matches. To bind this constructor to the configuration we register it and with reflection use the function name as the name used in the configuration file.
 
@@ -187,27 +187,27 @@ The filters can be very similar to features in their implementation. For example
 
 By specifying a minimum or a maximum value for a feature we can turn it into a filter. One way to do it is using a lexical closure. For example:
 
-\begin{lstlisting}
-func MakeFeatureFilter(fn Feature, min float64, max float64) Filter {
+\begin{file}
+func MakeFeatureFilter(fn Feature, min, max float64) Filter {
     return func(q *Query) bool {
         v, _ := feature(q)
         return (min <= v) && (v <= max)
     }
 }
-\end{lstlisting}
+\end{file}
 
-Of course there are some filters that cannot be defined by features hence there is still possibility to make separate filters. For example disallowing a wildcard in the beginning of the pattern.
+There are some filters that cannot be defined by features so there is still a possibility to make separate filters. For example disallowing certain tokens in pattern is defined as a separate filter.
 
 In languages which do not support such composition we could use object composition and/or function pointers.
 
-\section{Synchronized Tree Traversal}
+\section{Synchronized Graph Traversal}
 
-\emph{spexs2} can be seen as a pattern tree traversal algorithm with some extra logic. Implementing search over a tree requires synchronization such that there are only a certain number of workers and that they wouldn't die of starvation.
+\emph{spexs2} can be seen as a pattern tree traversal algorithm with some extra logic. Implementing search over a tree requires synchronization such that there are only a certain number of workers and that they wouldn't die of starvation. For universality we describe the principle for graphs.
 
 Without synchronization the parallel version looks like:
 
 \begin{algorithm}[H]
-    \caption{Tree traversal}
+    \caption{Graph traversal}
 \begin{algorithmic}[1]
     \Ensure{All nodes in tree get processed with fn}
 
@@ -296,7 +296,7 @@ Seeing how the algorithm runs is very useful to get an understanding how the alg
 
 For example:
 
-\begin{lstlisting}
+\begin{file}
 func Spexs(s *Setup) {
     for q, ok := s.In.Pop(); ok {
         trace("started extending %v", q)
@@ -314,13 +314,13 @@ func Spexs(s *Setup) {
         }
     }
 }
-\end{lstlisting}
+\end{file}
 
 Such statements make it harder to read the actual code, also it's hard to modify the statements for debugging or provide different ways of debugging.
 
 We can use lexical closures to make it simpler:
 
-\begin{lstlisting}
+\begin{file}
 type Extender func(q Query) []Query
 
 func AddDebuggingStatements(s *Setup) {
@@ -355,9 +355,11 @@ func Spexs(s *Setup) {
 
 func run(){
     S := CreateSpexsSetup()
-    AddDebuggingStatements(S)
+    if debugMode {
+        AddDebuggingStatements(S)
+    }
     Spexs(S)
 }
-\end{lstlisting}
+\end{file}
 
 We have removed the debugging statements from the algorithm. We could define other "debug statement injectors" that provide different levels of details. This method of course has a slight performance impact due to the additional indirection. This can be extended to provide user interaction and other features.
