@@ -7,7 +7,7 @@
 	\tikzstyle{trace} = [ ->, thick, dashed, bend right, font={\small} ];
 
 
-	\def \seq {x,a,c,g,c,c,g,a,t,c,g,c}
+	\def \seq {X,A,C,G,C,C,G,A,T,C,G,C}
 
 	\foreach \x [count=\xi] in \seq {
 		\ifnum 1 < \xi
@@ -22,10 +22,10 @@
 
 	\node[info] at (0,0.6) {Sequence};
 
-	\tikzstyle{starc} = [ ->, bend right, thin, color=red ];
-    \tikzstyle{starg} = [ ->, bend right, thin, color=blue ];
-    \tikzstyle{stara} = [ ->, bend right, thin, color=green ];
-    \tikzstyle{start} = [ ->, bend right, thin, color=black ];
+	\tikzstyle{starC} = [ ->, bend right, thin, color=red ];
+    \tikzstyle{starG} = [ ->, bend right, thin, color=blue ];
+    \tikzstyle{starA} = [ ->, bend right, thin, color=green ];
+    \tikzstyle{starT} = [ ->, bend right, thin, color=black ];
 
 	\foreach \x [count=\xi] in \seq {
         \foreach \y [count=\yi] in \seq {

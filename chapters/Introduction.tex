@@ -5,27 +5,27 @@
 
 One interesting problem in dataset analysis is the discovery of patterns. Patterns can show how the dataset was formed and how it repeats itself; the patterns can also be characteristic to some particular subset of the data.
 
-For example, a protein motif in a genomic sequence could predict a disease. Patterns in medical diagnoses could show relations between diseases. A repeating pattern in source code could show how the code could be minimized. Patterns in event logs could find causes for error events.
+For example, a protein motif in a genomic sequence could predict a disease. Patterns in medical diagnoses could show relations between diseases. A repeating pattern in source code could show how the code could be minimized. Patterns in event logs could find causes for error events or detect intrusion attempts.
 
 Research in pattern discovery is mainly driven by biology, which means that most of the discovery algorithms have been designed with genomic sequences in mind. The techniques are usually constrained to the genomic sequences, but these algorithms could be useful in other fields as well. Such benefit was already demonstrated by Wespi et al\cite{IntrusionDetection}, where they used a biological sequence pattern discovery algorithm for intrusion detection. Searching new ways of using pattern discovery should be actively researched.
 
-Today, the field of genomic sequences is facing problems caused by the increasing amount of data\cite{HowIsGenomeDoing}. We need to use more computational resources to analyse the continously growing amount of collected data. This means that the pattern discovery algorithms should take advantage of multicore processors, highly parallel processors and clusters.
+Today, the field of genomic sequences is facing problems caused by the increasing amount of data\cite{HowIsGenomeDoing}\insertref{something newer}. We need to use more computational resources to analyse the continously growing amount of collected data. This means that the pattern discovery algorithms should take advantage of multicore processors, highly parallel processors and clusters.
 
 \subsection{Pattern Discovery}
 
-Patterns can occur in different places: images, text, sounds, sequences, graphs, signals and more. The pattern representation can vary depending on the data itself and the parts that the pattern captures. Patterns in graphs can be sub-graphs with some additional info. Patterns represent in images can be a collection of different features.
+Patterns can occur in different types of data: images, text, sounds, sequences, graphs, signals and more. The pattern representation can vary depending on the data itself and the parts that the pattern captures. Patterns in graphs can be sub-graphs with some additional info. Patterns represent in images can be a collection of different features.
 
 Patterns discovery aims to fidn \emph{a priori} unknown patterns that can be considered interesting in some specific aspects; for example, we could look for patterns that occur frequently or have an interesting structure. A pattern that occurs more frequently than expected by chance may be considered interesting. Also, a graph pattern with circular shape may be considered interesting.
 
 When choosing a pattern structure we should take into account the data, expected results and efficiency. For example, theoretically we could choose an abstract pattern structure that can represent all possible patterns, but practically this could be inefficient and irrelevant to the problem. Finding image features from a visualization of sound would not probably produce anything meaningful.
 
-When choosing a pattern rating method we should take into account that many patterns can occur by chance. \hmm A pattern that specifies "contains something" is very frequent although it isn't very meaningful. Many methods have been proposed for comparing patterns, such as pattern occurances, ratio of pattern occurances between datasets, binomial and hypergeometric probability estimate and Z-score.\insertref
+When choosing a pattern rating method we should take into account that many patterns can occur by chance. \hmm A pattern that matches anything is very frequent although it isn't very meaningful. Many methods have been proposed for comparing patterns, such as pattern occurances, ratio of pattern occurances between datasets, binomial and hypergeometric probability estimate and Z-score.\insertref
 
 Although the idea of pattern discovery there are many parameters to choose from and is a difficult problem.
 
 \subsection{Algorithm parallelization}
 
-Taking an existing algorithm and making it parallel can sometimes be easier than writing a parallel algorithm from scratch. Existing algorithms may have already proven themselves in practice and have already good concepts\hmm. Algorithm parallelization can be divided into three subproblems:
+Taking an existing algorithm and making it parallel can sometimes be easier than writing a parallel algorithm from scratch. Existing algorithms may have already proven themselves in practice and are based on good optimization concepts. Algorithm parallelization can be divided into three subproblems:
 
 \begin{enumerate}
 	\item generalizing the algorithm,
@@ -49,6 +49,4 @@ The practical and "ideal" versions of an algorithm can often diverge due to perf
 
 \section{Structure of the thesis}
 
-In this thesis we explore how an algorithm for pattern discovery can be parallelized. We choose an existing algorithm SPEXS\cite{spexs} as a basis and parallelize in three steps.\hmm
-
-In Chapter \ref{c:definitions} we introduce the terminology. In Chapter \ref{c:algorithms} we give an overview of the already existing algorithms and discuss why SPEXS\cite{spexs} was chosen as a base for parallelization. We generalize the SPEXS algorithm in Chapter \ref{c:generalization} and reify it in Chapter \ref{c:parallelization}. We discuss an implementation of the parallelized algorithm in Chapter \ref{c:implementation} and in Chapter \ref{c:results} we show some possible applications and its performance characteristics. The conclusions are presented in Chapter \ref{c:conclusions}.
+In Chapter \ref{c:definitions} we introduce the terminology used throughout the thesis. In Chapter \ref{c:algorithms} we give an overview of the already existing algorithms and discuss reasons for choosing SPEXS\cite{spexs} as a basis for parallelization. We generalize and decompose the SPEXS algorithm in Chapter \ref{c:generalization} and reify it in Chapter \ref{c:parallelization}. We discuss an implementation of the parallelized algorithm in Chapter \ref{c:implementation} and in Chapter \ref{c:results} we show some possible applications and its parallelization benefits. The conclusions are presented in Chapter \ref{c:conclusions}.

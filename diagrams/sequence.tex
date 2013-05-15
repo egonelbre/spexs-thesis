@@ -6,7 +6,7 @@
 	\tikzstyle{extend} = [ ->, double, font={\small}];
 	\tikzstyle{trace} = [ ->, thick, dashed, bend right, font={\small} ];
 
-	\def \seq {x,a,c,g,c,c,g,a,t,c,g,c}
+	\def \seq {X,A,C,G,C,C,G,A,T,C,G,C}
 
 	\foreach \x [count=\xi] in \seq {
 		\ifnum 1 < \xi
@@ -23,16 +23,16 @@
 	\node[info] at (0,-0.7) {Matches};
 	\node[info] at (0,-1.5) {Querys};
 
-	\node[query](cg)  at (0,-2) {cg};
-	\node[query](cga) at (0,-3) {cga};
-	\node[query](cgc) at (0,-4) {cgc};
+	\node[query](CG)  at (0,-2) {CG};
+	\node[query](CGA) at (0,-3) {CGA};
+	\node[query](CGC) at (0,-4) {CGC};
 
-	\tikzstyle{tracecg} = [ ->, thick, dashed, bend right, color=black ];
-	\tikzstyle{tracecga} = [ ->, thick, dashdotted, bend right, color=red ];
-	\tikzstyle{tracecgc} = [ ->, thick, dotted, bend right, color=blue ];
+	\tikzstyle{tracecG} = [ ->, thick, dashed, bend right, color=black ];
+	\tikzstyle{tracecGA} = [ ->, thick, dashdotted, bend right, color=red ];
+	\tikzstyle{tracecGC} = [ ->, thick, dotted, bend right, color=blue ];
 
-	\draw[extend, bend right] (cg) to (cga);
-	\draw[extend, bend right] (cg) to (cgc);
+	\draw[extend, bend right] (CG) to (CGA);
+	\draw[extend, bend right] (CG) to (CGC);
 
 	\foreach \xi/\xv in {4/cg,7/cg,11/cg} {
 		\node[draw, below of=\xi, node distance=2em] (p\xi) {};

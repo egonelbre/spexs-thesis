@@ -6,7 +6,7 @@
 	\tikzstyle{extend} = [ ->, double, font={\small}];
 	\tikzstyle{trace} = [ ->, thick, dashed, bend right, font={\small} ];
 
-	\def \seq {x,a,c,g,c,c,g,a,t,c,g,c}
+	\def \seq {X,A,C,G,C,C,G,A,T,C,G,C}
 
 	\foreach \x [count=\xi] in \seq {
 		\ifnum 1 < \xi
@@ -29,21 +29,21 @@
 	\node[info] at (0,-0.7) {Matches};
 	\node[info] at (0,-1.5) {Querys};
 
-	\node[query](cg)  at (0,-2) {cg};
-	\node[query](cgx) at (0,-3) {cgx};
+	\node[query](CG)  at (0,-2) {CG};
+	\node[query](CGX) at (0,-3) {CGX};
 
-	\tikzstyle{tracecg} = [ ->, thick, dashed, bend right, color=black ];
-	\tikzstyle{tracecgx} = [ ->, thick, dashdotted, bend right, color=red ];
+	\tikzstyle{tracecG} = [ ->, thick, dashed, bend right, color=black ];
+	\tikzstyle{tracecGX} = [ ->, thick, dashdotted, bend right, color=red ];
 
-	\draw[extend, bend right] (cg) to (cgx);
+	\draw[extend, bend right] (CG) to (CGX);
 
-	\foreach \xi/\xv in {4/cg,7/cg,11/cg} {
+	\foreach \xi/\xv in {4/CG,7/CG,11/CG} {
 		\node[draw, below of=\xi, node distance=2em] (p\xi) {};
 		\draw[point] (p\xi) to (\xi);
 		\draw[trace\xv] (\xv) to (p\xi);
 	}
 
-	\foreach \xi/\xv in {5/cgx,8/cgx,12/cgx} {
+	\foreach \xi/\xv in {5/CGX,8/CGX,12/CGX} {
 		\node[draw, below of=\xi, node distance=2em] (p\xi) {};
 		\draw[point] (p\xi) to (\xi);
 		\draw[trace\xv] (\xv) to (p\xi);
