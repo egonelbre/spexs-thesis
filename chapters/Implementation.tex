@@ -345,9 +345,9 @@ func Spexs(s *Setup) {
         for qx := range extended {
             if s.Extendable(qx) {
                 s.In.Push(qx)
-            }
-            if s.Outputtable(qx) {
-                s.Out.Push(qx)
+                if s.Outputtable(qx) {
+                    s.Out.Push(qx)
+                }
             }
         }
     }

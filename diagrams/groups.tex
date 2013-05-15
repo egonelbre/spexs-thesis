@@ -30,12 +30,12 @@
 	\node[info] at (0,-1.5) {Querys};
 
 	\node[query](CG)  at (0,-2) {CG};
-	\node[query](CGX) at (0,-3) {CGX};
+	\node[query](CGx) at (0,-3) {CGx};
 
-	\tikzstyle{tracecG} = [ ->, thick, dashed, bend right, color=black ];
-	\tikzstyle{tracecGX} = [ ->, thick, dashdotted, bend right, color=red ];
+	\tikzstyle{traceCG} = [ ->, thick, dashed, bend right, color=black ];
+	\tikzstyle{traceCGx} = [ ->, thick, dashdotted, bend right, color=red ];
 
-	\draw[extend, bend right] (CG) to (CGX);
+	\draw[extend, bend right] (CG) to (CGx);
 
 	\foreach \xi/\xv in {4/CG,7/CG,11/CG} {
 		\node[draw, below of=\xi, node distance=2em] (p\xi) {};
@@ -43,7 +43,7 @@
 		\draw[trace\xv] (\xv) to (p\xi);
 	}
 
-	\foreach \xi/\xv in {5/CGX,8/CGX,12/CGX} {
+	\foreach \xi/\xv in {5/CGx,8/CGx,12/CGx} {
 		\node[draw, below of=\xi, node distance=2em] (p\xi) {};
 		\draw[point] (p\xi) to (\xi);
 		\draw[trace\xv] (\xv) to (p\xi);

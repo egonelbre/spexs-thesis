@@ -13,7 +13,7 @@ Here we show examples for the program:
 
 \subsection{Event sequences}
 
-To see whether it would be plausible to analyse event sequences we generated a dataset of 5000 sequences of length 20 to 50. The events [\R{A},\R{B},\R{C},\R{D},\R{F},\R{G},\R{H},\R{I},\R{X},\R{Y},\R{Z}] in the dataset are non-uniformly distributed and additionally there is an error event \R{E}, which will happen if there is a "trigger pattern" \R{X*Y*Z}. Examples of the sequences:
+To see whether it would be plausible to analyse event sequences we generated a dataset of 5000 sequences of length 20 to 50. The events [\R{A},\R{B},\R{C},\R{D},\R{F},\R{G},\R{H},\R{I},\R{X},\R{Y},\R{Z}] in the dataset are non-uniformly distributed and additionally there is an error event \R{E}, which will happen if there is a "trigger pattern" \R{X.*Y.*Z}. Examples of the sequences:
 
 \begin{file}
 # without errors
@@ -28,32 +28,32 @@ IXBBXHBBACYCFHADHGFDACDHCGYABYBHADZE
 AHAFFFGABIXBCAYCBBHBDCDDXZE
 \end{file}
 
-It is easy to notice the distinguishing \R{ZE} part, but the \R{X*Y*} part is very hard to notice, even when you know that it is there.
+It is easy to notice the distinguishing \R{ZE} part, but the \R{X.*Y.*} part is very hard to notice, even when you know that it is there.
 
 To prepare the dataset we extracted sequences into a separate file. Since there can be a lot of patterns by chance we use the whole dataset as a background. This allows us to compare the count of matches in the errors and the whole dataset. If the pattern occurs in both datasets at the same frequency, it is most doesn't distinguish the error dataset.
 
 \begin{file}
-pattern     errors      all            ratio      p-value
-A*Z         330/343     1706/5000      2.818      4.952-126
-B*Z         329/343     1676/5000      2.860      1.041-126
-X*G*Z       254/343     654/5000       5.659      5.511-132
-Y*B*Z       256/343     596/5000       6.258      1.954-142
-X*Y         343/343     1771/5000      2.822      9.879-147
-X*F*Z       274/343     717/5000       5.568      2.409-147
-X*C*Z       285/343     758/5000       5.478      7.304-156
-X*D*Z       281/343     718/5000       5.701      4.570-156
-A*A*Y*Z     250/343     452/5000       8.055      1.304-158
-G*Y*Z       265/343     515/5000       7.494      1.656-166
-F*Y*Z       272/343     522/5000       7.588      1.639-174
-X*A*Z       305/343     811/5000       5.478      1.798-176
-X*B*Z       304/343     785/5000       5.641      1.540-178
-D*Y*Z       281/343     557/5000       7.347      1.066-180
-C*Y*Z       285/343     584/5000       7.107      1.056-181
-B*Y*Z       292/343     610/5000       6.971      2.370-187
-A*Y*Z       300/343     616/5000       7.092      3.163-198
-X*Z         343/343     1054/5000      4.740      1.276-215
-Y*Z         343/343     805/5000       6.204      1.009-249
-X*Y*Z       343/343     343/5000       14.537     0
+pattern      errors      all            ratio      p-value
+A.*Z         330/343     1706/5000      2.818      4.952-126
+B.*Z         329/343     1676/5000      2.860      1.041-126
+X.*G.*Z      254/343     654/5000       5.659      5.511-132
+Y.*B.*Z      256/343     596/5000       6.258      1.954-142
+X.*Y         343/343     1771/5000      2.822      9.879-147
+X.*F.*Z      274/343     717/5000       5.568      2.409-147
+X.*C.*Z      285/343     758/5000       5.478      7.304-156
+X.*D.*Z      281/343     718/5000       5.701      4.570-156
+A.*A.*Y.*Z   250/343     452/5000       8.055      1.304-158
+G.*Y.*Z      265/343     515/5000       7.494      1.656-166
+F.*Y.*Z      272/343     522/5000       7.588      1.639-174
+X.*A.*Z      305/343     811/5000       5.478      1.798-176
+X.*B.*Z      304/343     785/5000       5.641      1.540-178
+D.*Y.*Z      281/343     557/5000       7.347      1.066-180
+C.*Y.*Z      285/343     584/5000       7.107      1.056-181
+B.*Y.*Z      292/343     610/5000       6.971      2.370-187
+A.*Y.*Z      300/343     616/5000       7.092      3.163-198
+X.*Z         343/343     1054/5000      4.740      1.276-215
+Y.*Z         343/343     805/5000       6.204      1.009-249
+X.*Y,*Z      343/343     343/5000       14.537     0
 \end{file}
 
 As we can see this \R{X*Y*Z} pattern can be found very easily. We picked 20 best patterns based on p-value, which was calculated according to hypergeometric distribution.

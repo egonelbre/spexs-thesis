@@ -27,20 +27,20 @@
 	\node[query](CGA) at (0,-3) {CGA};
 	\node[query](CGC) at (0,-4) {CGC};
 
-	\tikzstyle{tracecG} = [ ->, thick, dashed, bend right, color=black ];
-	\tikzstyle{tracecGA} = [ ->, thick, dashdotted, bend right, color=red ];
-	\tikzstyle{tracecGC} = [ ->, thick, dotted, bend right, color=blue ];
+	\tikzstyle{traceCG} = [ ->, thick, dashed, bend right, color=black ];
+	\tikzstyle{traceCGA} = [ ->, thick, dashdotted, bend right, color=red ];
+	\tikzstyle{traceCGC} = [ ->, thick, dotted, bend right, color=blue ];
 
 	\draw[extend, bend right] (CG) to (CGA);
 	\draw[extend, bend right] (CG) to (CGC);
 
-	\foreach \xi/\xv in {4/cg,7/cg,11/cg} {
+	\foreach \xi/\xv in {4/CG,7/CG,11/CG} {
 		\node[draw, below of=\xi, node distance=2em] (p\xi) {};
 		\draw[point] (p\xi) to (\xi);
 		\draw[trace\xv] (\xv) to (p\xi);
 	}
 
-	\foreach \xi/\xv in {5/cgc,8/cga,12/cgc} {
+	\foreach \xi/\xv in {5/CGC,8/CGA,12/CGC} {
 		\node[draw, below of=\xi, node distance=2em] (p\xi) {};
 		\draw[point] (p\xi) to (\xi);
 		\draw[trace\xv] (\xv) to (p\xi);
