@@ -21,7 +21,7 @@ In a document, sentences can be considered as a \emph{dataset}, where a single s
 
 \section{Pattern}
 
-Our aim is to discover repetetive and common structures in data. We call such structures \emph{patterns}. One generic way to define a \emph{pattern} is as a set of all the sub-structures it represents. This means that we can say whether some data sub-structure is represented by a pattern.
+Our aim is to discover repetitive and common structures in data. We call such structures \emph{patterns}. One generic way to define a \emph{pattern} is as a set of all the sub-structures it represents. This means that we can say whether some data sub-structure is represented by a pattern.
 
 The \emph{pattern structure} is usually dependent on the data-structures which it represents. For example, sequence patterns are usually represented as sequences, graph patterns are represented as graphs; but in some situations sequence patterns could also be represented as graphs.
 
@@ -46,7 +46,7 @@ We need to somehow understand where a given pattern $p$ is located in the datase
 Let our dataset be $D = [ \text{\R{ACGT}}, \text{\R{TXCGA}} ]$ and our pattern be $p = \text{\R{C.}}$. The corresponding query is $<D, p, \{ [1,3], [2,4]\}>$, which means that in the sequence 1, pattern $p$ ends at position 3, and in the sequence 2, the pattern ends at position 4.
 \end{exmp}
 
-The position representation is largerly dependent on the dataset and pattern representation, but irrelevant for this generic algorithm.
+The position representation is largely dependent on the dataset and pattern representation, but irrelevant for this generic algorithm.
 
 \subsection{Query features}
 
@@ -56,7 +56,7 @@ Queries can have different properties: length, number of matches in the dataset,
 
 We also need to see how "interesting" one query is compared to the others. \emph{Query interestingness} is a function $f: Query \mapsto Value$ where the $Value$-s are well-ordered. This gives a measure to compare two different queries. We can often represent such interestingness measures as a real number.
 
-We should also be able to somehow specify criterias for query. \emph{Query filter} is a function $f: Query \mapsto Boolean$ and shows whether the query matches the criteria.
+We should also be able to somehow specify criteria for query. \emph{Query filter} is a function $f: Query \mapsto Boolean$ and shows whether the query matches the criteria.
 
 \begin{exmp}
 Pattern occurrences in a document can be considered an interestingness measure. Whether query pattern is at least 3 tokens long is a query filter.
@@ -64,7 +64,7 @@ Pattern occurrences in a document can be considered an interestingness measure. 
 
 \section{Pool}
 
-\emph{Pool} is an abstract datatype for a storing the queries. The only operations that pool must provide is "push", for adding a query, and "pop", for getting a query.
+\emph{Pool} is an abstract data type for a storing the queries. The only operations that pool must provide is "push", for adding a query, and "pop", for getting a query.
 
 \begin{exmp}
 Stacks and queues both satisfy the pool requirement. We could also define pools that store the queries on the disk; it could internally pack or reorder the queries for performance reasons.

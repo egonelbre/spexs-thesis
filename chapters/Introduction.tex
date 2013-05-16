@@ -9,19 +9,17 @@ For example, a protein motif in a genomic sequence could predict a disease. Patt
 
 Research in pattern discovery is mainly driven by biology, which means that most of the discovery algorithms have been designed with genomic sequences in mind. The techniques are usually constrained to the genomic sequences, but these algorithms could be useful in other fields as well. Such benefit was already demonstrated by Wespi et al\cite{IntrusionDetection}, where they used a biological sequence pattern discovery algorithm for intrusion detection. Searching new ways of using pattern discovery should be actively researched.
 
-Today, the field of genomic sequences is facing problems caused by the increasing amount of data\cite{HowIsGenomeDoing}\insertref{something newer}. We need to use more computational resources to analyse the continously growing amount of collected data. This means that the pattern discovery algorithms should take advantage of multicore processors, highly parallel processors and clusters.
+Today, the field of genomic sequences is facing problems caused by the increasing amount of data\cite{BigData,HowIsGenomeDoing}. We need to use more computational resources to analyze the continuously growing amount of collected data. This means that the pattern discovery algorithms should take advantage of multi-core processors, highly parallel processors and clusters.
 
 \subsection{Pattern Discovery}
 
 Patterns can occur in different types of data: images, text, sounds, sequences, graphs, signals and more. The pattern representation can vary depending on the data itself and the parts that the pattern captures. Patterns in graphs can be sub-graphs with some additional info. Patterns represent in images can be a collection of different features.
 
-Patterns discovery aims to fidn \emph{a priori} unknown patterns that can be considered interesting in some specific aspects; for example, we could look for patterns that occur frequently or have an interesting structure. A pattern that occurs more frequently than expected by chance may be considered interesting. Also, a graph pattern with circular shape may be considered interesting.
+Patterns discovery aims to find \emph{a priori} unknown patterns that can be considered interesting in some specific aspects; for example, we could look for patterns that occur frequently or have an interesting structure. A pattern that occurs more frequently than expected by chance may be considered interesting. Also, a graph pattern with circular shape may be considered interesting.
 
 When choosing a pattern structure we should take into account the data, expected results and efficiency. For example, theoretically we could choose an abstract pattern structure that can represent all possible patterns, but practically this could be inefficient and irrelevant to the problem. Finding image features from a visualization of sound would not probably produce anything meaningful.
 
-When choosing a pattern rating method we should take into account that many patterns can occur by chance. \hmm A pattern that matches anything is very frequent although it isn't very meaningful. Many methods have been proposed for comparing patterns, such as pattern occurances, ratio of pattern occurances between datasets, binomial and hypergeometric probability estimate and Z-score.\insertref
-
-Although the idea of pattern discovery there are many parameters to choose from and is a difficult problem.
+When choosing a pattern rating method we should take into account that many patterns can occur by chance. For example, a pattern that matches anything is very frequent although it isn't very meaningful. Many methods have been used for comparing patterns, such as pattern occurrences, ratio of pattern occurrences between datasets, binomial and hypergeometric probability estimate and Z-score.\insertref
 
 \subsection{Algorithm parallelization}
 
@@ -37,7 +35,7 @@ Generalizing the algorithm means loosening the order constraints and using minim
 
 Decomposing the algorithm means dividing it into independent tasks that could be ran in parallel. This also means trying to minimize the interaction and the dependencies between "algorithm pieces".
 
-Reifying the algorithm means finding suitable data structures for parallelization and mapping the independent tasks to different processes. The suitable structures and efficent mapping to processes is dependent on the target hardware architecture. For example data structures involving vector operations work better on highly parallel processors.
+Reifying the algorithm means finding suitable data structures for parallelization and mapping the independent tasks to different processes. The suitable structures and efficient mapping to processes is dependent on the target hardware architecture. For example data structures involving vector operations work better on highly parallel processors.
 
 The generalizing and decomposition steps can also make the algorithm simpler. Generalization makes the algorithm more applicable to other fields, since there are less relations to the original pattern discovery problem.
 
@@ -45,7 +43,7 @@ The generalizing and decomposition steps can also make the algorithm simpler. Ge
 
 We have derived a new parallel algorithm called SPEXS2 for discovering interesting patterns from a set of sequences. We describe SPEXS2 in a generic way and show some possibilities for extending it further.
 
-The practical and "ideal" versions of an algorithm can often diverge due to performance and implementation details, therefore we also explain problems and possible solutions with implementing such algorithm. We also have provided a concise implementation of the algorithm that captures the generic description more closely. Then we show some possible applications for the algorithm and analyse the benefits of parallelization.
+The practical and "ideal" versions of an algorithm can often diverge due to performance and implementation details, therefore we also explain problems and possible solutions with implementing such algorithm. We also have provided a concise implementation of the algorithm that captures the generic description more closely. Then we show some possible applications for the algorithm and analyze the benefits of parallelization.
 
 \section{Structure of the thesis}
 

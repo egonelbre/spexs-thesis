@@ -1,17 +1,67 @@
 \chapter{Approaches to Pattern Discovery}
 \label{c:algorithms}
 
+There have been suggested several ways of organizing patten discovery algorithms\cite{SurveyDNAMotif, SurveyMotifDiscovery, CombinatorialSubtle, Hausler05}. Here we give a overview of the different ideas; for thorough descriptions we suggest "Motif Discovery on Promotor Sequences" by M. Häußler and J. Nicolas\cite{Hausler05} and "A survey of motif discovery methods in an integrated framework" by Sandve and Drabløs\cite{SurveyMotifDiscovery}.
+
+\section{Pattern rating}
+
+There are many ways of comparing patterns to find the "most interesting" pattern. Of course, pairwise comparison is often wasteful and it is better to have a interestingness measure. For practical purposes it is useful to represent that measure with a floating point value.
+
+One useful property an interestingness measure can have is monotonicity when patterns are ordered by length. This means that when we move from a small pattern to a larger pattern the interestingness always either grows or decreases. For example, if we make a pattern more specific the number of matches can only decrease. This can be very helpful for pruning the search space. Mostly monotonic functions could provide probabilistic pruning, but this area doesn't have much research.
+
+\begin{exmp}
+Lets assume we are looking patterns that should have at least 10 matches. If we encounter a pattern \R{ACT} that has 8 matches then we do not have to examine patterns \R{xACT} and \R{ACTx}, where \R{x} is some token from the alphabet.
+\end{exmp}
+
+The most trivial measure for patterns is the number of pattern matches in the dataset. When calculating number of matches we must be aware that we can have multiple matches per sequence. For example, a pattern \R{AA} matches in sequence \R{AAAAAA} 6 times. It is better to count the number of sequences that contain the matches to account for such pathological cases.
+
+Many patterns can occur by chance and removing such false positives from output is important. As previously mentioned a frequent pattern is not necessarily interesting. We can use a reference dataset to compare the frequencies of patterns. There are different possibilities for a reference dataset: background sequence, shuffled input sequences, background Markov-Model, binomial/multinomial models. The background sequence is usually a similar dataset to the dataset we are analyzing; for example, if we select a subset from data for analyzing we can use the rest as a background sequence. If there are no background sequences we can simply shuffle the input sequences to get a "randomized" sample. To preserve more of the data characteristic we can build more complex models for randomization such as hidden Markov Model\cite{RatingMarkovModel} or binomial and multinomial models.
+
+Many rating functions are specified using the reference dataset as a measurement for false positives. One trivial way is to use the ratio between the input sequence occurrence and background sequence occurrences. One problem with ratios is that, if the frequencies are small then the ratios may be very high. Using binomial or hypergeometric model we can estimate how probable is the number of occurrences in input and background dataset. There are also measures Z-score, which estimates how many standard deviations an observation differs from the mean, and $\chi^2$-Value, which estimates whether a frequency distribution differs from theoretical distribution.
+
+If we have several patterns with the same "score" then we can break the "tie" by comparing more measures. One such measure is complexity of a pattern. For example, when we have patterns \R{AATTGGG} and \R{C} and both have the same number of occurrences then the more specific pattern is probably more interesting.
+
+\section{Algorithmic techniques}
+
 \WIP
 
-\section{Combinatorial and Statistical}
+\subsection{Counting sequences}
+
+To find the most frequent sequences the simplest approach is to enumerate all possible sequences with the number of occurrences. A trie or an hash-table can be used for effective storage and lookup for occurrences. We can use the frequency table to prune sequences that are infrequent.
 
 
 
-\section{Iterative and Division}
 
 
 
-\section{Online and Offline}
+
+word counting
+
+combinatorial
+
+sampling
+
+online/offline
+
+iterative
+
+division
+
+alignment
+
+% ==================================================================================
+% ==================================================================================
+% ==================================================================================
+% ==================================================================================
+% ==================================================================================
+% ==================================================================================
+
+
+\subsection{Combinatorial and Statistical}
+
+\subsection{Iterative and Division}
+
+\subsection{Online and Offline}
 
 The algorithms can be online or offline. Online algorithms take a stream input and process it piece-by-piece without having the entire input available from the start. Offline algorithm can examine the whole data immediately as needed.
 

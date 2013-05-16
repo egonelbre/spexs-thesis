@@ -9,7 +9,7 @@ Information about the full source code is in the Appendix \ref{add:spexs2}.
 
 The language choice in a project is very subjective. Usually the language chosen is either the language that the author feels most comfortable with or widely used language that has many libraries. The decision to use Go was based on several informal sources\cite{HammerPrinciple,LanguageShootout,LoopRecognition,go,clojure,julia} and the following discussion should be seen as opinions rather than facts.
 
-This project should be a reference implementation and should be as readable as possible; languages such as Fortran, C++, Java are probably not the best choices due to their complexity. The project deals with a lot of generic code; this means Clojure, Haskell and OCaml would be useful, but it would require a lot of effort if someone wishes to contribute and doesn't know the language. Languages such as Matlab, Octave or R would be ideal due to their ease of use, but their speed or memory performance is worse than C.
+This project should be a reference implementation and should be as readable as possible; languages such as C++, Java are probably not the best choices due to their complexity. The project deals with a lot of generic code; this means Clojure, Haskell and OCaml would be useful, but they would require a lot of effort if someone wishes to contribute and doesn't know the language. Languages such as Matlab, Octave or R would be ideal due to their ease of use, but their speed or memory performance is worse than C.
 
 There are newer languages Go, D and Julia that suit the problem better. D is an high performance language that was designed as an replacement for C++, but still has a steep learning curve. Julia is a high-performance dynamic language designed for technical computing, but at the time of starting the project it had significant language runtime bugs. Go is a systems language designed to be simple, but it is worse in performance than D and Julia.
 
@@ -42,7 +42,7 @@ This structure is universal for algorithm implementations and allows easily to a
 
 \section{Configuration}
 
-One problem with flexible algorithms is that there are a lot of ways to be run. This can lead to having tens or hundereds of command-line flags for the application.
+One problem with flexible algorithms is that there are a lot of ways to be run. This can lead to having tens or hundreds of command-line flags for the application.
 
 To avoid this problem we decided to use a \emph{json} file for the program configuration. This format is widely known and well structured. For example a configuration file for pattern discovery in protein sequences:
 
@@ -79,7 +79,7 @@ To avoid this problem we decided to use a \emph{json} file for the program confi
 }
 \end{file}
 
-In hindsight \emph{json} for configuration may not be the best option due to rigidity. Users can often forget to add or remove leading commas or forget to add quotes. This suggests that formats such as \emph{rson} or \emph{yaml} would be better choices.
+In hindsight \emph{json} for configuration may not be the best option due to rigidity. Users can often forget to add or remove leading commas or forget to add quotes. This suggests that formats such as \emph{rson}\insertref{rson} or \emph{yaml}\insertref{yaml} would be better choices.
 
 Other problem with configuration files is that they are harder to modify than command-line flags. By mixing command-line flags and configuration files we can get a solution that works better in practice than either of them independently.
 
@@ -129,7 +129,7 @@ We also use the command-line argument syntax to make it easier to use. Now when 
         ...
 \end{file}
 
-This allows to clearly see that the occurences ratio between datasets A and B must be at least 2. Obviously we can also define features that take more arguments.
+This allows to clearly see that the occurrences ratio between datasets A and B must be at least 2. Obviously we can also define features that take more arguments.
 
 \section{Pools}
 
@@ -149,13 +149,13 @@ For the output queue a priority queue is the obvious choice since we usually onl
 
 The structure of query required some special consideration. The proposed solution in "Pattern Discovery from Biosequences" was to use a trie for remembering each pattern and then use optimized set for storing locations inside the database. Since the algorithm must now work concurrently using a simple trie was not an option because adding a child to the parent from multiple processes causes a race condition. 
 
-The first approach was to flip the trie, which means instead of parent pointing to the child the child points to the parent. The original tree can be extracted by reversing the links after the algorithm has finished. This started causing problems since we are working in a garbage collected enviornment and each pointer adds overhead to the garbage collection. Rough estimation also suggested that memory benefit from using trie is minimal.
+The first approach was to flip the trie, which means instead of parent pointing to the child the child points to the parent. The original tree can be extracted by reversing the links after the algorithm has finished. This started causing problems since we are working in a garbage collected environment and each pointer adds overhead to the garbage collection. Rough estimation also suggested that memory benefit from using trie is minimal.
 
 The second approach was just to copy the any needed content to the child and not to link them. This worked out very well.
 
 The other problem was how to store the position list. Initially it seemed that a very tightly packed set structure is required to keep the memory usage of the program minimal. This of course would have impacted the performance. This actually turned out not to be the case since all the queries could be packed with any packing algorithm when they are stored in the pools and that had similar memory benefit with a simpler code.
 
-One interesting optimization we found was a related to storing sparse positions. A simple way to implement large bitset is using a hash map to a small bitarray. We use the first bits as the key and the rest store as a position in the bitarray. We know that the occurrences of a pattern are likely to be sparse, hence it is also quite likely there are only bitarrays where only a single bit is set. The soltion is to move last bits to the front of the integer. This makes the last bits to be less uniform and hence the packing will be better. Rough memory testing showed that this made the structure use about 2x less memory.
+One interesting optimization we found was a related to storing sparse positions. A simple way to implement large bitset is using a hash map to a small bit array. We use the first bits as the key and the rest store as a position in the bit array. We know that the occurrences of a pattern are likely to be sparse, hence it is also quite likely there are only bit arrays where only a single bit is set. The solution is to move last bits to the front of the integer. This makes the last bits to be less uniform and hence the packing will be better. Rough memory testing showed that this made the structure use about 2x less memory.
 
 \section{Query features, interestingness and filters}
 
@@ -292,7 +292,7 @@ We use $mutex$ to protect variables and data structures. Semaphore $added$ track
 
 \section{Debugging}
 
-Seeing how the algorithm runs is very useful to get an understanding how the algorithm works. This often can help to either improve the input configuration or debug the program itself. Often such tracing is implemented by adding debug statments.
+Seeing how the algorithm runs is very useful to get an understanding how the algorithm works. This often can help to either improve the input configuration or debug the program itself. Often such tracing is implemented by adding debug statements.
 
 For example:
 

@@ -180,6 +180,6 @@ The extender was shown to work via graphs, practically it is much more reasonabl
 
 From the previous results we can also derive the minimal requirements for the dataset. First we need to get the initial empty query - which means we should be somehow be able to get all the positions where a pattern could start. The other operator is finding the next position and token from a given position. Finding of next positions from a given positions on sequence can be interpreted as a forward iterator.
 
-Since the best way to visualize was on graphs suggests that the \emph{spexs2} algorithm could be made to work on trees and then on graphs. Finding sequential patterns from a tree should be straightforward since the generic algorithm is oblivious to the amount of following tokens any position can have. Graphs can be more difficult since we need to remove duplicates caused by other extensions.
+Since the best way to visualize was on graphs suggests that the \emph{spexs2} algorithm could be made to work on trees and then on graphs. Finding sequential patterns from a tree should be straightforward since the generic algorithm is oblivious to the amount of following tokens any position can have. Graphs are more difficult since we need to remove duplicates caused by extending previous pattern graphs\cite{SubgraphIsomorphism}.
 
 To use this generic version of the SPEXS algorithm we need to 1. choose our pool structures, 2. choose our filters, 3. choose our extender and preparation and 4. dataset implementation.
