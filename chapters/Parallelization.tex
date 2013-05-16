@@ -1,31 +1,31 @@
 \chapter{Parallelization}
 \label{c:parallelization}
 
-Here we discuss different ways how we can reify the algorithm to support parallelism. There are often several ways of making program parallel. Using parallelization means that there is additionally a need for some communication and synchronization to make the processes arrive at the final result. So it is useful to find as many possible parallelizations, but it is not wise to use all of them.
+Here we discuss different ways of reifying the algorithm to support parallelism. There are several ways of making a program parallel. Using parallelization means that there is a need for some communication and synchronization to make the processes reach the final result. So, it is useful to find as many possible parallelizations as possible, but it is not wise to use all of them.
 
 \section{Process}
 
-The main process of the algorithm as described by data flow diagram.\cite{Kahn74,Lee95} Circles denote processes and unfinished rectangles denote data stores.
+This is the main process of the algorithm as described by data flow diagram.\cite{Kahn74,Lee95} Circles denote processes and unfinished rectangles denote data stores.
 
 \begin{figure}[H]
 	\scalebox{0.8}{\input{./diagrams/process.tex}}
 \end{figure}
 
-We can see that the different query extensions do not share a dependency, except the dataset. Since dataset itself is read-only for a given process, it means we can use multiple extender processes. The same applies for extendability and output filter.
+We can see that the different query extension processes do not share a dependency, except the dataset. Dataset itself is read-only in a given process, which means that we can use multiple extender processes. The same applies for extendable and output filter.
 
 \begin{figure}[H]
   \scalebox{0.8}{\input{./diagrams/process2.tex}}
 \end{figure}
 
-We can add more processes in a similar fashion without affecting the end result. Although such concurrency will introduce a source of indeterminism.
+We can add more processes in a similar fashion without affecting the end result. However, such concurrency will introduce a source of indeterminism.
 
 \section{Extending}
 
-The extender can be parallelized via map and reduce concepts\cite{MapReduce,SteeleFold}. The extender was based on two concepts finding the \emph{next} positions from previous pattern position and then group those positions together to find the next queries.
+The extender can be parallelized via map and reduce concepts\cite{MapReduce,SteeleFold}. The extender was based on two concepts: finding the \emph{next} positions from a previous pattern position, and then grouping those positions together to find the next queries.
 
-The finding the next position from a position can be easily implemented via mapping by using the \emph{next} function of the dataset. The grouping requires some attention - the grouping is itself a reduction into a map by key with joining.
+The next positions can easily be found from the previous position via mapping by using the \emph{next} function of the dataset. The grouping requires some extra attention - the grouping is a reduction into a map by a key with joining.
 
-The pseudo-code representation for such function compositions would be very difficult and would require a lot of new syntax. Therefore we present this idea in Clojure\cite{clojure} which should be readable to people who know lisp. We use the reducers library to show how the extension can be implemented.
+Creating a pseudo-code representation of such function compositions would be very difficult and it would require a lot of new syntax. Therefore, we present this idea in Clojure\cite{clojure} which should be readable to people who know lisp. We use the reducers library to show how the extension can be implemented.
 
 \begin{algorithm}[H]
 	\caption{Parallel extender}
@@ -48,22 +48,22 @@ The pseudo-code representation for such function compositions would be very diff
 \end{lstlisting}
 \end{algorithm}
 
-Such approach may not give much improvement on desktop CPUs, since we already can process multiple queries at the same time. This parallelization could be benefitial for highly parallel processors such as GPGPUs or FPGAs.
+Such an approach may not give much improvement on desktop CPUs, since we already can process multiple queries at the same time. This parallelization could be beneficial for highly parallel processors such as GPGPUs or FPGAs.
 
 \section{Distributed processes}
 
-Since the dataset and the process memory consumption can get quite large it would also be benefitial to be able to partition the dataset between multiple machines. This can also help on a single machine since we can interlace running the different processes and store the non-running process in non-volatile memory.
+Since the dataset and the process memory consumption can get quite large it would also be beneficial to partition the dataset between multiple machines. This can also help on a single machine, since we can interlace running the different processes and store the non-running process in non-volatile memory.
 
-The extension results for a given query stays inside the sequence which means we can partition by assigning sequences to separate datasets.
+The extension results for a given query stay inside the sequence, which means that we can partition the dataset by assigning sequences to separate datasets.
 
-The whole dataset is required only for filtering, since even one of the simplest operations ("counting matches in dataset") requires full knowledge of all matches over the dataset. We can calculate partial results and let the filters communicate the results. This could be also done in a seprate process instead of directly communicating.
+The whole dataset is required only for filtering queries, since simplest operations ("counting matches in dataset") require full knowledge of all matches over the dataset. We can calculate partial results and let the filters communicate the results. This could also be done in a separate process instead of using direct communication.
 
 \begin{figure}[H]
 	\scalebox{0.8}{\input{./diagrams/process3.tex}}
 \end{figure}
 
 \begin{exmp}
-For example to see whether some query is over some count limit we first count matches in the partial datasets. Then send the partial results to a each other and add these results together locally. Depending on that result we know how to proceed.
+For example, to see whether some query is over some count limit, we first count matches in the partial datasets. Then the processes exchange the partial results and add these results together locally. Depending on the local result and filter configuration whether to discard or keep the query.
 \end{exmp}
 
-Such distribution could be used to separate the process into more manageable chunks, but adds significant communication overhead.
+Such distribution could be used to separate the process into more manageable chunks, but, at the same time, it adds significant communication overhead.
