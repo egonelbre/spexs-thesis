@@ -40,13 +40,13 @@ We denote the set of all pattern $p$ \emph{matches} in a dataset $D$ as $matches
 
 \section{Query}
 
-We need to somehow understand where a given pattern $p$ is located in the dataset $D$. This compound structure $q = <D, p, matches(p, D)>$ is called a \emph{query}.
+We need to somehow understand where a given pattern $p$ is located in the dataset $D$. This compound structure $q = <D, p, matches(p, D)>$ is called a \emph{query}. The words pattern and query are interexchangable. When talking about pattern parameters then it makes sense to do so only in a specific context, so we are actually talking about the query.
 
 \begin{exmp}
 Let our dataset be $D = [ \text{\R{ACGT}}, \text{\R{TXCGA}} ]$ and our pattern be $p = \text{\R{C.}}$. The corresponding query is $<D, p, \{ [1,3], [2,4]\}>$, which means that in the sequence 1, pattern $p$ ends at position 3, and in the sequence 2, the pattern ends at position 4.
 \end{exmp}
 
-The position representation is largely dependent on the dataset and pattern representation, but irrelevant for this generic algorithm.
+The position representation is largely dependent on the dataset and pattern representation, but irrelevant for this generic algorithm. 
 
 \subsection{Query features}
 
