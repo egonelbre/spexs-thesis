@@ -66,4 +66,4 @@ The whole dataset is required only for filtering queries, since simplest operati
 For example, to see whether some query is over some count limit, we first count matches in the partial datasets. Then the processes exchange the partial results and add these results together locally. Depending on the local result and filter configuration whether to discard or keep the query.
 \end{exmp}
 
-Such distribution could be used to separate the process into more manageable chunks, but, at the same time, it adds significant communication overhead.
+Such distribution could be used to separate the process into more manageable chunks, but, at the same time, it may add significant communication overhead.
