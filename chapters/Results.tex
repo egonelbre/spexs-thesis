@@ -1,15 +1,30 @@
 \chapter{Applications and experimental results}
 \label{c:results}
 
-\WIP
-
 \section{Examples}
 
-Here we show examples for the program:
+Here we show several proof of concept examples of using \emph{spexs2} tool.
 
 \subsection{Genomic sequences}
 
-\todo[inline]{make an example}
+Since the original \emph{SPEXS} algorithm worked on genomic sequences it is appropriate to show it still works on such datasets. Here we show the same pattern discovery as in "Pattern Discovery in From Biosequences"\cite{spexs}.
+
+The search problem was to find overrepresented sequences from a cluster of co-expressed genes than in the set of random sample from updstream sequences in yeast genome.
+
+\begin{file}
+Pattern       Cluster    Background   Ratio                  Binomial Prob.
+GATGAG.T      52/70      63/67        8.37326388888889       4.649859102508886e-37
+G.GATGAG.T    39/49      26/29        14.979423868312757     6.926815045122553e-37
+AAAATTTT      63/77      126/134      5.095363079615049      1.7310014924641316e-33
+AAAA.TTTT     59/86      107/138      5.617283950617284      3.952854803955552e-33
+GATGAG.TG     34/42      23/23        14.74537037037037      7.414032182966375e-32
+G.GATGAG      45/60      54/58        8.456565656565656      1.049499034231607e-31
+AAA.TTTT      79/145     247/345      3.261648745519713      1.281009980470273e-31
+GATGAG.T.A    35/44      28/29        12.551724137931034     2.690462970438308e-30
+TG.AAA.TTT    53/61      93/99        5.808510638297872      8.624022620310813e-30
+\end{file}
+
+Almost the same results were reported by \emph{SPEXS}; there are some variations in the probabilities and background due to the random sample.
 
 \subsection{Event sequences}
 
