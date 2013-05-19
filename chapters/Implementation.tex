@@ -155,7 +155,34 @@ The second approach was just to copy the any needed content to the child and not
 
 The other problem was how to store the position list. Initially it seemed that a very tightly packed set structure is required to keep the memory usage of the program minimal. This of course would have impacted the performance. This actually turned out not to be the case since all the queries could be packed with any packing algorithm when they are stored in the pools and that had similar memory benefit with a simpler code.
 
-One interesting optimization we found was a related to storing sparse positions. A simple way to implement large bitset is using a hash map to a small bit array. We use the first bits as the key and the rest store as a position in the bit array. We know that the occurrences of a pattern are likely to be sparse, hence it is also quite likely there are only bit arrays where only a single bit is set. The solution is to move last bits to the front of the integer. This makes the last bits to be less uniform and hence the packing will be better. Rough memory testing showed that this made the structure use about 2x less memory.
+One interesting memory optimization we found was a related to storing sparse positions. Because there wasn't an memory efficient set implementation for Go we needed to implement an integer set. A trivial way to implement large bitset is using a hash map, where the values are bit-arrays. We use the first bits as the key and the rest store in the bit array. We know that the occurrences of a pattern are likely to be sparse, hence it is also quite likely there are only bit arrays where only a single bit is set. In a sense, this sort of sparse data is the worst case scenario for this implementation. The solution is to swap $k$ lower bits with some $k$ higher bits. This means that the key bits will be less uniform and hence it is more likely that multiple numbers end up in the same bitarray.
+
+For example, lets assume we have 8bit integers and we can store 3 bit numbers in the bitarray. We swap bits 2 and 1 with bits 4 and 3.
+
+\begin{center}
+    \small
+    \begin{tabular}{ | r | l | l | }
+    \hline
+    number & binary & swapped \\
+    index & 76543.210 & 76521.430 \\
+    \hline
+     7 & 00001.011 & 00001.011 \\
+    12 & 00011.000 & 00000.110 \\
+    19 & 00100.011 & 00101.001 \\
+    26 & 00110.010 & 00101.100 \\
+    32 & 01000.000 & 01000.000 \\
+    37 & 01001.001 & 01000.011 \\
+    43 & 01010.011 & 01001.101 \\
+    50 & 01100.010 & 01101.000 \\
+    56 & 01110.000 & 01100.100 \\
+    61 & 01111.001 & 01100.111 \\
+    \hline
+    \end{tabular}    
+\end{center}
+
+We can see that, in the unswapped case, the data structure has the worst case scenario where each number would be stored in a separate bitarray. After swapping the bits we have made them "less uniformly distributed" and reduced the number of bit-arrays from 10 to 7.
+
+Of course, "the best" bit-swapping positions and key/value size vary depending on the numbers being stored. When we are using large integers we can additionally make an additional layer to reduce the memory overhead. In our case, after tuning, it used about 2x less memory than the trivial implementation.
 
 \section{Query features, interestingness and filters}
 
@@ -306,10 +333,10 @@ func Spexs(s *Setup) {
             if s.Extendable(qx) {
                 trace(" > extendable %v" qx)
                 s.In.Push(qx)
-            }
-            if s.Outputtable(qx) {
-                trace(" > outputtable %v" qx)
-                s.Out.Push(qx)
+                if s.Outputtable(qx) {
+                    trace(" > outputtable %v" qx)
+                    s.Out.Push(qx)
+                }
             }
         }
     }

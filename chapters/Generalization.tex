@@ -98,7 +98,7 @@ The simplest case how the \emph{next} function behaves is when we are only looki
 	\input{./diagrams/sequence.tex}
 \end{figure}
 
-Initially we have matches only for query \R{CG}. Then, by taking the \emph{next} token from the sequence we can build up queries \R{CGA} and \R{CGC}.
+Initially we only have query \R{CG}. Then, by taking the \emph{next} token from the sequence we can build up queries \R{CGA} and \R{CGC}, including the match location set.
 
 \subsection{Group tokens}
 
@@ -142,10 +142,10 @@ We can limit the length of the run to speed up the process. Limiting the run len
 
 \subsection{Optimized group tokens}
 
-Instead of immediately extending the group tokens, we can take the output of another extender and combine its results. If we have a group token $\gamma$ that contains $tokens(\gamma)$ then the \emph{matches} for such group is $$matches(p\gamma, D) = \bigcup_{t \in tokens(\gamma)} matches(pt, D) $$.
+Instead of immediately extending the group tokens, we can take the output of another extender and combine its results. If we have a group token $\gamma$ that contains $tokens(\gamma)$ then the match positions for such group is $$positions(p\gamma, D) = \bigcup_{t \in tokens(\gamma)} positions(pt, D) $$.
 
 \begin{exmp}
-A pattern \R{A[CTG]} is located in the document $D$ at positions $matches(\R{AC}, D) + matches(\R{AT}, D) + matches(\R{AG}, D)$.
+A pattern \R{A[CTG]} is located in the document $D$ at positions $positions(\R{AC}, D) + positions(\R{AT}, D) + positions(\R{AG}, D)$.
 \end{exmp}
 
 \subsection{Other possible extensions}
@@ -162,7 +162,7 @@ The graph for such token would look like:
 	\input{./diagrams/star4.tex}
 \end{figure}
 
- Similarly, we can use the same technique that we used for the group tokens, to optimize performance ($matches(pY, D) = matches(p) \cup matches(pY)$, where $Y$ is a token).
+ Similarly, we can use the same technique that we used for the group tokens, to optimize performance ($positions(pY, D) = positions(p) \cup positions(pY)$, where $Y$ is a token).
 
 \subsection{Alternative extensions}
 
