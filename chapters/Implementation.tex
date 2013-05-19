@@ -9,18 +9,15 @@ Information about the full source code is in the Appendix \ref{add:spexs2}.
 
 The language choice in a project is very subjective. Usually the language chosen is either the language that the author feels most comfortable with or widely used language that has many libraries. The decision to use Go was based on several informal sources\cite{HammerPrinciple,LanguageShootout,LoopRecognition,go,clojure,julia} and the following discussion should be seen as opinions rather than facts.
 
-This project should be a reference implementation and should be as readable as possible; languages such as C++, Java are probably not the best choices due to their complexity. The project deals with a lot of generic code; this means Clojure, Haskell and OCaml would be useful, but they would require a lot of effort if someone wishes to contribute and doesn't know the language. Languages such as Matlab, Octave or R would be ideal due to their ease of use, but their speed or memory performance is worse than C.
+This project should be a reference implementation and should be as readable as possible; languages such as C++, Java are probably not the best choices due to their complexity. We need to implement generic code; this means that Clojure, Haskell and OCaml would be useful, but they would require a lot of effort to learn for a newcomer. Languages such as Matlab, Octave or R would be ideal due to their ease of use, but their speed or memory performance is significantly worse than C.
 
 There are newer languages Go, D and Julia that suit the problem better. D is an high performance language that was designed as an replacement for C++, but still has a steep learning curve. Julia is a high-performance dynamic language designed for technical computing, but at the time of starting the project it had significant language runtime bugs. Go is a systems language designed to be simple, but it is worse in performance than D and Julia.
 
-Go seemed to be the best choice due its simplicity, stability and concurrency support. The performance characteristics also seemed good enough. Language simplicity has several benefits: ease of learning, readability and simplicity. Ease of learning means people can more easily contribute to the project. Readability means that it serves a better reference implementation. Simplicity means that most of the language semantics and structures can be directly translated to other languages if there is a need for better performance.
-
-In summary, Go is a nice compromise between Python and C. It adds additional rigidity and concurrency primitives and is a simple language.
+Go seemed to be the best choice due its simplicity, stability and concurrency support. The performance characteristics also seemed good enough. Language simplicity has several benefits. It is easier for new people to contribute to the project. Simplicity means that most of the language semantics can be directly translated to an other language if there are unsolvable problems. In summary, Go seemed a nice compromise between Python and C.
 
 \section{Architecture}
 
-The main criteria for designing program have been described in D. Parnas
-paper "On the Criteria To Be Used in Decomposing Systems into Modules"\cite{Parnas72}. It suggests decomposing into isolated units and parts that are likely to change together.
+The main criteria for designing program have been described in "On the Criteria To Be Used in Decomposing Systems into Modules"\cite{Parnas72}. It suggests decomposing programs into isolated units and parts that are likely to change together.
 
 We chose the following module decomposition for the application:
 
@@ -36,15 +33,11 @@ We chose the following module decomposition for the application:
 \end{description}
 \end{small}
 
-The program starts by interpreting flags, then it marshals configuration file onto an internal data structure, this configuration structure as an input to the setup module. Setup module initializes (as defined by configuration) a reader, a printer and also prepares structures for algorithm. Then the reader reads input to the database. Then the algorithm is activated and finally it is printed out with Printer.
-
-This structure is universal for algorithm implementations and allows easily to add more configuration options, different input formats and different output formats. By changing the configuration, reader and printer we could make it a web service instead of running it on a command line.
+The program starts by interpreting flags, then it marshals configuration file onto an internal data structure, this configuration structure is used as an input to the setup module. Setup module initializes (as defined by configuration) a reader, a printer and also prepares structures for the algorithm. Then the reader reads input into database. Then the algorithm is started. After the algorithm finishes the Printer formats the output. This structure is universal for algorithm implementations and allows easily to add more configuration options, different input formats and different output formats. By changing the configuration, reader and printer we could make it into a web service instead of running it on command line.
 
 \section{Configuration}
 
-One problem with flexible algorithms is that there are a lot of ways to be run. This can lead to having tens or hundreds of command-line flags for the application.
-
-To avoid this problem we decided to use a \emph{json} file for the program configuration. This format is widely known and well structured. For example a configuration file for pattern discovery in protein sequences:
+One problem with flexible algorithms is that it can run in many different ways. This can lead to having tens or hundreds of command-line flags for the application. To avoid this problem we decided to use a \emph{json}\cite{json} file for the program configuration. This format is widely known and well structured. For example a configuration file for pattern discovery in protein sequences:
 
 \begin{file}
 {
@@ -79,11 +72,9 @@ To avoid this problem we decided to use a \emph{json} file for the program confi
 }
 \end{file}
 
-In hindsight \emph{json} for configuration may not be the best option due to rigidity. Users can often forget to add or remove leading commas or forget to add quotes. This suggests that formats such as \emph{rson}\insertref{rson} or \emph{yaml}\insertref{yaml} would be better choices.
+In hindsight \emph{json} for configuration may not be the best option due to its rigidity. Users can often forget to add/remove trailing commas or forget to add quotes. This suggests that formats that are less rigid, such as \emph{yaml}\cite{yaml}, would be a better choice.
 
-Other problem with configuration files is that they are harder to modify than command-line flags. By mixing command-line flags and configuration files we can get a solution that works better in practice than either of them independently.
-
-One easy way to implement is to add custom syntax into the configuration file:
+One other problem with configuration files is that they are harder to modify than command-line flags. By mixing command-line flags and configuration files we can get a solution that works better in practice than either of them independently. One easy way to implement this is to add custom syntax into the configuration file:
 
 \begin{file}
 "Datasets" : {
@@ -91,7 +82,7 @@ One easy way to implement is to add custom syntax into the configuration file:
     ...
 \end{file}
 
-Now some command-flags can be interpreted as replacements into the configuration file. Using \cmdline{spexs2 --conf conf.json argument=other} would transform the configuration file into:
+We can interpret command line flags as replacements into the configuration file. I Using \cmdline{spexs2 --conf conf.json argument=other} would transform the configuration file into:
 
 \begin{file}
 "Datasets" : {
@@ -99,17 +90,15 @@ Now some command-flags can be interpreted as replacements into the configuration
     ...
 \end{file}
 
-If no such parameter is given then the default value "main" can be used.
+If no parameter was given then the default value "default" would be used instead.
 
-Configuration files are also problematic for running the first time. As a user you need to find a configuration file that suits your needs, then modify it and finally run it. To remedy this problem the application can embed sample configuration files so called "profiles" that can be used directly from the command line. This means you can directly use \cmdline{spexs2 -p=protein input=some.data min-p=1.0}.
+Configuration files are also problematic when getting familiar with the tool. As a user you need to find a configuration file that suits your needs, then modify it and finally run it. To remedy this problem the application can embed sample configuration files so called "profiles" that can be used instead. This means you can use \cmdline{spexs2 -p=protein input=some.data min-p=1.0} for simpler cases.
 
 \section{Alphabet and Database}
 
-\emph{spexs2} was designed also to work with texts and words. To support such large alphabets we first needed to map each token to an identifier (an integer) and convert the sequences to a sequence of these identifiers. Unfortunately this is problematic for large datasets since this can take a lot of time as compared to just copying the file to memory.
+\emph{spexs2} was designed also to work with texts and words. To support such large alphabets we first needed to map each token to an identifier (an integer) and convert the sequences to a sequence of these identifiers. There are analyses that require many datasets. For example instead of comparing two datasets at a time you may want to compare multiple datasets at the same time. Supporting multiple datasets in the code is rather trivial, but exposing this to the user is more problematic.
 
-There are analyses that may require many datasets. For example instead of comparing two datasets at a time you may want to compare pair-wise multiple datasets at the same time. Supporting multiple datasets in the code is rather trivial, but exposing this to the user is more interesting.
-
-To support multiple datasets we first added a name for each dataset in the configuration:
+To support multiple datasets we added a name for each dataset in the configuration:
 
 \begin{file}
 "Datasets" : {
@@ -119,7 +108,7 @@ To support multiple datasets we first added a name for each dataset in the confi
     ...
 \end{file}
 
-We also use the command-line argument syntax to make it easier to use. Now when we are defining filters we need to specify how exactly they are calculated. For example we can not just say ratio of occurrences in dataset since that would be ambigous. We used syntax similar to function calls in the configuration:
+We can use the command-line argument syntax to make it easier to use. When we are defining filters we need to specify how to exactly calculate them. For example we can not just say ratio of occurrences since that would be ambigous if there are more than two datasets. Our solution was to use syntax similar to function calls in the configuration. This allows to clearly see that the occurrences ratio between datasets A and B must be at least 2. Obviously we can define features that take more arguments.
 
 \begin{file}
 ...
@@ -129,35 +118,29 @@ We also use the command-line argument syntax to make it easier to use. Now when 
         ...
 \end{file}
 
-This allows to clearly see that the occurrences ratio between datasets A and B must be at least 2. Obviously we can also define features that take more arguments.
-
 \section{Pools}
 
-The input pool can direct the flow of extending process, which in turn can affect performance and memory. The performance doesn't get affected as much because the algorithm is exhaustive and hence every query gets examined, unless it is terminated early or the filters tuned during runtime.
+The input pool can direct the flow of extending process, which in turn can affect performance and memory. The performance doesn't get affected as much because the algorithm is exhaustive and hence every query gets examined, unless it is terminated early or the filters are being tuned during runtime.
 
-There are several ways run the extension process: breadth first, depth first, most frequent first, least frequent first and others. Breadth first and depth first can easily be achieved by a queue and a stack respectively. We can use priority queues to implement other ways of extending.
+There are several ways to run the extension process: breadth first, depth first, most frequent first, least frequent first and others. Breadth first and depth first can easily be achieved by a queue and a stack respectively. We can use priority queues to implement other ways of extending.
 
-The major concern was running on large datasets which meant that the memory consumption important. Although the most frequent first can arrive to the interesting results faster it can also use a lot of memory due to unextended less frequent nodes.
+One major concern is running on large datasets, which means that the memory consumption is very important. Although examining the most frequent query first can reach the interesting results faster, it also uses more memory due to the unextended less frequent queries.
 
-The least frequent approach would minimize the memory use since the least frequent would be most likely to be discarded by filters. This requires the use of a priority queue. The depth first approach would also use little memory but can use a stack.
+Examining the least frequent approach minimizes the memory use, since the least frequent query is most likely to be discarded by filters. But this requires the use of a priority queue. The depth first approach uses less memory than travsing the most frequent first and it can use a stack. Since we need concurrent access to the pool it requires fast push/pop operations. The depth-first ordering is more suitable since push/pop operations are faster than on priority queues.
 
-Since we need concurrent access to the pool it requires very fast adding and removing operations. The depth-first ordering is more suitable since stack operations are faster than priority queues.
-
-For the output queue a priority queue is the obvious choice since we usually only want a limited number of the most interesting results.
+For the output pool a limited size priority queue is the obvious choice, because we need to sort based on some interestingness measure and only the best results are necessary.
 
 \section{Query and Location set}
 
-The structure of query required some special consideration. The proposed solution in "Pattern Discovery from Biosequences" was to use a trie for remembering each pattern and then use optimized set for storing locations inside the database. Since the algorithm must now work concurrently using a simple trie was not an option because adding a child to the parent from multiple processes causes a race condition. 
+The structure of query required some special consideration. The proposed solution in "Pattern Discovery from Biosequences" was to use a trie for remembering each pattern and then use optimized set for storing locations inside the database. Since the algorithm must work concurrently using a simple trie was not an option, because adding a child to the parent from multiple processes can easily cause a race condition.
 
-The first approach was to flip the trie, which means instead of parent pointing to the child the child points to the parent. The original tree can be extracted by reversing the links after the algorithm has finished. This started causing problems since we are working in a garbage collected environment and each pointer adds overhead to the garbage collection. Rough estimation also suggested that memory benefit from using trie is minimal.
+The first approach we tried was to flip the trie, which means that, instead of parent pointing to the child, the child points to the parent. The original tree can be extracted by reversing the links after the algorithm has finished. This started causing problems, because we are working in a garbage collected environment and each pointer adds overhead to the garbage collection. Rough estimation also suggested that memory benefit from using trie is minimal. The second approach was to copy any needed content to the child and not have links between them.
 
-The second approach was just to copy the any needed content to the child and not to link them. This worked out very well.
+The other problem was how to store the position set. Initially it seemed that a very tightly packed set structure is required to keep the memory usage of the program minimal. This of course would have impacted the performance. This actually turned out not to be the case since all the queries can be packed with any packing algorithm while they are being stored in a pool and that did have similar memory benefit.
 
-The other problem was how to store the position list. Initially it seemed that a very tightly packed set structure is required to keep the memory usage of the program minimal. This of course would have impacted the performance. This actually turned out not to be the case since all the queries could be packed with any packing algorithm when they are stored in the pools and that had similar memory benefit with a simpler code.
+One interesting memory optimization we found was related to storing sparsely distributed integers. Because there wasn't a memory efficient set implementation for Go, we needed to implement an integer set. A trivial way to implement a large bitset is using a hash map, where the values are bit-arrays. We use the first bits as the key and the rest store in the bit-array. We know that the occurrences of a pattern are likely to be sparse, hence it is also quite likely there are only bit arrays where only a single bit is set. In a sense, this sort of sparse data is the worst case scenario for this implementation. The solution is to swap $k$ lower bits with some $k$ higher bits. This means that the key bits will be more likely to collide, hence it is more likely that multiple numbers end up in the same bit-array.
 
-One interesting memory optimization we found was a related to storing sparse positions. Because there wasn't an memory efficient set implementation for Go we needed to implement an integer set. A trivial way to implement large bitset is using a hash map, where the values are bit-arrays. We use the first bits as the key and the rest store in the bit array. We know that the occurrences of a pattern are likely to be sparse, hence it is also quite likely there are only bit arrays where only a single bit is set. In a sense, this sort of sparse data is the worst case scenario for this implementation. The solution is to swap $k$ lower bits with some $k$ higher bits. This means that the key bits will be less uniform and hence it is more likely that multiple numbers end up in the same bitarray.
-
-For example, lets assume we have 8bit integers and we can store 3 bit numbers in the bitarray. We swap bits 2 and 1 with bits 4 and 3.
+For example, lets assume we have 8bit integers and we can store 3 bit numbers in the bit-array. We swap bits 2 and 1 with bits 4 and 3. We added a "." to show the key-value separation. Here we generated numbers that have a short interval between that is at least larger than 5.
 
 \begin{center}
     \small
@@ -180,23 +163,19 @@ For example, lets assume we have 8bit integers and we can store 3 bit numbers in
     \end{tabular}    
 \end{center}
 
-We can see that, in the unswapped case, the data structure has the worst case scenario where each number would be stored in a separate bitarray. After swapping the bits we have made them "less uniformly distributed" and reduced the number of bit-arrays from 10 to 7.
-
-Of course, "the best" bit-swapping positions and key/value size vary depending on the numbers being stored. When we are using large integers we can additionally make an additional layer to reduce the memory overhead. In our case, after tuning, it used about 2x less memory than the trivial implementation.
+In the unswapped case the data structure would have the worst case scenario, where each number would be stored in a separate bit-array. After swapping the bits we have made them "less uniformly distributed" and reduced the number of bit-arrays from 10 to 7. Of course, "the best" bit-swapping method and key/value size vary depending on the numbers being stored. If we are using large integers we can additionally make an additional layer to reduce the memory overhead. In our case, after tuning, it used about 2x less memory than the trivial implementation.
 
 \section{Query features, interestingness and filters}
 
-When we first described the query features we showed that filters and interestingness are a special case query features. In \emph{spexs2} the features are used to print information about the results.
-
-Since most of the features implemented could also be used as a interestingness measure we used a simplification for the "Feature" function definition:
+When we first described the query features we showed that filters and interestingness are a special case query features. In \emph{spexs2} the features are used to print information about the results. Since most of the implemented \emph{features} can also be used as a interestingness measure we used a simplification for the "Feature" function definition.
 
 \begin{file}
 type Feature func(q *Query) (float64, string)
 \end{file}
 
-Which means that the function returns two types, a real value and a string. In the implementation there are only few features that return arbitrary types so it was easier to convert it into a string. The only place where such features were needed is for printing. For example one of such features is the representation of the pattern.
+This means that the function returns two types, a real value and a string. In the implementation there are only few features that return arbitrary types so it was easier to convert them into a string than let them return a variant type. The only place, where such different features is needed, is for printing. For example, one of such features is the string representation of the pattern.
 
-And an implementation of a Feature constructor:
+To construct an \emph{Feature} we use a function that takes the datasets as arguments. To bind the constructor to the configuration we register it and use the function name as the name that is used in the configuration file.
 
 \begin{file}
 // the count of matching sequences
@@ -208,11 +187,7 @@ func Matches(datasets []int) Feature {
 }    
 \end{file}
 
-The argument to the function defines over which datasets the resulting function counts matches. To bind this constructor to the configuration we register it and with reflection use the function name as the name used in the configuration file.
-
-The filters can be very similar to features in their implementation. For example a filter for pattern length is similar to the pattern length feature. Although implementing all combinations is possible we can use function composition to avoid such repetition.
-
-By specifying a minimum or a maximum value for a feature we can turn it into a filter. One way to do it is using a lexical closure. For example:
+The filters can be very similar to features in their implementation. For example a filter for pattern length is similar to the pattern length feature. Although implementing all combinations is possible we can use function composition to avoid such repetition. By limiting a feature with a minimum or a maximum value we can turn it into a filter. For example:
 
 \begin{file}
 func MakeFeatureFilter(fn Feature, min, max float64) Filter {
@@ -223,13 +198,11 @@ func MakeFeatureFilter(fn Feature, min, max float64) Filter {
 }
 \end{file}
 
-There are some filters that cannot be defined by features so there is still a possibility to make separate filters. For example disallowing certain tokens in pattern is defined as a separate filter.
-
-In languages which do not support such composition we could use object composition and/or function pointers.
+There are some filters that cannot be defined by features so there is still a possibility to make separate filters. For example, disallowing certain tokens in pattern is defined as a separate filter. In languages which do not support such composition we could use object composition and/or function pointers.
 
 \section{Synchronized Graph Traversal}
 
-\emph{spexs2} can be seen as a pattern tree traversal algorithm with some extra logic. Implementing search over a tree requires synchronization such that there are only a certain number of workers and that they wouldn't die of starvation. For universality we describe the principle for graphs.
+\emph{spexs2} can be seen as a pattern tree traversal algorithm with some extra logic. Implementing parallel search over a tree requires synchronization such that there are only a certain number of workers and that they wouldn't die of starvation. For universality we describe the principle for graphs.
 
 Without synchronization the parallel version looks like:
 
@@ -258,11 +231,10 @@ Without synchronization the parallel version looks like:
 \end{algorithmic}
 \end{algorithm}
 
-This would not work correctly with multiple workers since there are race conditions and the workers can die early due to starvation.
+This would not work correctly with multiple workers since there are race conditions and the workers can die early due to starvation. In the solution \ref{synctravel} we use $mutex$ to protect variables and data structures. Semaphore $added$ tracks how many items are in the $unvisited$ set. If the process terminates $added$ is turned into a turnstile\footnote{Turnstile\cite{semaphores} is a way of using a semaphore for letting through multiple waiters by first releasing a waiting worker and that worker will release one worker.} on line 30 and 13. Variable $workers$ tracks how many workers are busy.
 
-The solution is to control worker startup and only terminate workers if all have finished and there are no more items in unvisited set.
-
-\begin{algorithm}[H]
+\begin{algorithm}
+    \label{synctravel}
     \caption{Synchronized graph traversal}
 \begin{algorithmic}[1]
     \Ensure{All nodes in $graph$ get processed with $fn$}
@@ -277,34 +249,30 @@ The solution is to control worker startup and only terminate workers if all have
         
         \Spawn
             \While{$true$}
-                \State added.wait()
-                \State mutex.lock()
+                \State added.wait() \Comment{wait for an unvisited node}
+                \State mutex.lock() \Comment{protect shared variables}
                 \If{ $terminate$ }
-                    \State added.signal()
+                    \State added.signal() \Comment{let next worker through}
                     \State mutex.unlock()
                     \State{\textbf{break}}
                 \EndIf
-
-                \Let{$node$}{$unvisited$.take()}
+                \Let{$node$}{$unvisited$.take()} \Comment{}
                 \Let{$workers$}{$workers$ + 1}
-                \State mutex.unlock()
-                \Statex
-                \State fn($node$)
-                \Statex
+                \State mutex.unlock() \Comment{release shared variables}
+                \State fn($node$) \Comment{do the actual work}
                 \For{ $child \in$ children($node$) }
-                    \State mutex.lock()
+                    \State mutex.lock() \Comment{protect the unvisited queue}
                     \If{ examine?($child$) }
                         \State $unvisited$.put($child$)
                         \State added.signal()
                     \EndIf
                     \State mutex.unlock()
                 \EndFor
-                \Statex
-                \State mutex.lock()
+                \State mutex.lock() \Comment{protect shared variables}
                 \Let{$workers$}{$workers - 1$}
                 \If{$workers = 0$ and $unvisited = \{\}$}
                     \Let{$terminate$}{true}
-                    \State added.signal()
+                    \State added.signal() \Comment{release a waiting worker}
                 \EndIf
                 \State mutex.unlock()
             \EndWhile
@@ -315,11 +283,9 @@ The solution is to control worker startup and only terminate workers if all have
 \end{algorithmic}
 \end{algorithm}
 
-We use $mutex$ to protect variables and data structures. Semaphore $added$ tracks how many items are in the $unvisited$ set, if the process finally terminates it is turned into a turnstile on line 31 and 13. Variable $workers$ tracks how many workers are busy.
-
 \section{Debugging}
 
-Seeing how the algorithm runs is very useful to get an understanding how the algorithm works. This often can help to either improve the input configuration or debug the program itself. Often such tracing is implemented by adding debug statements.
+Seeing how the algorithm runs is very useful for getting an understanding how the algorithm works. This often can help to either improve the input configuration or debug the program itself. Such tracing is often implemented by adding debug statements.
 
 For example:
 
@@ -343,9 +309,7 @@ func Spexs(s *Setup) {
 }
 \end{file}
 
-Such statements make it harder to read the actual code, also it's hard to modify the statements for debugging or provide different ways of debugging.
-
-We can use lexical closures to make it simpler:
+Such statements make it harder to read the actual code, also it's hard to modify the statements for debugging or/and provide different ways of debugging. We can use lexical closures to make this simpler:
 
 \begin{file}
 type Extender func(q Query) []Query
@@ -389,4 +353,10 @@ func run(){
 }
 \end{file}
 
-We have removed the debugging statements from the algorithm. We could define other "debug statement injectors" that provide different levels of details. This method of course has a slight performance impact due to the additional indirection. This can be extended to provide user interaction and other features.
+As we can see the algorithm doesn't have any debugging statements. We can also define different "debug statement injectors" that provide different information. This method, of course, has a slight impact on performance due to the additional indirection, but only if it is used. This can be extended to provide user interaction and other features.
+
+\section{Comparison with SPEXS}
+
+The implementations of \emph{spexs2} and \emph{spexs} vary significantly. \emph{spexs2} was designed to be generic tool. For comparison: \emph{spexs} has one input format, allows five ways of extending, allows 4 different ways for pattern traversal and allows specifying about 4 different filters; \emph{spexs2} has two input formats, supports large alphabets\footnote{\emph{spexs2} can theoretically support alphabets up to $2^{64}$ tokens.}, has five different ways to extend, has 17 different features and 19 different filters for queries and has customizable output.
+
+It is probably worth mentioning that most of the \emph{query feature} implementations are about 10 lines of code, every \emph{query feature} that returns a floating point value can be used as a \emph{filter}, and each extension method is about 30 lines of code. In summary \emph{spexs2} can be considered a generic tool for sequence pattern discovery, where new features can be added easily.

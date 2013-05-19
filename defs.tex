@@ -14,8 +14,7 @@
     fontfamily=tt,
     gobble=0,
     frame=none,
-    framesep=5mm,
-    baselinestretch=0.8}
+    framesep=5mm}
 
 % algorithm environment
 \newcommand{\sym}{\mathcal}
@@ -29,7 +28,7 @@
 
 % for representing tokens
 \newcommand{\R}[1]{\colorbox{black!15}{\texttt{#1}}}
-\newcommand{\cmdline}[1]{\colorbox{black!15}{\texttt{#1}}}
+\newcommand{\cmdline}[1]{\[\texttt{#1}\]}
 
 % defintions
 
@@ -55,8 +54,6 @@
 
 \newcommand{\eg}{\todo[fancyline]{add examples}}
 \newcommand{\WIP}{\todo[color=blue!40,inline]{Work in progress}}
-
-
 
 \lstset{ %
     basicstyle=\scriptsize,

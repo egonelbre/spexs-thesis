@@ -44,7 +44,7 @@ If we extend each pattern at each step by one we guarantee that we examine all t
 
 Since pools act independently from the rest of the algorithm they are free to reorder, or store the queries on disk, or even discard the queries, if needed. If we wish to get 100 best results the, then the output pool may immediately discard the bad ones.
 
-We can also use different types of structures as pools. For example, using a queue would make the query examining run breadth first, using a stack would make it run depth first. We can use priority queue to choose examine the best queries first in order to reach the interesting results faster as suggested in "Patterns Discovery from Biosequences"\cite{spexs}.
+We can also use different types of structures as pools. For example, using a queue would make the query examining run breadth first, using a stack would make it run depth first. We can use priority queue to choose examine the best queries first in order to reach the interesting results faster as suggested in "Pattern Discovery from Biosequences"\cite{spexs}.
 
 \section{Filtering}
 
@@ -53,7 +53,7 @@ Filtering allows us to reduce the number of queries we have to examine and enabl
 The filters can make the decision, whether the query should be extended, based on any available information, for example, query pattern, number of occurrences, metadata in sequences, metadata in dataset or configuration data.
 
 \begin{exmp}
-\hmm{use input vs background}We can add metadata about the sequence origin dataset. We count the occurences of a query in each origin separately and then if the ratio between origin dataset counts is smaller than some number defined in the configuration we can discard it from output.
+Whether a sequence belongs to the input or the background dataset can be considered metadata. We count the occurences of a pattern in each origin separately and then, if the ratio between origin dataset counts is larger than some number defined in the configuration, we can add it to output pool.
 \end{exmp}
 
 Although only one filter "function" has been specified in the algorithm the filter can be a composite of multiple filters.

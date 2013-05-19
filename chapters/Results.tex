@@ -3,32 +3,30 @@
 
 \section{Examples}
 
-Here we show several proof of concept examples of using \emph{spexs2} tool.
+Here we show several proof of concept examples for using the \emph{spexs2} tool.
 
 \subsection{Genomic sequences}
 
-Since the original \emph{SPEXS} algorithm worked on genomic sequences it is appropriate to show it still works on such datasets. Here we show the same pattern discovery as in "Pattern Discovery in From Biosequences"\cite{spexs}.
-
-The search problem was to find overrepresented sequences from a cluster of co-expressed genes than in the set of random sample from updstream sequences in yeast genome.
+The original SPEXS algorithm worked on genomic sequences, so it is appropriate to show that \emph{spexs2} also works on such datasets. Here is a problem that was presented in "Pattern Discovery in From Biosequences"\cite{spexs}. The search problem was to find overrepresented sequences from a cluster of co-expressed genes by comparing them to a set of random samples from upstream sequences in yeast genome.
 
 \begin{file}
-Pattern       Cluster    Background   Ratio                  Binomial Prob.
-GATGAG.T      52/70      63/67        8.37326388888889       4.649859102508886e-37
-G.GATGAG.T    39/49      26/29        14.979423868312757     6.926815045122553e-37
-AAAATTTT      63/77      126/134      5.095363079615049      1.7310014924641316e-33
-AAAA.TTTT     59/86      107/138      5.617283950617284      3.952854803955552e-33
-GATGAG.TG     34/42      23/23        14.74537037037037      7.414032182966375e-32
-G.GATGAG      45/60      54/58        8.456565656565656      1.049499034231607e-31
-AAA.TTTT      79/145     247/345      3.261648745519713      1.281009980470273e-31
-GATGAG.T.A    35/44      28/29        12.551724137931034     2.690462970438308e-30
-TG.AAA.TTT    53/61      93/99        5.808510638297872      8.624022620310813e-30
+Pattern       Cluster    Background   Ratio      Binomial Prob.
+GATGAG.T      52/70      63/67        8.37       4.649e-37
+G.GATGAG.T    39/49      26/29        14.979     6.926e-37
+AAAATTTT      63/77      126/134      5.095      1.731e-33
+AAAA.TTTT     59/86      107/138      5.617      3.952e-33
+GATGAG.TG     34/42      23/23        14.74      7.414e-32
+G.GATGAG      45/60      54/58        8.456      1.049e-31
+AAA.TTTT      79/145     247/345      3.261      1.281e-31
+GATGAG.T.A    35/44      28/29        12.551     2.690e-30
+TG.AAA.TTT    53/61      93/99        5.808      8.624e-30
 \end{file}
 
-Almost the same results were reported by \emph{SPEXS}; there are some variations in the probabilities and background due to the random sample.
+Almost the same results were reported by \emph{spexs}; there are some variations due to the random background sample.
 
 \subsection{Event sequences}
 
-To see whether it would be plausible to analyze event sequences we generated a dataset of 5000 sequences of length 20 to 50. The events [\R{A},\R{B},\R{C},\R{D},\R{F},\R{G},\R{H},\R{I},\R{X},\R{Y},\R{Z}] in the dataset are non-uniformly distributed and additionally there is an error event \R{E}, which will happen if there is a "trigger pattern" \R{X.*Y.*Z}. Examples of the sequences:
+To test, whether it is plausible to analyze event sequences, we generated a dataset of 5000 sequences of length 20 to 50. The events [\R{A}, \R{B}, \R{C}, \R{D}, \R{F}, \R{G}, \R{H}, \R{I}, \R{X}, \R{Y}, \R{Z}] in the dataset are non-uniformly distributed and additionally there is an error event \R{E}, which will happen if there is a "trigger pattern" \R{X.*Y.*Z}. Some examples from the sequences:
 
 \begin{file}
 # without errors
@@ -43,47 +41,41 @@ IXBBXHBBACYCFHADHGFDACDHCGYABYBHADZE
 AHAFFFGABIXBCAYCBBHBDCDDXZE
 \end{file}
 
-It is easy to notice the distinguishing \R{ZE} part, but the \R{X.*Y.*} part is very hard to notice, even when you know that it is there.
+It is easy to notice the \R{ZE} part, but the \R{X.*Y.*} part of the pattern is very hard to notice - even when you know that it is there. 
 
-To prepare the dataset we extracted sequences into a separate file. Since there can be a lot of patterns by chance we use the whole dataset as a background. This allows us to compare the count of matches in the errors and the whole dataset. If the pattern occurs in both datasets at the same frequency, it is most doesn't distinguish the error dataset.
+To prepare the dataset we extracted sequences with errors into a separate file. Since there can be a lot of patterns by chance we use the whole dataset as the background. This allows us to compare the count of matches in the errors and the whole dataset. If the pattern occurs in both datasets at the same frequency it probably isn't an interesting pattern.
 
 \begin{file}
 pattern      errors      all            ratio      p-value
-A.*Z         330/343     1706/5000      2.818      4.952-126
-B.*Z         329/343     1676/5000      2.860      1.041-126
-X.*G.*Z      254/343     654/5000       5.659      5.511-132
-Y.*B.*Z      256/343     596/5000       6.258      1.954-142
-X.*Y         343/343     1771/5000      2.822      9.879-147
-X.*F.*Z      274/343     717/5000       5.568      2.409-147
-X.*C.*Z      285/343     758/5000       5.478      7.304-156
-X.*D.*Z      281/343     718/5000       5.701      4.570-156
-A.*A.*Y.*Z   250/343     452/5000       8.055      1.304-158
-G.*Y.*Z      265/343     515/5000       7.494      1.656-166
-F.*Y.*Z      272/343     522/5000       7.588      1.639-174
-X.*A.*Z      305/343     811/5000       5.478      1.798-176
-X.*B.*Z      304/343     785/5000       5.641      1.540-178
-D.*Y.*Z      281/343     557/5000       7.347      1.066-180
-C.*Y.*Z      285/343     584/5000       7.107      1.056-181
-B.*Y.*Z      292/343     610/5000       6.971      2.370-187
-A.*Y.*Z      300/343     616/5000       7.092      3.163-198
-X.*Z         343/343     1054/5000      4.740      1.276-215
-Y.*Z         343/343     805/5000       6.204      1.009-249
+A.*Z         330/343     1706/5000      2.818      4.952e-126
+B.*Z         329/343     1676/5000      2.860      1.041e-126
+X.*G.*Z      254/343     654/5000       5.659      5.511e-132
+Y.*B.*Z      256/343     596/5000       6.258      1.954e-142
+X.*Y         343/343     1771/5000      2.822      9.879e-147
+X.*F.*Z      274/343     717/5000       5.568      2.409e-147
+X.*C.*Z      285/343     758/5000       5.478      7.304e-156
+X.*D.*Z      281/343     718/5000       5.701      4.570e-156
+A.*A.*Y.*Z   250/343     452/5000       8.055      1.304e-158
+G.*Y.*Z      265/343     515/5000       7.494      1.656e-166
+F.*Y.*Z      272/343     522/5000       7.588      1.639e-174
+X.*A.*Z      305/343     811/5000       5.478      1.798e-176
+X.*B.*Z      304/343     785/5000       5.641      1.540e-178
+D.*Y.*Z      281/343     557/5000       7.347      1.066e-180
+C.*Y.*Z      285/343     584/5000       7.107      1.056e-181
+B.*Y.*Z      292/343     610/5000       6.971      2.370e-187
+A.*Y.*Z      300/343     616/5000       7.092      3.163e-198
+X.*Z         343/343     1054/5000      4.740      1.276e-215
+Y.*Z         343/343     805/5000       6.204      1.009e-249
 X.*Y,*Z      343/343     343/5000       14.537     0
 \end{file}
 
-As we can see this \R{X*Y*Z} pattern can be found very easily. We picked 20 best patterns based on p-value, which was calculated according to hypergeometric distribution.
-
-This example is an ideal situation for the problem and the conclusions should be verified against real world data.
+As we can see this \R{X.*Y.*Z} pattern can be found very easily. We picked 20 best patterns based on p-value, which was calculated according to hypergeometric distribution. This example is an ideal situation and the conclusions should be verified against real world data.
 
 \subsection{Text patterns}
 
-As an example how text patterns could provide useful feedback is to run it on a chapter of thesis. It could find overused words and phrases. To test this claim we ran the algorithm on Chapter \ref{c:implementation}.
+As an example, how text patterns can provide useful feedback, we ran it on a chapter of this thesis. Potentially it can find overused words and phrases. To test this claim we ran the algorithm on Chapter \ref{c:implementation}. 
 
-To prepare the text we separated each sentence to a separate sequence. Then we removed all the non-textual characters and replaced them with spaces. The text was then converted to lowercase. We could additionally stem the text, but it didn't provide any useful improvements for this text.
-
-We use a group $"bind" = [and, or, if, then, else, the, a, an, my]$ do define words that do not carry much meaning.
-
-As a starting point we searched patterns that may have group symbols and are at least 4 patterns long. We limited the output to 10 results:
+To prepare the text we separated each sentence to a separate sequence. Then we removed all the non-textual characters and replaced them with spaces. The text was then converted to lowercase. We additionally tried stemming the text, but it didn't provide any useful improvements for this case. We use a group $"bind" = [and, or, if, then, else, the, a, an, my]$ do define words that do not carry much meaning. First we searched patterns that can have group symbols and are at least 4 tokens long. We limited the output to 10 results:
 
 \begin{file}
 matches  pattern
@@ -99,7 +91,7 @@ matches  pattern
 2        for pattern discovery in
 \end{file}
 
-Repetition of such long word sequences looks very interesting. Further investigation revealed that there was a sentence that was rewritten and the previous version wasn't removed. After removing the repeating sentence we reran and also lowered the pattern length limit to 3.
+Repetition of such long word sequences looks peculiar. Further investigation revealed that there was a sentence that was rewritten and the previous version hadn't been removed. After removing the repeating sentence we reran and also lowered the pattern length limit to 3.
 
 \begin{file}
 matches  pattern
@@ -125,11 +117,11 @@ matches  pattern
 2        the algorithm is
 \end{file}
 
-We see repetitions such as "this means that", "in the configuration", "we can use" and "pattern discover in", which suggests we can improve the text in such places. So it can find rather simple patterns. Usefulness of the algorithm for such natural language processing tasks should be further examined.
+We see repetitions such as "this means that", "in the configuration", "we can use" and "pattern discover in", which suggests we can improve the text at those places. Usefulness of the algorithm for such natural language processing tasks should be further examined.
 
 \section{Performance measurements}
 
-To verify that the parallelization improves the performance we need to see a speedup when using multiple cores. As a comparison we also compare with the original spexs. The exact versions used were \emph{spexs2@6b14edd} compiled with \emph{go1.1rc3} and \emph{spexs.0.2.a01}.
+To verify that the parallelization improves the performance we need to see a speedup when using multiple cores. As a comparison we also compare with the original \emph{spexs}. The exact versions we tested were \emph{spexs2@6b14edd} and \emph{spexs.0.2.a01}. 
 
 For performance analysis we used 400,000 random protein sequences with length 12. Limited number of wildcards to 3 and searched all patterns with at least 5 matches in the dataset. We calculated the average of 5 runs for \emph{spexs} and average of 3 runs for \emph{spexs2}.
 
@@ -220,6 +212,4 @@ For performance analysis we used 400,000 random protein sequences with length 12
 
 The original \emph{spexs} works faster than \emph{spexs2} which is to be expected due to the runtime differences. At single core \emph{spexs2} performance is about 7 times slower than \emph{spexs}. We can expect 2x performance difference due to the Go runtime and compiler. The rest of the difference ~3.5x are most likely due to more general algorithm and some simplifications that were made to increase code readability.
 
-The parallelization has significant benefit up to 20 cores. Amdahl's Law \cite{AmdahlsReval} states that the the parallel algorithms will be limited by their sequential parts; so this falloff is to be expected.
-
-We showed that the algorithm benefits from parallelization although the runtime has significant impact on the performance of the program. Which suggests that \emph{spexs2} performance could be significantly improved with optimizations.
+The parallelization has significant benefit up to 20 cores. Amdahl's Law \cite{AmdahlsReval} states that the the parallel algorithms will be limited by their sequential parts; so this falloff is to be expected. The parallelization is effective, although the runtime has significant impact on the performance. \emph{spexs2} performance can be significantly improved with optimizations\footnote{The focus currently has mainly been simplicity, readability and memory usage.} that weren't implemented due to time constraints.

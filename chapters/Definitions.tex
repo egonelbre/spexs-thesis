@@ -7,7 +7,7 @@ Pattern discovery is a research area aiming to discover unknown patterns in a gi
 
 We use $\Sigma$ to denote the set of tokens in the dataset, an \emph{alphabet}. The \emph{size} of the alphabet is $|\Sigma|$. \emph{Tokens} can be numbers, letters, words or sentences or any other fixed element.
 
-Any sequence $S=a_1 a_2 ... a_n, \forall a_i \in \Sigma$ is called a \emph{sequence} over the alphabet $\Sigma$. If the length of the string is $0$, it is called an empty sequence or $\epsilon$.
+Any sequence $S=a_1 a_2 ... a_n, \forall a_i \in \Sigma$ is called a \emph{sequence} over the alphabet $\Sigma$. We denote the \emph{length} of sequence with $|S|$. If the length $|S|$ of the sequence $S$ is $0$, it is called an empty sequence or $\epsilon$.
 
 \begin{exmp}
 \R{ACGTGCCATC} is a sequence over $\Sigma = \{\R{A}, \R{C}, \R{G}, \R{T}\}$.
@@ -21,7 +21,7 @@ In a document, sentences can be considered as a \emph{dataset}, where a single s
 
 \section{Pattern}
 
-Our aim is to discover repetitive and common structures in data. We call such structures \emph{patterns}. One generic way to define a \emph{pattern} is as a set of all the sub-structures it represents. This means that we can say whether some data sub-structure is represented by a pattern.
+Our aim is to discover repetitive and characteristic structures in data. We call such structures \emph{patterns}. One generic way to define a \emph{pattern} is as a set of all the sub-structures it represents. This means that we can say whether some data sub-structure is represented by a pattern.
 
 The \emph{pattern structure} is usually dependent on the data-structures which it represents. For example, sequence patterns are usually represented as sequences, graph patterns are represented as graphs; but in some situations sequence patterns could also be represented as graphs.
 
@@ -36,7 +36,7 @@ In this thesis we only consider sequential pattern structures and use \emph{patt
 \{ \R{AA}, \R{AT}, \R{CA}, \R{CT}, \R{GA}, \R{GT}, \R{TA}, \R{TT}\}; it matches \R{CCTC} and exactly matches \R{AT}.	
 \end{exmp}
 
-We denote the set of all pattern $p$ match \emph{position} in a dataset $D$ as $positions(p, D)$. The exact representation of a single position depends on the pattern structure. For sequences it can be simply a tuple of sequence number, the starting and end position. For graphs this can be represented as a mapping of a pattern to the graph.
+We denote the set of all pattern $p$ matching positions in a dataset $D$ as $positions(p, D)$. The exact representation of a single position depends on the pattern structure. For sequences it can be simply a tuple of sequence number, the starting and end position. For graphs this can be represented as a mapping of the pattern to the graph.
 
 \section{Query}
 
@@ -73,5 +73,5 @@ Stacks and queues both satisfy the pool requirement. We could also define pools 
 In this thesis, \emph{pattern discovery} is defined as a process for finding, according to a query interestingness measure, the most interesting subset of sequential patterns that meet certain criteria in a sequence dataset.
 
 \begin{exmp}
-Let our research problem be "Finding the most common nucleotide patterns, which are at least 3 nucleotides long, from a shotgun sequencing output.".\emph{Most common} defines our interestingness measure. \emph{At least 3 nucleotides} is the criteria for selecting a subset of patterns. \emph{Sequencing output} is used as our dataset and \emph{nucleotides} define how the sequence looks like.
+Let our research problem be "Finding the most common nucleotide patterns, which are at least 3 nucleotides long, from a shotgun sequencing output." \emph{"Most common"} defines our interestingness measure. \emph{"At least 3 nucleotides"} is the criteria for selecting a subset of patterns. \emph{"Sequencing output"} is used as our dataset and \emph{"nucleotides"} define how the sequence looks like.
 \end{exmp}
