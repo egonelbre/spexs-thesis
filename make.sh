@@ -8,6 +8,7 @@ pdflatex $FLAGS --shell-escape main
 biber main
 pdflatex $FLAGS main
 pdflatex -quiet main
+pdflatex -quiet main
 
 cp main.pdf ../Thesis.pdf
 

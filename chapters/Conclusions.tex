@@ -5,16 +5,19 @@ In this thesis we analyzed how to develop a parallel pattern discovery algorithm
 
 As a practical part we implemented a parallelized algorithm based on \emph{spexs}\cite{spexs}. We discussed several problems of implementing an algorithm and interesting approaches to these problems. The program has been designed to be easily extendable for different inputs, filters and interestingness criteria. We discussed different possible uses for the implementation and analyzed the performance gained from parallelization.
 
-Further work on \emph{spexs2} should investigate the best configurations for different applications. We discussed that \emph{spexs2} could be made to find tree and graph patterns, which could be an interesting research topic.
-
 Approaches suggested in this thesis could be used to generalize and parallelize other algorithms. Finding generic algorithms can be an easy way of discovering new optimizations, new algorithms and new potential applications for algorithms. If these generalizations can be implemented practically, we make the implementation easily extendable and also usable for a wider range of problems.
 
-\chapter{Resümee}
+\chapter*{Paralleelne Mustriotsing}
 \label{c:kokkuvote}
+\addcontentsline{toc}{chapter}{\numberline{}Kokkuvõte}
 
-Selles töös uurisime kuidas arendada paralleelset mustrituvastus algoritmi. Näitasime kuidas võtta olemasolev algoritm ning paralleliseerida seda üldistades, liigendades ja reifitseerides. Algoritmi üldistamine võib tuua esile intuitiivse algoritmi interpretatsiooni. Liigendatud algoritmis on võimalik iga osa eraldi käsitleda ilma algoritmi enda tulemust muutmata. Asendades iga osa paralleelsete struktuuride ja algoritmidega saamegi paralleelse algoritmi.
+\begin{flushleft}
+  {\large Egon Elbre } \\[2mm]
+  {\large Magistritöö } \\[6mm]
+\end{flushleft}
 
-Praktilise osana implementeerisime paralleliseeritud algoritmi \emph{spexs2} võttes aluseks algoritmi SPEXS\cite{spexs}. Arutlesime erinevate probleemide üle, mis tekkisid algoritmi implementeerimisel. Programmi on võimalik laiendada lihtsalt erinevate sisend andmetega, otsingu filtritega ja huvitavus kriteeriumitega. Pakkusime välja erinevaid kasutusvõimalusi ning analüüsisime paralleliseerimisest saavutatud kiirusevõitu.
+Selles töös uurisime, kuidas arendada paralleelset mustrituvastus algoritmi. Näitasime, kuidas võtta olemasolev algoritm ning paralleliseerida see üldistades, liigendades ja reifitseerides. Algoritmi üldistamine võib tuua esile intuitiivse algoritmi interpretatsiooni. Liigendatud algoritmis on võimalik iga osa eraldi käsitleda algoritmi tulemust muutmata. Asendades iga osa paralleelsete struktuuride ja algoritmidega, saamegi paralleelse algoritmi.
 
-Selles töös tutvustatud ideid saab kasutada algoritmide üldistamisel ja paralleliseerimisel. Üldistades algoritmi on võimalik leida uusi viise kuidas algoritmi optimeerida, uusi algoritme ja uusi võimalikke kasutusvaldkondi sellele algoritmile. Kui need üldistused implementeerida siis saame programmi, mida on lihtne laiendada ning, mis on kasutatav erinevate probleemide jaoks.
+Praktilise osana implementeerisime paralleliseeritud algoritmi \emph{spexs2} võttes aluseks algoritmi SPEXS\cite{spexs}. Seejärel arutlesime erinevate probleemide üle, mis tekkisid algoritmi implementeerimisel. \emph{spexs2}-te on võimalik laiendada erinevate sisendandmetega, otsingufiltritega ja huvitavuskriteeriumitega. Pakkusime välja erinevaid algoritmi kasutusvõimalusi ning analüüsisime paralleliseerimise tulemusel saavutatud kiirusevõitu.
 
+Selles töös tutvustatud ideid saab kasutada algoritmide üldistamisel ja paralleliseerimisel. Algoritmi üldistamisel on võimalik leida uusi viise kuidas algoritmi optimeerida ning avastada uusi algoritme ja leida uusi kasutusvaldkondi sellele algoritmile. Üldistused implementeerimisel saame programmi, mida on lihtne laiendada ning mida saab kasutada erinevate probleemide lahendamiseks.

@@ -231,11 +231,11 @@ Without synchronization the parallel version looks like:
 \end{algorithmic}
 \end{algorithm}
 
-This would not work correctly with multiple workers since there are race conditions and the workers can die early due to starvation. In the solution \ref{synctravel} we use $mutex$ to protect variables and data structures. Semaphore $added$ tracks how many items are in the $unvisited$ set. If the process terminates $added$ is turned into a turnstile\footnote{Turnstile\cite{semaphores} is a way of using a semaphore for letting through multiple waiters by first releasing a waiting worker and that worker will release one worker.} on line 30 and 13. Variable $workers$ tracks how many workers are busy.
+This would not work correctly with multiple workers since there are race conditions and the workers can die early due to starvation. In the algorithm \ref{synctravel} we use $mutex$ to protect variables and data structures. Semaphore $added$ tracks how many items are in the $unvisited$ set. If the process terminates $added$ is turned into a turnstile\footnote{Turnstile\cite{semaphores} is a way of using a semaphore for letting through multiple waiters by first releasing a waiting worker and that worker will release another worker.} on line 30 and 13. Variable $workers$ tracks how many workers are busy.
 
 \begin{algorithm}
-    \label{synctravel}
-    \caption{Synchronized graph traversal}
+\caption{Synchronized graph traversal}
+\label{synctravel}
 \begin{algorithmic}[1]
     \Ensure{All nodes in $graph$ get processed with $fn$}
 
@@ -252,11 +252,11 @@ This would not work correctly with multiple workers since there are race conditi
                 \State added.wait() \Comment{wait for an unvisited node}
                 \State mutex.lock() \Comment{protect shared variables}
                 \If{ $terminate$ }
-                    \State added.signal() \Comment{let next worker through}
+                    \State added.signal() \Comment{let the next worker through}
                     \State mutex.unlock()
                     \State{\textbf{break}}
                 \EndIf
-                \Let{$node$}{$unvisited$.take()} \Comment{}
+                \Let{$node$}{$unvisited$.take()}
                 \Let{$workers$}{$workers$ + 1}
                 \State mutex.unlock() \Comment{release shared variables}
                 \State fn($node$) \Comment{do the actual work}
