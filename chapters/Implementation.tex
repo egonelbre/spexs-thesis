@@ -33,11 +33,11 @@ We chose the following module decomposition for the application:
 \end{description}
 \end{small}
 
-The program starts by interpreting flags, then it marshals configuration file onto an internal data structure, this configuration structure is used as an input to the setup module. Setup module initializes (as defined by configuration) a reader, a printer and also prepares structures for the algorithm. Then the reader reads input into database. Then the algorithm is started. After the algorithm finishes the Printer formats the output. This structure is universal for algorithm implementations and allows easily to add more configuration options, different input formats and different output formats. By changing the configuration, reader and printer we could make it into a web service instead of running it on command line.
+The program starts by interpreting flags, then it marshals the configuration file onto an internal data structure, this configuration structure is used as an input to the setup module. The setup module initializes (as defined by configuration) a reader, a printer and also prepares structures for the algorithm. Then the reader reads the input files into the database. Then the algorithm is started and, finally, the printer formats the results and sends them to the output. This structure is universal for algorithm implementations and it allows adding more configuration options easily, different input formats and different output formats. By changing the configuration, reader and printer we could make it into a web service, instead of running it on command line.
 
 \section{Configuration}
 
-One problem with flexible algorithms is that it can run in many different ways. This can lead to having tens or hundreds of command-line flags for the application. To avoid this problem we decided to use a \emph{json}\cite{json} file for the program configuration. This format is widely known and well structured. For example a configuration file for pattern discovery in protein sequences:
+One problem with flexible algorithms is that it can be run in many different ways. This can lead to us having tens or hundreds of command-line flags for the application. To avoid this problem we decided to use a \emph{json}\cite{json} file for the program configuration. This format is widely known and well structured. For example, a configuration file for pattern discovery in protein sequences:
 
 \begin{file}
 {
@@ -92,11 +92,11 @@ We can interpret command line flags as replacements into the configuration file.
 
 If no parameter was given then the default value "default" would be used instead.
 
-Configuration files are also problematic when getting familiar with the tool. As a user you need to find a configuration file that suits your needs, then modify it and finally run it. To remedy this problem the application can embed sample configuration files so called "profiles" that can be used instead. This means you can use \cmdline{spexs2 -p=protein input=some.data min-p=1.0} for simpler cases.
+Configuration files are also problematic when getting familiar with the tool. As a user you need to find a configuration file that suits your needs, then modify it and finally run it. To remedy this problem the application can embed sample configuration files so called "profiles" that can be used instead. This means you can use the following for simpler cases: \cmdline{spexs2 -p=protein input=some.data min-p=1.0}
 
 \section{Alphabet and Database}
 
-\emph{spexs2} was designed also to work with texts and words. To support such large alphabets we first needed to map each token to an identifier (an integer) and convert the sequences to a sequence of these identifiers. There are analyses that require many datasets. For example instead of comparing two datasets at a time you may want to compare multiple datasets at the same time. Supporting multiple datasets in the code is rather trivial, but exposing this to the user is more problematic.
+\emph{spexs2} was designed also to work with texts and words. To support such large alphabets we first needed to map each token to an identifier (an integer) and convert the sequences to a sequence of these identifiers. There are analyses that require many datasets. For example, instead of comparing two datasets at a time you may want to compare multiple datasets at the same time. Supporting multiple datasets in the code is rather trivial, but exposing this to the user is more problematic.
 
 To support multiple datasets we added a name for each dataset in the configuration:
 
@@ -108,7 +108,7 @@ To support multiple datasets we added a name for each dataset in the configurati
     ...
 \end{file}
 
-We can use the command-line argument syntax to make it easier to use. When we are defining filters we need to specify how to exactly calculate them. For example we can not just say ratio of occurrences since that would be ambigous if there are more than two datasets. Our solution was to use syntax similar to function calls in the configuration. This allows to clearly see that the occurrences ratio between datasets A and B must be at least 2. Obviously we can define features that take more arguments.
+We can use the command-line argument syntax to make it easier to use. When we are defining filters we need to specify how to exactly calculate them. For example, we can not just say ratio of occurrences since that would be ambigous if there are more than two datasets. Our solution was to use syntax similar to function calls in the configuration. This allows us to clearly see that the occurrences ratio between datasets A and B must be at least 2. Obviously we can define features that take more arguments.
 
 \begin{file}
 ...
@@ -120,7 +120,7 @@ We can use the command-line argument syntax to make it easier to use. When we ar
 
 \section{Pools}
 
-The input pool can direct the flow of extending process, which in turn can affect performance and memory. The performance doesn't get affected as much because the algorithm is exhaustive and hence every query gets examined, unless it is terminated early or the filters are being tuned during runtime.
+The input pool can direct the flow of extending process, which, in turn, can affect performance and memory. Performance does not get affected by chaning the poolt type as much because the algorithm is exhaustive and, hence, every query gets examined, unless it is terminated early or the filters are being tuned during runtime.
 
 There are several ways to run the extension process: breadth first, depth first, most frequent first, least frequent first and others. Breadth first and depth first can easily be achieved by a queue and a stack respectively. We can use priority queues to implement other ways of extending.
 
@@ -136,9 +136,9 @@ The structure of query required some special consideration. The proposed solutio
 
 The first approach we tried was to flip the trie, which means that, instead of parent pointing to the child, the child points to the parent. The original tree can be extracted by reversing the links after the algorithm has finished. This started causing problems, because we are working in a garbage collected environment and each pointer adds overhead to the garbage collection. Rough estimation also suggested that memory benefit from using trie is minimal. The second approach was to copy any needed content to the child and not have links between them.
 
-The other problem was how to store the position set. Initially it seemed that a very tightly packed set structure is required to keep the memory usage of the program minimal. This of course would have impacted the performance. This actually turned out not to be the case since all the queries can be packed with any packing algorithm while they are being stored in a pool and that did have similar memory benefit.
+The other problem was how to store the position set. Initially it seemed that a very tightly packed set structure is required to keep the memory usage of the program minimal. This of course would have impacted the performance. This actually turned out not to be the case, since all the queries can be packed with any packing algorithm while they are being stored in a pool and that did have similar memory benefit.
 
-One interesting memory optimization we found was related to storing sparsely distributed integers. Because there wasn't a memory efficient set implementation for Go, we needed to implement an integer set. A trivial way to implement a large bitset is using a hash map, where the values are bit-arrays. We use the first bits as the key and the rest store in the bit-array. We know that the occurrences of a pattern are likely to be sparse, hence it is also quite likely there are only bit arrays where only a single bit is set. In a sense, this sort of sparse data is the worst case scenario for this implementation. The solution is to swap $k$ lower bits with some $k$ higher bits. This means that the key bits will be more likely to collide, hence it is more likely that multiple numbers end up in the same bit-array.
+One interesting memory optimization we found was related to storing sparsely distributed integers. Because we did not find a memory efficient set implementation for Go, we needed to implement one ourselves. A trivial way to implement a large bitset is using a hash map, where the values are bit-arrays. We use the first bits as the key and the rest store in the bit-array. We know that the occurrences of a pattern are likely to be sparse, hence it is also quite likely there are only bit arrays where only a single bit is set. In a sense, this sort of sparse data is the worst case scenario for this implementation. The solution is to swap $k$ lower bits with some $k$ higher bits. This means that the key bits will be more likely to collide, hence it is more likely that multiple numbers end up in the same bit-array.
 
 For example, lets assume we have 8bit integers and we can store 3 bit numbers in the bit-array. We swap bits 2 and 1 with bits 4 and 3. We added a "." to show the key-value separation. Here we generated numbers that have a short interval between that is at least larger than 5.
 
@@ -163,7 +163,7 @@ For example, lets assume we have 8bit integers and we can store 3 bit numbers in
     \end{tabular}    
 \end{center}
 
-In the unswapped case the data structure would have the worst case scenario, where each number would be stored in a separate bit-array. After swapping the bits we have made them "less uniformly distributed" and reduced the number of bit-arrays from 10 to 7. Of course, "the best" bit-swapping method and key/value size vary depending on the numbers being stored. If we are using large integers we can additionally make an additional layer to reduce the memory overhead. In our case, after tuning, it used about 2x less memory than the trivial implementation.
+In the unswapped case the data structure would have the worst case scenario, where each number would be stored in a separate bit-array. After swapping the bits we have made them "less uniformly distributed" and reduced the number of bit-arrays from 10 to 7. Of course, "the best" bit-swapping method and key/value size vary, depending on the numbers being stored. If we are using large integers we can additionally make an additional layer to reduce the memory overhead. In our case, after tuning, it used about 2x less memory than the trivial implementation.
 
 \section{Query features, interestingness and filters}
 
@@ -173,7 +173,7 @@ When we first described the query features we showed that filters and interestin
 type Feature func(q *Query) (float64, string)
 \end{file}
 
-This means that the function returns two types, a real value and a string. In the implementation there are only few features that return arbitrary types so it was easier to convert them into a string than let them return a variant type. The only place, where such different features is needed, is for printing. For example, one of such features is the string representation of the pattern.
+This means that the function returns two types, a real value and a string. In the implementation, there are only a few features that return arbitrary types so it was easier to convert them into a string than let them return a variant type. The only place, where such different features is needed, is for printing. For example, one of such features is the string representation of the pattern.
 
 To construct an \emph{Feature} we use a function that takes the datasets as arguments. To bind the constructor to the configuration we register it and use the function name as the name that is used in the configuration file.
 
@@ -187,7 +187,7 @@ func Matches(datasets []int) Feature {
 }    
 \end{file}
 
-The filters can be very similar to features in their implementation. For example a filter for pattern length is similar to the pattern length feature. Although implementing all combinations is possible we can use function composition to avoid such repetition. By limiting a feature with a minimum or a maximum value we can turn it into a filter. For example:
+The filters can be very similar to features in their implementation. For example, a filter for pattern length is similar to the pattern length feature. Although implementing all combinations is possible we can use function composition to avoid such repetition. By limiting a feature with a minimum or a maximum value we can turn it into a filter. For example:
 
 \begin{file}
 func MakeFeatureFilter(fn Feature, min, max float64) Filter {
@@ -357,6 +357,6 @@ As we can see the algorithm doesn't have any debugging statements. We can also d
 
 \section{Comparison with SPEXS}
 
-The implementations of \emph{spexs2} and \emph{spexs} vary significantly. \emph{spexs2} was designed to be generic tool. For comparison: \emph{spexs} has one input format, allows five ways of extending, allows 4 different ways for pattern traversal and allows specifying about 4 different filters; \emph{spexs2} has two input formats, supports large alphabets\footnote{\emph{spexs2} can theoretically support alphabets up to $2^{64}$ tokens.}, has five different ways to extend, has 17 different features and 19 different filters for queries and has customizable output.
+The implementations of \emph{spexs2} and \emph{spexs} vary significantly. \emph{spexs2} was designed to be a generic tool. In comparison: \emph{spexs} has one input format, allows five ways of extending, allows 4 different ways for pattern traversal and allows specifying about 4 different filters; \emph{spexs2} has two input formats, supports large alphabets\footnote{\emph{spexs2} alphabet size is limited by the size of an integer.}, has five different ways to extend, has 17 different features and 19 different filters for queries and has customizable output.
 
 It is probably worth mentioning that most of the \emph{query feature} implementations are about 10 lines of code, every \emph{query feature} that returns a floating point value can be used as a \emph{filter}, and each extension method is about 30 lines of code. In summary \emph{spexs2} can be considered a generic tool for sequence pattern discovery, where new features can be added easily.

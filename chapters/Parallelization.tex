@@ -1,7 +1,7 @@
 \chapter{Parallelization}
 \label{c:parallelization}
 
-Here we discuss different ways of reifying the algorithm to support parallelism. There are several ways of making a program parallel. Using parallelization means that there is a need for some communication and synchronization to make the processes reach the final result. So, it is useful to find as many possible parallelizations as possible, but it is not wise to use all of them.
+In this chapter we discuss different ways of reifying the algorithm to support parallelism. There are several ways of making a program parallel. Using parallelization means that there is a need for some communication and synchronization to make the processes reach the final result. So, it is useful to find as many possible parallelizations as possible, but it is not wise to use all of them.
 
 \section{Process}
 
@@ -23,7 +23,7 @@ We can add more processes in a similar fashion without affecting the end result.
 
 The extender can be parallelized via map and reduce concepts\cite{MapReduce,SteeleFold}. The extender was based on two concepts: finding the \emph{next} positions from a previous pattern position, and then grouping those positions together to find the next queries.
 
-The next positions can easily be found from the previous position via mapping by using the \emph{next} function of the dataset. The grouping requires some extra attention - the grouping is a reduction into a map by a key with joining.
+The next positions can easily be found from the previous position via mapping, by using the \emph{next} function of the dataset. Grouping requires some extra attention - grouping is a reduction into a map by a key with joining.
 
 Creating a pseudo-code representation of such function compositions would be very difficult and it would require a lot of new syntax. Therefore, we present this idea in Clojure\cite{clojure} which should be readable to people who know lisp. We use the reducers library to show how the extension can be implemented.
 
@@ -52,7 +52,7 @@ Such an approach may not give much improvement on desktop CPUs, since we already
 
 \section{Distributed processes}
 
-Since the dataset and the process memory consumption can get quite large it would also be beneficial to partition the dataset between multiple machines. This can also help on a single machine, since we can interlace running the different processes and store the non-running process in non-volatile memory.
+Since the dataset and the process memory consumption can get quite large, it would also be beneficial to partition the dataset between multiple machines. This can also help on a single machine, since we can interlace running the different processes and store the non-running process in non-volatile memory.
 
 The extension results for a given query stay inside the sequence, which means that we can partition the dataset by assigning sequences to separate datasets.
 
@@ -63,7 +63,7 @@ The whole dataset is required only for filtering queries, since simplest operati
 \end{figure}
 
 \begin{exmp}
-For example, to see whether some query is over some count limit, we first count matches in the partial datasets. Then the processes exchange the partial results and add these results together locally. Depending on the local result and filter configuration whether to discard or keep the query.
+For example, to see whether some query is over some count limit, we first count matches in the partial datasets. Then the processes exchange the partial results and add these results together locally. Depending on the local result and filter configuration, whether to discard or keep the query.
 \end{exmp}
 
 Such distribution could be used to separate the process into more manageable chunks, but, at the same time, it may add significant communication overhead.

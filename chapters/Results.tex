@@ -69,13 +69,13 @@ Y.*Z         343/343     805/5000       6.204      1.009e-249
 X.*Y,*Z      343/343     343/5000       14.537     0
 \end{file}
 
-As we can see this \R{X.*Y.*Z} pattern can be found very easily. We picked 20 best patterns based on p-value, which was calculated according to hypergeometric distribution. This example is an ideal situation and the conclusions should be verified against real world data.
+As we can see, this \R{X.*Y.*Z} pattern can be found very easily. We picked 20 best patterns based on p-value, which was calculated according to hypergeometric distribution. This example is an ideal situation and the conclusions should be verified against real world data.
 
 \subsection{Text patterns}
 
 As an example, how text patterns can provide useful feedback, we ran it on a chapter of this thesis. Potentially it can find overused words and phrases. To test this claim we ran the algorithm on Chapter \ref{c:implementation}. 
 
-To prepare the text we separated each sentence to a separate sequence. Then we removed all the non-textual characters and replaced them with spaces. The text was then converted to lowercase. We additionally tried stemming the text, but it didn't provide any useful improvements for this case. We use a group $"bind" = [and, or, if, then, else, the, a, an, my]$ do define words that do not carry much meaning. First we searched patterns that can have group symbols and are at least 4 tokens long. We limited the output to 10 results:
+To prepare the text we separated each sentence to a separate sequence. Then we removed all the non-textual characters and replaced them with spaces. The text was then converted to lowercase. We additionally tried stemming the text, but it didn't provide any useful improvements for this case. We use a group $"bind" = [and, or, if, then, else, the, a, an, my]$ to define words that do not carry much meaning. First we searched patterns that can have group symbols and are at least 4 tokens long. We limited the output to 10 results:
 
 \begin{file}
 matches  pattern

@@ -25,7 +25,7 @@ Our aim is to discover repetitive and characteristic structures in data. We call
 
 The \emph{pattern structure} is usually dependent on the data-structures which it represents. For example, sequence patterns are usually represented as sequences, graph patterns are represented as graphs; but in some situations sequence patterns could also be represented as graphs.
 
-We denote the set of structures that a pattern structure $p$ defines as $all(p)$. If $\alpha \in all(p)$, where $\alpha$ is a structure then we say that the structure $\alpha$ \emph{matches exactly} the pattern $p$. We say that $\alpha$ \emph{matches} $p$ if any structure from $all(p)$ is a sub-structure of $\alpha$.
+We denote the set of structures that a pattern structure $p$ defines as $all(p)$. If $\alpha \in all(p)$, where $\alpha$ is a structure, then we say that the structure $\alpha$ \emph{matches exactly} the pattern $p$. We say that $\alpha$ \emph{matches} $p$ if any structure from $all(p)$ is a sub-structure of $\alpha$.
 
 In this thesis we only consider sequential pattern structures and use \emph{pattern} in the meaning \emph{sequential pattern structure}. One very common way of describing patterns is by using regular expressions\cite{KleeneRegularSets,RegularExpressions}. In this thesis we use regular expressions to describe the patterns and introduce the regular expression syntax where needed.
 
@@ -36,11 +36,11 @@ In this thesis we only consider sequential pattern structures and use \emph{patt
 \{ \R{AA}, \R{AT}, \R{CA}, \R{CT}, \R{GA}, \R{GT}, \R{TA}, \R{TT}\}; it matches \R{CCTC} and exactly matches \R{AT}.	
 \end{exmp}
 
-We denote the set of all pattern $p$ matching positions in a dataset $D$ as $positions(p, D)$. The exact representation of a single position depends on the pattern structure. For sequences it can be simply a tuple of sequence number, the starting and end position. For graphs this can be represented as a mapping of the pattern to the graph.
+We denote the set of all pattern $p$ matching positions in a dataset $D$ as $positions(p, D)$. The exact representation of a single position depends on the pattern structure. For sequences it can be simply a tuple of the sequence number and the starting and end positions. For graphs this can be represented as a mapping of the pattern to the graph.
 
 \section{Query}
 
-We need to somehow understand where a given pattern $p$ is located in the dataset $D$. This compound structure $q = \langle D, p, positions(p, D) \rangle $ is called a \emph{query}. The words pattern and query are interexchangable. When talking about pattern parameters then it makes sense to do so only in a specific context, so we are actually talking about the query.
+We need to somehow understand where a given pattern $p$ is located in the dataset $D$. This compound structure $q = \langle D, p, positions(p, D) \rangle $ is called a \emph{query}. The words pattern and query are interexchangable. When talking about pattern parameters, then it makes sense to do so only in a specific context, so we are actually talking about the query.
 
 \begin{exmp}
 Let our dataset be $D = [ \text{\R{ACGT}}, \text{\R{TXCGA}} ]$ and our pattern be $p = \text{\R{C.}}$. The corresponding query is $\langle D, p, \{ [1,3], [2,4]\} \rangle$, which means that in the sequence 1, pattern $p$ ends at position 3, and in the sequence 2, the pattern ends at position 4.
@@ -52,12 +52,12 @@ When we talk about how "interesting" a pattern is, we are actually evaluating th
 
 Queries can have different properties: length, number of matches in the dataset, pattern textual representation etc. Such properties can be represented by a function that takes a query as an input and returns the property. Formally a \emph{query feature} is a function $f: Query \mapsto Any$.
 
-We also need to see how "interesting" one query is compared to the others. \emph{Query interestingness} is a function $f: Query \mapsto Value$ where the $Value$-s are well-ordered. This gives a measure to compare two different queries. We can often represent such interestingness measures as a real number.
+We also need to see how "interesting" one query is compared to the others. \emph{Query interestingness} is a function $f: Query \mapsto Value$, where the $Value$-s are well-ordered. This gives a measure to compare two different queries. We can often represent such interestingness measures as a real number.
 
-We should also be able to somehow specify criteria for query. \emph{Query filter} is a function $f: Query \mapsto Boolean$ and shows whether the query matches the criteria.
+We should also be able to somehow specify criteria for a query. \emph{Query filter} is a function $f: Query \mapsto Boolean$ and shows whether the query matches the criteria.
 
 \begin{exmp}
-Pattern occurrences in a document can be considered an interestingness measure. Whether query pattern is at least 3 tokens long is a query filter.
+Pattern occurrences in a document can be considered an interestingness measure. Whether a query pattern is at least 3 tokens long is a query filter.
 \end{exmp}
 
 \section{Pool}
